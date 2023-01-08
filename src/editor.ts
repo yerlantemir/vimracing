@@ -1,4 +1,3 @@
-import { EditorView } from "codemirror";
 import {
   keymap,
   lineNumbers,
@@ -10,7 +9,7 @@ import {
   rectangularSelection,
 } from "@codemirror/view";
 import { defaultKeymap, indentWithTab } from "@codemirror/commands";
-import { Vim, vim } from "@replit/codemirror-vim";
+import { vim } from "@replit/codemirror-vim";
 import { javascript } from "@codemirror/lang-javascript";
 import { MergeView } from "@codemirror/merge";
 
@@ -31,14 +30,14 @@ const doc2 = `
   }
 `;
 
-new MergeView({
+const editor = new MergeView({
   a: {
     doc: doc1,
     extensions: [
       vim(),
       lineNumbers(),
       javascript(),
-      keymap.of([defaultKeymap, indentWithTab]),
+      keymap.of([...defaultKeymap, indentWithTab ]),
       highlightActiveLineGutter(),
       highlightSpecialChars(),
       highlightActiveLine(),
@@ -55,3 +54,6 @@ new MergeView({
   highlightChanges: true,
   gutter: true,
 });
+
+
+export default editor;

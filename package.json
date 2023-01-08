@@ -6,9 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm run build & npm run serve",
-    "build": "node_modules/.bin/rollup -c rollup.config.mjs --watch",
+    "build": "node_modules/.bin/rollup -c rollup.config.js --watch",
     "serve": "node_modules/.bin/http-server dist/ -c-1 -p 3000"
   },
+  "type": "module",
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -18,8 +19,14 @@
     "@codemirror/view": "^6.1.0",
     "@replit/codemirror-vim": "^6.0.1",
     "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/codemirror": "^5.60.6",
     "codemirror": "^6.0.1",
     "http-server": "^14.1.1",
     "rollup": "^3.9.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.0.0",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.4"
   }
 }
