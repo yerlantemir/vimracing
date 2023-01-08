@@ -31,23 +31,14 @@ const doc2 = `
   }
 `;
 
-let editor = new MergeView({
+new MergeView({
   a: {
     doc: doc1,
     extensions: [
       vim(),
       lineNumbers(),
       javascript(),
-      keymap.of([
-        {
-          key: "Escape",
-          run: () => {
-            console.log("ASSDASDASJDASDJ?");
-          },
-        },
-        defaultKeymap,
-        indentWithTab,
-      ]),
+      keymap.of([defaultKeymap, indentWithTab]),
       highlightActiveLineGutter(),
       highlightSpecialChars(),
       highlightActiveLine(),
@@ -58,18 +49,7 @@ let editor = new MergeView({
   },
   b: {
     doc: doc2,
-    extensions: [
-      lineNumbers(),
-      javascript(),
-      // keymap.of([defaultKeymap, indentWithTab]),
-      // vim(),
-      // highlightActiveLineGutter(),
-      // highlightSpecialChars(),
-      // highlightActiveLine(),
-      // dropCursor(),
-      // rectangularSelection(),
-      // drawSelection(),
-    ],
+    extensions: [lineNumbers(), javascript()],
   },
   parent: document.body,
   highlightChanges: true,
