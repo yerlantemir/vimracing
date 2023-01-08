@@ -1,0 +1,25 @@
+{
+  "name": "vimracing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/editor.mjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm run build & npm run serve",
+    "build": "node_modules/.bin/rollup -c rollup.config.mjs --watch",
+    "serve": "node_modules/.bin/http-server dist/ -c-1 -p 3000"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@codemirror/commands": "^6.0.1",
+    "@codemirror/lang-javascript": "^6.1.2",
+    "@codemirror/merge": "github:codemirror/merge",
+    "@codemirror/view": "^6.1.0",
+    "@replit/codemirror-vim": "^6.0.1",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "codemirror": "^6.0.1",
+    "http-server": "^14.1.1",
+    "rollup": "^3.9.1"
+  }
+}
