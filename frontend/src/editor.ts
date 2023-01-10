@@ -6,12 +6,12 @@ import {
   highlightSpecialChars,
   drawSelection,
   dropCursor,
-  rectangularSelection,
-} from "@codemirror/view";
-import { defaultKeymap, indentWithTab } from "@codemirror/commands";
-import { vim } from "@replit/codemirror-vim";
-import { javascript } from "@codemirror/lang-javascript";
-import { MergeView } from "@codemirror/merge";
+  rectangularSelection
+} from '@codemirror/view';
+import { defaultKeymap, indentWithTab } from '@codemirror/commands';
+import { vim } from '@replit/codemirror-vim';
+import { javascript } from '@codemirror/lang-javascript';
+import { MergeView } from '@codemirror/merge';
 
 const doc1 = `
   if (true) {
@@ -37,23 +37,22 @@ const editor = new MergeView({
       vim(),
       lineNumbers(),
       javascript(),
-      keymap.of([...defaultKeymap, indentWithTab ]),
+      keymap.of([...defaultKeymap, indentWithTab]),
       highlightActiveLineGutter(),
       highlightSpecialChars(),
       highlightActiveLine(),
       dropCursor(),
       rectangularSelection(),
-      drawSelection(),
-    ],
+      drawSelection()
+    ]
   },
   b: {
     doc: doc2,
-    extensions: [lineNumbers(), javascript()],
+    extensions: [lineNumbers(), javascript()]
   },
   parent: document.body,
   highlightChanges: true,
-  gutter: true,
+  gutter: true
 });
-
 
 export default editor;

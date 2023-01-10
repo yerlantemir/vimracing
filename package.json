@@ -2,31 +2,26 @@
   "name": "vimracing",
   "version": "1.0.0",
   "description": "",
-  "main": "src/editor.mjs",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npm run build & npm run serve",
-    "build": "node_modules/.bin/rollup -c rollup.config.js --watch",
-    "serve": "node_modules/.bin/http-server dist/ -c-1 -p 3000"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yerlantemir/vimracing.git"
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@codemirror/commands": "^6.0.1",
-    "@codemirror/lang-javascript": "^6.1.2",
-    "@codemirror/merge": "github:codemirror/merge",
-    "@codemirror/view": "^6.1.0",
-    "@replit/codemirror-vim": "^6.0.1",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@types/codemirror": "^5.60.6",
-    "codemirror": "^6.0.1",
-    "http-server": "^14.1.1",
-    "rollup": "^3.9.1"
+  "bugs": {
+    "url": "https://github.com/yerlantemir/vimracing/issues"
   },
+  "homepage": "https://github.com/yerlantemir/vimracing#readme",
   "devDependencies": {
-    "@rollup/plugin-typescript": "^11.0.0",
-    "tslib": "^2.4.1",
-    "typescript": "^4.9.4"
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1"
   }
 }
