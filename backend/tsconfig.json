@@ -7,5 +7,9 @@
         "module": "commonjs",
         "noImplicitAny": true,
         "strict": true
-    }
+    },
+    "exclude": [
+        "dist",
+        "node_modules"
+    ]
 }

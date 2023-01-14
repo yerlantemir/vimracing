@@ -11,7 +11,7 @@ import {
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
-import { MergeView } from '@codemirror/merge';
+import { MergeView, DirectMergeConfig } from '@codemirror/merge';
 
 const doc1 = `
   if (true) {
@@ -30,7 +30,7 @@ const doc2 = `
   }
 `;
 
-const editor = new MergeView({
+const defaultConfig = {
   a: {
     doc: doc1,
     extensions: [
@@ -50,9 +50,15 @@ const editor = new MergeView({
     doc: doc2,
     extensions: [lineNumbers(), javascript()]
   },
-  parent: document.body,
   highlightChanges: true,
   gutter: true
-});
+};
 
-export default editor;
+class Editor extends MergeView {
+  constructor(config?: Partial<DirectMergeConfig>) {
+    console.log({ ...defaultConfig, ...config });
+
+    super({ ...defaultConfig, ...config });
+  }
+}
+export default Editor;
