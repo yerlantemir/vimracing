@@ -11,12 +11,32 @@ app.use(cors());
 
 const rooms: Record<string, Room> = {};
 
+const doc = {
+  start: `
+    if (true) {
+      console.log(hello);
+    }
+    else {
+      console.log(fuck you!)
+    }
+  `,
+  goal: `
+    if (false) {
+      console.log(hello);
+    }
+    else {
+      console.log('fuck you!')
+    }
+  `
+};
+
 app.post('/room/create', (req, res) => {
   const id = uuid();
   rooms[id] = {
     id,
     title: 'random',
-    clients: new Set()
+    users: [],
+    doc
   };
   res.send({
     id
@@ -28,10 +48,44 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const userExistsOnRace = (raceMap: Room, id: string) => {
-  for (const { id: userId } of raceMap.clients) {
+  for (const { userId } of raceMap.users) {
     if (id === userId) return true;
   }
   return false;
+};
+
+const onUserMessage = (data: WebSocket.RawData) => {
+  const request = JSON.parse(data.toString());
+  if (request['event'] === 'CHANGE') {
+    const requestData = request['data'];
+    const raceId = requestData['raceId'];
+    const userId = requestData['id'];
+    const currentDoc = requestData['doc'];
+
+    console.log('HERE', {
+      requestData,
+      raceId,
+      userId,
+      currentDoc,
+      gaol: doc['goal'].trim()
+    });
+    if (raceId && userExistsOnRace(rooms[raceId], userId)) {
+      console.log('CASDkl');
+      const wsConnection = rooms[raceId].users.find(
+        (user) => userId === user.userId
+      )?.connection;
+      if (currentDoc.trim() === doc['goal'].trim()) {
+        wsConnection?.send(
+          JSON.stringify({
+            event: 'WIN',
+            data: {
+              userId
+            }
+          })
+        );
+      }
+    }
+  }
 };
 
 wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
@@ -42,21 +96,29 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
   const userId = definedUserId ?? uuid();
 
   if (!raceId || !rooms[raceId]) {
-    ws.send('404');
+    ws.send(
+      JSON.stringify({
+        status: '404'
+      })
+    );
     return;
   }
 
   if (raceId && !userExistsOnRace(rooms[raceId], userId)) {
-    rooms[raceId].clients.add({
-      id: userId,
+    rooms[raceId].users.push({
+      userId,
       connection: ws
     });
-    console.log('new Race enter', rooms);
   }
+
+  ws.on('message', onUserMessage);
 
   ws.send(
     JSON.stringify({
-      id: userId
+      event: 'RACE_ENTER',
+      status: '200',
+      id: userId,
+      doc
     })
   );
 });

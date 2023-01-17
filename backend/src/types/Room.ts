@@ -1,7 +1,8 @@
-import { WebSocket } from 'ws';
+import { UserConnection } from './User';
 
 export type Room = {
   id: string;
-  clients: Set<{ id: string; connection: WebSocket }>;
+  users: Array<UserConnection>;
   title: string;
+  doc: { start: string; goal: string };
 };
