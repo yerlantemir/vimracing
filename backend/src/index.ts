@@ -1,10 +1,13 @@
-import * as express from 'express';
+import express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import { uuid } from 'uuidv4';
 import { Room } from './types/Room';
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors());
 
 const rooms: Record<string, Room> = {};
 
@@ -24,14 +27,38 @@ const server = http.createServer(app);
 
 const wss = new WebSocket.Server({ server });
 
-wss.on('connection', (ws: WebSocket) => {
-  ws.on('message', (message: string) => {
-    console.log('received: %s', message);
-    ws.send(`Hello, you sent -> ${message}`);
-  });
+const userExistsOnRace = (raceMap: Room, id: string) => {
+  for (const { id: userId } of raceMap.clients) {
+    if (id === userId) return true;
+  }
+  return false;
+};
 
-  //send immediatly a feedback to the incoming connection
-  ws.send('Hi there, I am a WebSocket server');
+wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
+  const urlParams = new URLSearchParams(req.url?.split('?')[1]);
+  const raceId = urlParams.get('raceId');
+  const definedUserId = urlParams.get('userId');
+
+  const userId = definedUserId ?? uuid();
+
+  if (!raceId || !rooms[raceId]) {
+    ws.send('404');
+    return;
+  }
+
+  if (raceId && !userExistsOnRace(rooms[raceId], userId)) {
+    rooms[raceId].clients.add({
+      id: userId,
+      connection: ws
+    });
+    console.log('new Race enter', rooms);
+  }
+
+  ws.send(
+    JSON.stringify({
+      id: userId
+    })
+  );
 });
 
 server.listen(process.env.PORT || 8999, () => {

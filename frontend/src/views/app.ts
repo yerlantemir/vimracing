@@ -1,7 +1,7 @@
 import { Router } from '@vaadin/router';
 import { LitElement, css, html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import './race';
+import { createRoom } from '../api/createRoom';
 
 @customElement('index-root')
 export class Index extends LitElement {
@@ -11,8 +11,10 @@ export class Index extends LitElement {
     }
   `;
 
-  private _onCreateRaceClick() {
-    Router.go('/corridor/123');
+  private async _onCreateRaceClick() {
+    const newRoomId = await createRoom();
+
+    Router.go(`/corridor/${newRoomId}`);
   }
   render() {
     return html`hello there!

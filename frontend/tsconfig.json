@@ -1,23 +1,15 @@
 {
-    "compilerOptions": {
-        "experimentalDecorators": true,
-        "target": "es2017",
-        "module": "esnext",
-        "lib": ["es2017", "dom", "dom.iterable"],
-        "sourceMap": true,
-        "strict": true,
-        "noUnusedLocals": true,
-        "noUnusedParameters": true,
-        "noImplicitReturns": true,
-        "noFallthroughCasesInSwitch": true,
-        "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true,
-        "forceConsistentCasingInFileNames": true,
-        "plugins": [
-          {
-            "name": "ts-lit-plugin",
-            "strict": true
-          }
-        ]
-    },
+  "compilerOptions": {
+    "target": "es2018",                          
+    "module": "esnext",
+    "moduleResolution": "node",                     
+    "noEmitOnError": true,
+    "lib": ["es2017"],                            
+    "strict": true,  
+    "esModuleInterop": false,                 
+    "experimentalDecorators": true,
+    "rootDir": "./src"
+  }
+  ,
+  "include": ["./src/**/*.ts"]
 }

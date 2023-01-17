@@ -1,15 +1,17 @@
 import router from './router';
 
-const outlet = document.querySelector('#root');
+const outlet = document.querySelector('body');
 
 router.setOutlet(outlet);
+
+console.log('ASDASD?');
 
 router.setRoutes([
   {
     path: '/',
     component: 'index-root',
     action: async () => {
-      await import('./app');
+      await import('./views/app');
     }
   },
   {
@@ -17,14 +19,14 @@ router.setRoutes([
     component: 'corridor-view',
 
     action: async () => {
-      await import('./corridor');
+      await import('./views/corridor');
     }
   },
   {
     path: '/race/:raceId',
     component: 'race-view',
     action: async () => {
-      await import('./race');
+      await import('./views/race');
     }
   }
 ]);

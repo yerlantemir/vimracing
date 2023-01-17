@@ -2,6 +2,6 @@ import { WebSocket } from 'ws';
 
 export type Room = {
   id: string;
-  clients: Set<WebSocket>;
+  clients: Set<{ id: string; connection: WebSocket }>;
   title: string;
 };

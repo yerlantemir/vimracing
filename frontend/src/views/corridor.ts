@@ -1,7 +1,7 @@
 import { Router } from '@vaadin/router';
-import { LitElement, css, html } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import router from './router';
+import router from '../router';
 
 @customElement('corridor-view')
 export class Corridor extends LitElement {
@@ -12,12 +12,13 @@ export class Corridor extends LitElement {
     super();
   }
   connectedCallback() {
+    super.connectedCallback();
     console.log('ASDDDDDDDDDDD');
 
     this.raceId = router.location.params.raceId as string;
   }
   private _onRaceEnterClick() {
-    if (this.raceId) Router.go(`/race/${this.raceId}}`);
+    if (this.raceId) Router.go(`/race/${this.raceId}`);
     else {
       console.error('raceId does not exist');
     }
