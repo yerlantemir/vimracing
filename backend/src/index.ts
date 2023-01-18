@@ -62,26 +62,18 @@ const onUserMessage = (data: WebSocket.RawData) => {
     const userId = requestData['id'];
     const currentDoc = requestData['doc'];
 
-    console.log('HERE', {
-      requestData,
-      raceId,
-      userId,
-      currentDoc,
-      gaol: doc['goal'].trim()
-    });
     if (raceId && userExistsOnRace(rooms[raceId], userId)) {
-      console.log('CASDkl');
-      const wsConnection = rooms[raceId].users.find(
-        (user) => userId === user.userId
-      )?.connection;
+      const wsConnectionS = rooms[raceId].users.map((user) => user.connection);
       if (currentDoc.trim() === doc['goal'].trim()) {
-        wsConnection?.send(
-          JSON.stringify({
-            event: 'WIN',
-            data: {
-              userId
-            }
-          })
+        wsConnectionS.forEach((con) =>
+          con?.send(
+            JSON.stringify({
+              event: 'WIN',
+              data: {
+                userId
+              }
+            })
+          )
         );
       }
     }
@@ -98,7 +90,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
   if (!raceId || !rooms[raceId]) {
     ws.send(
       JSON.stringify({
-        status: '404'
+        event: 'NOT_FOUND'
       })
     );
     return;
@@ -116,9 +108,10 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
   ws.send(
     JSON.stringify({
       event: 'RACE_ENTER',
-      status: '200',
-      id: userId,
-      doc
+      data: {
+        id: userId,
+        doc
+      }
     })
   );
 });
