@@ -6,33 +6,30 @@ import {
   highlightSpecialChars,
   drawSelection,
   dropCursor,
-  rectangularSelection
+  rectangularSelection,
+  ViewUpdate
 } from '@codemirror/view';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
 import { MergeView, DirectMergeConfig } from '@codemirror/merge';
+import { EditorView } from 'codemirror';
 
 const doc1 = `
-  if (true) {
-    console.log(hello);
-  }
-  else {
-    console.log(fuck you!)
-  }
+blabl
 `;
 const doc2 = `
-  if (false) {
-    console.log(hello);
-  }
-  else {
-    console.log('fuck you!')
-  }
+asda
 `;
 
-const defaultConfig = {
+type EditorConfig = Partial<DirectMergeConfig> & {
+  onChange: (doc: string) => void;
+  raceDoc: { start: string; goal: string };
+};
+
+const createDefaultConfig = (config?: EditorConfig) => ({
   a: {
-    doc: doc1,
+    doc: config?.raceDoc.start ?? doc1,
     extensions: [
       vim(),
       lineNumbers(),
@@ -43,22 +40,24 @@ const defaultConfig = {
       highlightActiveLine(),
       dropCursor(),
       rectangularSelection(),
-      drawSelection()
+      drawSelection(),
+      EditorView.updateListener.of((v: ViewUpdate) => {
+        if (v.docChanged) {
+          config?.onChange?.(v.state.doc.toString());
+        }
+      })
     ]
   },
   b: {
-    doc: doc2,
+    doc: config?.raceDoc?.goal ?? doc2,
     extensions: [lineNumbers(), javascript()]
   },
   highlightChanges: true,
   gutter: true
-};
-
+});
 class Editor extends MergeView {
-  constructor(config?: Partial<DirectMergeConfig>) {
-    console.log({ ...defaultConfig, ...config });
-
-    super({ ...defaultConfig, ...config });
+  constructor(config?: EditorConfig) {
+    super({ ...createDefaultConfig(config), ...config });
   }
 }
 export default Editor;

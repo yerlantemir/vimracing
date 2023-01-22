@@ -4,8 +4,6 @@ const outlet = document.querySelector('body');
 
 router.setOutlet(outlet);
 
-console.log('ASDASD?');
-
 router.setRoutes([
   {
     path: '/',

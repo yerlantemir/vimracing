@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "target": "es2018",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "noEmitOnError": true,
+        "strict": true,
+        "declaration": true,
+        "declarationMap": true,
+        "esModuleInterop": false,
+        "types": []
+    },
+    "exclude": [
+        "node_modules/**"
+    ],
+    "references": [
+        {
+            "path": "backend"
+        },
+        {
+            "path": "frontend"
+        },
+        {
+            "path": "shared"
+        },
+    ]
+}

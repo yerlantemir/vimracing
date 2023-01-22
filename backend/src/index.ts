@@ -1,9 +1,15 @@
-import express from 'express';
+import * as express from 'express';
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import { uuid } from 'uuidv4';
 import { Room } from './types/Room';
-import cors from 'cors';
+import * as cors from 'cors';
+import {
+  RaceEnterEvent,
+  RaceNotFoundEvent,
+  RaceWinEvent,
+  SocketEventType
+} from '@vimracing/shared';
 
 const app = express();
 
@@ -56,7 +62,7 @@ const userExistsOnRace = (raceMap: Room, id: string) => {
 
 const onUserMessage = (data: WebSocket.RawData) => {
   const request = JSON.parse(data.toString());
-  if (request['event'] === 'CHANGE') {
+  if (request['event'] === SocketEventType.CHANGE) {
     const requestData = request['data'];
     const raceId = requestData['raceId'];
     const userId = requestData['id'];
@@ -65,16 +71,15 @@ const onUserMessage = (data: WebSocket.RawData) => {
     if (raceId && userExistsOnRace(rooms[raceId], userId)) {
       const wsConnectionS = rooms[raceId].users.map((user) => user.connection);
       if (currentDoc.trim() === doc['goal'].trim()) {
-        wsConnectionS.forEach((con) =>
-          con?.send(
-            JSON.stringify({
-              event: 'WIN',
-              data: {
-                userId
-              }
-            })
-          )
-        );
+        wsConnectionS.forEach((con) => {
+          const payload: RaceWinEvent = {
+            event: SocketEventType.WIN,
+            data: {
+              id: userId
+            }
+          };
+          con?.send(JSON.stringify(payload));
+        });
       }
     }
   }
@@ -88,11 +93,12 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
   const userId = definedUserId ?? uuid();
 
   if (!raceId || !rooms[raceId]) {
-    ws.send(
-      JSON.stringify({
-        event: 'NOT_FOUND'
-      })
-    );
+    const payload: RaceNotFoundEvent = {
+      event: SocketEventType.NOT_FOUND,
+      data: {}
+    };
+
+    ws.send(JSON.stringify(payload));
     return;
   }
 
@@ -105,15 +111,15 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
 
   ws.on('message', onUserMessage);
 
-  ws.send(
-    JSON.stringify({
-      event: 'RACE_ENTER',
-      data: {
-        id: userId,
-        doc
-      }
-    })
-  );
+  const payload: RaceEnterEvent = {
+    event: SocketEventType.RACE_ENTER,
+    data: {
+      id: userId,
+      raceDoc: doc
+    }
+  };
+
+  ws.send(JSON.stringify(payload));
 });
 
 server.listen(process.env.PORT || 8999, () => {
