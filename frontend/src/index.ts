@@ -6,26 +6,34 @@ router.setOutlet(outlet);
 
 router.setRoutes([
   {
-    path: '/',
-    component: 'index-root',
+    path: '',
+    component: 'layout-component',
     action: async () => {
-      await import('./views/app');
-    }
-  },
-  {
-    path: '/corridor/:raceId',
-    component: 'corridor-view',
-
-    action: async () => {
-      await import('./views/corridor');
-    }
-  },
-  {
-    path: '/race/:raceId',
-    component: 'race-view',
-    action: async () => {
-      await import('./views/race');
-    }
+      await import('./components/Layout');
+    },
+    children: [
+      {
+        path: '/',
+        component: 'index-root',
+        action: async () => {
+          await import('./views/app');
+        }
+      },
+      {
+        path: '/corridor/:raceId',
+        component: 'corridor-view',
+        action: async () => {
+          await import('./views/corridor');
+        }
+      },
+      {
+        path: '/race/:raceId',
+        component: 'race-view',
+        action: async () => {
+          await import('./views/race');
+        }
+      }
+    ]
   }
 ]);
 

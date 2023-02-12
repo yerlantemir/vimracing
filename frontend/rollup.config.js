@@ -20,7 +20,7 @@ export default {
     }),
     commonjs(),
     serve({
-      open: true,
+      open: false,
       historyApiFallback: true,
       contentBase: 'dist',
       port: 3000,

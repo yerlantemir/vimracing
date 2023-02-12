@@ -4,7 +4,7 @@
     "rootDir": "./src",
     "experimentalDecorators": true,
     "declaration": false,
-    "declarationMap": false
+    "declarationMap": false,
   },
   "include": [
     "./src/**/*.ts"
