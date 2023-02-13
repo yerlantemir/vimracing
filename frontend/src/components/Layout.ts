@@ -10,11 +10,13 @@ export class Layout extends LitElement {
       font-family: 'Roboto', sans-serif;
       --white-1: #f8f8f8;
       --white-2: #ededed;
+      --white-3: #e1e1e1;
+
       --blue-1: #68d0ff;
       --blue-2: #03a9f4;
+
       --green-1: #7bdc90;
       --other-dots: #c29a4d;
-      --red: red;
 
       display: flex;
       justify-content: center;

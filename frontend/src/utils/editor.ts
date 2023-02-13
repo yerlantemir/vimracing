@@ -15,13 +15,6 @@ import { javascript } from '@codemirror/lang-javascript';
 import { MergeView, DirectMergeConfig } from '@codemirror/merge';
 import { EditorView } from 'codemirror';
 
-const doc1 = `
-blabl
-`;
-const doc2 = `
-asda
-`;
-
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange: (doc: string) => void;
   raceDoc: { start: string; goal: string };
@@ -29,7 +22,7 @@ type EditorConfig = Partial<DirectMergeConfig> & {
 
 const createDefaultConfig = (config?: EditorConfig) => ({
   a: {
-    doc: config?.raceDoc.start ?? doc1,
+    doc: config?.raceDoc.start ?? '',
     extensions: [
       vim(),
       lineNumbers(),
@@ -49,7 +42,7 @@ const createDefaultConfig = (config?: EditorConfig) => ({
     ]
   },
   b: {
-    doc: config?.raceDoc?.goal ?? doc2,
+    doc: config?.raceDoc?.goal ?? '',
     extensions: [lineNumbers(), javascript()]
   },
   highlightChanges: true,

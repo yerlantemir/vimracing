@@ -8,9 +8,6 @@ import '../components/Button';
 @customElement('index-root')
 export class Index extends LitElement {
   static styles = css`
-    button-component {
-      min-width: 200px;
-    }
     h5 {
       font-size: 1.5rem;
       color: var(--black-1);
@@ -21,6 +18,9 @@ export class Index extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 3.75rem;
+    }
+    .createButton {
+      width: 200px;
     }
   `;
 
@@ -34,7 +34,10 @@ export class Index extends LitElement {
       <content-card>
         <div class="content">
           <h5>Vimracing - the global vim competition</h5>
-          <button-component @click=${this._onCreateRaceClick}>
+          <button-component
+            class="createButton"
+            @click=${this._onCreateRaceClick}
+          >
             Create race
           </button-component>
         </div>

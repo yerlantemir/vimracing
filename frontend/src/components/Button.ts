@@ -12,7 +12,7 @@ export class Button extends LitElement {
       font-size: 1rem;
       cursor: pointer;
       border: none;
-      min-width: 200px;
+      width: 100%;
     }
   `;
   render() {

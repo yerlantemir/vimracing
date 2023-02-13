@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import Editor from '../utils/editor';
 import router from '../router';
@@ -10,6 +10,7 @@ import {
 } from '@vimracing/shared';
 import { parseData, stringifyData } from '../utils/raw';
 import { CacheStorage, CacheStorageKey } from '../utils/storage';
+import '../components/ContentCard.ts';
 
 @customElement('race-view')
 export class Race extends LitElement {
@@ -22,6 +23,24 @@ export class Race extends LitElement {
   @property()
   socketConnection?: WebSocket;
 
+  static styles = css`
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 3.75rem;
+    }
+    h5 {
+      font-size: 1.25rem;
+      margin: 0;
+      font-weight: 500;
+    }
+
+    .editor {
+      border: 1px solid black;
+      border-radius: 0.75rem;
+      padding: 0.25rem;
+    }
+  `;
   private _sendChangeEvent(doc: string) {
     const userId = CacheStorage.get(CacheStorageKey.UserId);
     const raceId = this.raceId;
@@ -117,6 +136,15 @@ export class Race extends LitElement {
   }
 
   render() {
-    return html`<div id="cm"></div>`;
+    return html`
+      <content-card>
+        <div class="content">
+          <h5>The race is on! Refactor the code below:</h5>
+          <div class="editor">
+            <div id="cm"></div>
+          </div>
+        </div>
+      </content-card>
+    `;
   }
 }
