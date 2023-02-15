@@ -9,6 +9,8 @@ import {
   rectangularSelection,
   ViewUpdate
 } from '@codemirror/view';
+
+import { EditorState } from '@codemirror/state';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
@@ -43,7 +45,17 @@ const createDefaultConfig = (config?: EditorConfig) => ({
   },
   b: {
     doc: config?.raceDoc?.goal ?? '',
-    extensions: [lineNumbers(), javascript()]
+    extensions: [
+      lineNumbers(),
+      javascript(),
+      EditorView.theme({
+        '&': {
+          pointerEvents: 'none',
+          userSelect: 'none'
+        }
+      }),
+      EditorView.editable.of(false)
+    ]
   },
   highlightChanges: true,
   gutter: true

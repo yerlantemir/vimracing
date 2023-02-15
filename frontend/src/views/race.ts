@@ -66,8 +66,6 @@ export class Race extends LitElement {
   }
 
   private _onRaceEnter({ id, raceDoc }: RaceEnterEvent['data']) {
-    console.log({ id, raceDoc });
-
     const definedUserId = CacheStorage.get(CacheStorageKey.UserId);
 
     if (!definedUserId && id) {
@@ -86,8 +84,6 @@ export class Race extends LitElement {
   }
 
   private _onRaceWin({ id }: RaceWinEvent['data']) {
-    console.log({ id });
-
     const definedUserId = CacheStorage.get(CacheStorageKey.UserId);
 
     if (id === definedUserId) {
@@ -100,18 +96,11 @@ export class Race extends LitElement {
   private _onMessage(event: WebSocketEventMap['message']) {
     const { event: socketEvent, data } = parseData(event.data);
 
-    console.log(SocketEventType.RACE_ENTER, socketEvent);
-
     if (socketEvent === SocketEventType.RACE_ENTER) {
-      console.log('A?');
-
       this._onRaceEnter.apply(this, [data]);
     } else if (socketEvent === SocketEventType.WIN) {
-      console.log('B?');
       this._onRaceWin.apply(this, [data]);
     }
-
-    console.log('C?');
   }
 
   connectedCallback() {

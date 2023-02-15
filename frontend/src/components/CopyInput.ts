@@ -62,6 +62,9 @@ export class CopyInput extends LitElement {
   private _onInputClick(e: any) {
     e.target.select();
   }
+  connectedCallback(): void {
+    super.connectedCallback();
+  }
   render() {
     return html`
       <div class="inputContainer">
