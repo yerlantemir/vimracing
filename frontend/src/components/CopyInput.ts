@@ -1,6 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property, query } from 'lit/decorators.js';
 
+const COPIED_INTERNAL_MS = 3000;
+
 @customElement('copy-input')
 export class CopyInput extends LitElement {
   @property()
@@ -56,7 +58,7 @@ export class CopyInput extends LitElement {
     this.copied = true;
     setInterval(() => {
       this.copied = false;
-    }, 3000);
+    }, COPIED_INTERNAL_MS);
   }
 
   private _onInputClick(e: any) {

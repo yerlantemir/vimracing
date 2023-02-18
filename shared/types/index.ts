@@ -8,7 +8,7 @@ export enum SocketEventType {
 export interface ChangeEvent {
   event: SocketEventType.CHANGE;
   data: {
-    doc: string;
+    doc: string[];
     raceId: string;
     id: string;
   };
@@ -26,8 +26,8 @@ export interface RaceEnterEvent {
   data: {
     id: string;
     raceDoc: {
-      start: string;
-      goal: string;
+      start: string[];
+      goal: string[];
     };
   };
 }

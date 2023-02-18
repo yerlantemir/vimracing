@@ -41,7 +41,7 @@ export class Race extends LitElement {
       padding: 0.25rem;
     }
   `;
-  private _sendChangeEvent(doc: string) {
+  private _sendChangeEvent(doc: string[]) {
     const userId = CacheStorage.get(CacheStorageKey.UserId);
     const raceId = this.raceId;
 
@@ -61,7 +61,7 @@ export class Race extends LitElement {
     this.socketConnection?.send(stringifyData(eventDataString));
   }
 
-  private _onDocChange(doc: string) {
+  private _onDocChange(doc: string[]) {
     this._sendChangeEvent.apply(this, [doc]);
   }
 

@@ -4,5 +4,5 @@ export type Room = {
   id: string;
   users: Array<UserConnection>;
   title: string;
-  doc: { start: string; goal: string };
+  doc: { start: string[]; goal: string[] };
 };

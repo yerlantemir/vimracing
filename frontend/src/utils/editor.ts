@@ -9,8 +9,8 @@ import {
   rectangularSelection,
   ViewUpdate
 } from '@codemirror/view';
+import { Text } from '@codemirror/state';
 
-import { EditorState } from '@codemirror/state';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
@@ -18,13 +18,13 @@ import { MergeView, DirectMergeConfig } from '@codemirror/merge';
 import { EditorView } from 'codemirror';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
-  onChange: (doc: string) => void;
-  raceDoc: { start: string; goal: string };
+  onChange: (doc: string[]) => void;
+  raceDoc: { start: string[]; goal: string[] };
 };
 
 const createDefaultConfig = (config?: EditorConfig) => ({
   a: {
-    doc: config?.raceDoc.start ?? '',
+    doc: Text.of(config?.raceDoc.start ?? []),
     extensions: [
       vim(),
       lineNumbers(),
@@ -38,13 +38,15 @@ const createDefaultConfig = (config?: EditorConfig) => ({
       drawSelection(),
       EditorView.updateListener.of((v: ViewUpdate) => {
         if (v.docChanged) {
-          config?.onChange?.(v.state.doc.toString());
+          console.log(v.state);
+
+          config?.onChange?.(v.state.doc.toJSON());
         }
       })
     ]
   },
   b: {
-    doc: config?.raceDoc?.goal ?? '',
+    doc: Text.of(config?.raceDoc?.goal ?? []),
     extensions: [
       lineNumbers(),
       javascript(),

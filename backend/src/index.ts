@@ -18,22 +18,22 @@ app.use(cors());
 const rooms: Record<string, Room> = {};
 
 const doc = {
-  start: `
-    if (true) {
-      console.log(hello);
-    }
-    else {
-      console.log(fuck you!)
-    }
-  `,
-  goal: `
-    if (false) {
-      console.log(hello);
-    }
-    else {
-      console.log('fuck you!')
-    }
-  `
+  start: [
+    'if (true) {',
+    '  console.log(hello);',
+    '}',
+    'else {',
+    '   console.log(fuck you!)',
+    '}'
+  ],
+  goal: [
+    'if (false) {',
+    '  console.log(hello);',
+    '}',
+    'else {',
+    "  console.log('fuck you!')",
+    '}'
+  ]
 };
 
 app.post('/room/create', (req, res) => {
@@ -70,7 +70,7 @@ const onUserMessage = (data: WebSocket.RawData) => {
 
     if (raceId && userExistsOnRace(rooms[raceId], userId)) {
       const wsConnectionS = rooms[raceId].users.map((user) => user.connection);
-      if (currentDoc.trim() === doc['goal'].trim()) {
+      if (currentDoc.join('') === doc.goal.join('')) {
         wsConnectionS.forEach((con) => {
           const payload: RaceWinEvent = {
             event: SocketEventType.WIN,
