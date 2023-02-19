@@ -1,6 +1,6 @@
 export enum SocketEventType {
   CHANGE = 'Change',
-  WIN = 'Win',
+  RACE_FINISH = 'RaceFinish',
   RACE_ENTER = 'RaceEnter',
   NOT_FOUND = 'NotFound'
 }
@@ -14,10 +14,15 @@ export interface ChangeEvent {
   };
 }
 
-export interface RaceWinEvent {
-  event: SocketEventType.WIN;
+export enum RACE_FINISH_RESULT {
+  WIN = 'win',
+  LOSE = 'lose'
+}
+export interface RaceFinishEvent {
+  event: SocketEventType.RACE_FINISH;
   data: {
     id: string;
+    result: RACE_FINISH_RESULT;
   };
 }
 
@@ -38,6 +43,6 @@ export interface RaceNotFoundEvent {
 
 export type SocketEvent =
   | ChangeEvent
-  | RaceWinEvent
+  | RaceFinishEvent
   | RaceEnterEvent
   | RaceNotFoundEvent;

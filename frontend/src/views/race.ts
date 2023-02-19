@@ -5,7 +5,8 @@ import router from '../router';
 import {
   ChangeEvent,
   RaceEnterEvent,
-  RaceWinEvent,
+  RaceFinishEvent,
+  RACE_FINISH_RESULT,
   SocketEventType
 } from '@vimracing/shared';
 import { parseData, stringifyData } from '../utils/raw';
@@ -83,10 +84,10 @@ export class Race extends LitElement {
       });
   }
 
-  private _onRaceWin({ id }: RaceWinEvent['data']) {
-    const definedUserId = CacheStorage.get(CacheStorageKey.UserId);
+  private _onRaceWin({ result }: RaceFinishEvent['data']) {
+    console.log(result, RACE_FINISH_RESULT.WIN);
 
-    if (id === definedUserId) {
+    if (result === RACE_FINISH_RESULT.WIN) {
       alert('YOU WON!');
     } else {
       alert('YOU LOSE(');
@@ -96,9 +97,11 @@ export class Race extends LitElement {
   private _onMessage(event: WebSocketEventMap['message']) {
     const { event: socketEvent, data } = parseData(event.data);
 
+    console.log(socketEvent);
+
     if (socketEvent === SocketEventType.RACE_ENTER) {
       this._onRaceEnter.apply(this, [data]);
-    } else if (socketEvent === SocketEventType.WIN) {
+    } else if (socketEvent === SocketEventType.RACE_FINISH) {
       this._onRaceWin.apply(this, [data]);
     }
   }
