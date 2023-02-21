@@ -6,8 +6,6 @@ import * as cors from 'cors';
 import mongo from 'mongoose';
 import { RacesConnectionManager } from './RacesConnectionManager';
 
-mongo.connect('mongodb://127.0.01:27017/vimracing').then(() => {});
-
 const app = express();
 
 app.use(cors());

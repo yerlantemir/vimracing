@@ -6,7 +6,7 @@
   "main": "dist/types/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
-    "tsc": "tsc"
+    "tsc": "rimraf ./dist && tsc"
   },
   "author": "",
   "license": "ISC",

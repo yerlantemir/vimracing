@@ -3,10 +3,9 @@ import { customElement, property } from 'lit/decorators.js';
 import Editor from '../utils/editor';
 import router from '../router';
 import {
-  ChangeEvent,
-  RaceEnterEvent,
-  RaceFinishEvent,
-  RACE_FINISH_RESULT,
+  ServerRaceChangeEvent,
+  ServerRaceEnterEvent,
+  FrontendRaceChangeEvent,
   SocketEventType
 } from '@vimracing/shared';
 import { parseData, stringifyData } from '../utils/raw';
@@ -20,6 +19,12 @@ export class Race extends LitElement {
 
   @property()
   raceId?: string;
+
+  @property()
+  goalDoc?: string[];
+
+  @property()
+  usersPayload?: ServerRaceChangeEvent['data']['usersPayload'];
 
   @property()
   socketConnection?: WebSocket;
@@ -51,12 +56,12 @@ export class Race extends LitElement {
       return;
     }
 
-    const eventDataString: ChangeEvent = {
+    const eventDataString: FrontendRaceChangeEvent = {
       event: SocketEventType.CHANGE,
       data: {
-        id: userId,
+        userId,
         raceId,
-        doc
+        raceDoc: doc
       }
     };
     this.socketConnection?.send(stringifyData(eventDataString));
@@ -66,7 +71,7 @@ export class Race extends LitElement {
     this._sendChangeEvent.apply(this, [doc]);
   }
 
-  private _onRaceEnter({ id, raceDoc }: RaceEnterEvent['data']) {
+  private _onRaceEnter({ id, raceDoc }: ServerRaceEnterEvent['data']) {
     const definedUserId = CacheStorage.get(CacheStorageKey.UserId);
 
     if (!definedUserId && id) {
@@ -84,16 +89,6 @@ export class Race extends LitElement {
       });
   }
 
-  private _onRaceWin({ result }: RaceFinishEvent['data']) {
-    console.log(result, RACE_FINISH_RESULT.WIN);
-
-    if (result === RACE_FINISH_RESULT.WIN) {
-      alert('YOU WON!');
-    } else {
-      alert('YOU LOSE(');
-    }
-  }
-
   private _onMessage(event: WebSocketEventMap['message']) {
     const { event: socketEvent, data } = parseData(event.data);
 
@@ -101,9 +96,15 @@ export class Race extends LitElement {
 
     if (socketEvent === SocketEventType.RACE_ENTER) {
       this._onRaceEnter.apply(this, [data]);
-    } else if (socketEvent === SocketEventType.RACE_FINISH) {
-      this._onRaceWin.apply(this, [data]);
+    } else if (socketEvent === SocketEventType.CHANGE) {
+      this._onRacePayloadChange.apply(this, [data]);
     }
+  }
+
+  private _onRacePayloadChange({
+    usersPayload
+  }: ServerRaceChangeEvent['data']) {
+    this.usersPayload = usersPayload;
   }
 
   connectedCallback() {
@@ -127,8 +128,22 @@ export class Race extends LitElement {
     this.socketConnection?.close();
   }
 
+  renderUsers() {
+    if (!this.usersPayload) return null;
+
+    return html`
+      <ul>
+        ${this.usersPayload
+          .sort((a, b) => a['completeness'] - b['completeness'])
+          .map(
+            ({ id, completeness }) => html`<li>${id} - ${completeness}</li>`
+          )}
+      </ul>
+    `;
+  }
   render() {
     return html`
+      ${this.renderUsers()}
       <content-card>
         <div class="content">
           <h5>The race is on! Refactor the code below:</h5>

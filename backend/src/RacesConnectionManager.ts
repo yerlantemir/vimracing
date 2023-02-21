@@ -2,11 +2,11 @@ import { uuid } from 'uuidv4';
 import * as WebSocket from 'ws';
 import { RaceConnection, UserConnection } from './types/Connection';
 import {
-  RaceEnterEvent,
-  RaceNotFoundEvent,
-  RaceFinishEvent,
+  ServerRaceChangeEvent,
+  ServerRaceEnterEvent,
+  ServerRaceNotFoundEvent,
   SocketEventType,
-  RACE_FINISH_RESULT
+  FrontendRaceChangeEvent
 } from '@vimracing/shared';
 
 export class RacesConnectionManager {
@@ -27,7 +27,7 @@ export class RacesConnectionManager {
   static onRaceEnter(raceId: string, userId: string, ws: WebSocket) {
     const race = this._getRaceById(raceId);
     if (!race || !RacesConnectionManager._raceExists(raceId)) {
-      const payload: RaceNotFoundEvent = {
+      const payload: ServerRaceNotFoundEvent = {
         event: SocketEventType.NOT_FOUND,
         data: {}
       };
@@ -39,13 +39,14 @@ export class RacesConnectionManager {
     if (!RacesConnectionManager._userExistsOnRace(raceId, userId)) {
       RacesConnectionManager._addUserToRace(raceId, {
         id: userId,
-        connection: ws
+        connection: ws,
+        currentDoc: race.doc.start
       });
     }
 
     ws.on('message', this._onUserMessage.bind(this));
 
-    const payload: RaceEnterEvent = {
+    const payload: ServerRaceEnterEvent = {
       event: SocketEventType.RACE_ENTER,
       data: {
         id: userId,
@@ -57,45 +58,78 @@ export class RacesConnectionManager {
   }
 
   static _onUserMessage(data: WebSocket.RawData) {
-    const request = JSON.parse(data.toString());
+    const request: FrontendRaceChangeEvent = JSON.parse(data.toString());
+    const {
+      data: { raceId, userId, raceDoc },
+      event
+    } = request;
 
-    if (request['event'] === SocketEventType.CHANGE) {
-      const requestData = request['data'];
-      const raceId = requestData['raceId'];
-      const userId = requestData['id'];
-      const userDoc = requestData['doc'];
+    if (!raceId || !userId) return;
 
-      if (!raceId || !userId) return;
+    const currentRace = this._getRaceById(raceId);
 
-      const currentRace = this._getRaceById(raceId);
+    if (
+      !currentRace ||
+      !RacesConnectionManager._userExistsOnRace(raceId, userId)
+    )
+      return;
 
-      if (
-        !currentRace ||
-        !RacesConnectionManager._userExistsOnRace(raceId, userId)
-      )
-        return;
-
-      if (this._isDocsEqual(userDoc, currentRace.doc.goal)) {
-        this._onUserWin(currentRace, userId);
-      }
+    if (event === SocketEventType.CHANGE) {
+      this._onDocChange({ race: currentRace, userId, userDoc: raceDoc });
     }
   }
 
-  static _onUserWin(race: RaceConnection, currentUserId: string) {
+  static _onDocChange({
+    race,
+    userId,
+    userDoc
+  }: {
+    race: RaceConnection;
+    userId: string;
+    userDoc: string[];
+  }) {
+    this.racesConnection = this.racesConnection.map((r) => {
+      if (r.id !== race.id) {
+        return r;
+      }
+      return {
+        ...r,
+        users: r.users.map((user) => {
+          if (user.id !== userId) {
+            return user;
+          }
+          return {
+            ...user,
+            currentDoc: userDoc
+          };
+        })
+      };
+    });
+
     race.users.forEach((user) => {
-      const payload: RaceFinishEvent = {
-        event: SocketEventType.RACE_FINISH,
+      const payload: ServerRaceChangeEvent = {
+        event: SocketEventType.CHANGE,
         data: {
-          id: currentUserId,
-          result:
-            user.id === currentUserId
-              ? RACE_FINISH_RESULT.WIN
-              : RACE_FINISH_RESULT.LOSE
+          usersPayload: race.users.map((user) => ({
+            id: user.id,
+            completeness: this._getCompletenessPercentage(
+              user.currentDoc,
+              race.doc.goal
+            )
+          }))
         }
       };
       user.connection?.send(JSON.stringify(payload));
-      user.connection.close();
     });
+  }
+
+  static _getCompletenessPercentage(userDoc: string[], goalDoc: string[]) {
+    let count = 0;
+    userDoc.forEach((line, index) => {
+      if (line === goalDoc[index]) count++;
+    });
+
+    return Math.floor((count / goalDoc.length) * 100);
   }
 
   static _isDocsEqual(a: string[], b: string[]) {
@@ -114,6 +148,7 @@ export class RacesConnectionManager {
     return this.racesConnection.some((race) => race.id === raceId);
   }
 
+  // TBD
   static _selectDoc() {
     return {
       start: [

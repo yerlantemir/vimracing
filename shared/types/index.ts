@@ -5,28 +5,23 @@ export enum SocketEventType {
   NOT_FOUND = 'NotFound'
 }
 
-export interface ChangeEvent {
+export interface FrontendRaceChangeEvent {
   event: SocketEventType.CHANGE;
   data: {
-    doc: string[];
+    userId: string;
+    raceDoc: string[];
     raceId: string;
-    id: string;
   };
 }
 
-export enum RACE_FINISH_RESULT {
-  WIN = 'win',
-  LOSE = 'lose'
-}
-export interface RaceFinishEvent {
-  event: SocketEventType.RACE_FINISH;
+export interface ServerRaceChangeEvent {
+  event: SocketEventType.CHANGE;
   data: {
-    id: string;
-    result: RACE_FINISH_RESULT;
+    usersPayload: { id: string; completeness: number }[];
   };
 }
 
-export interface RaceEnterEvent {
+export interface ServerRaceEnterEvent {
   event: SocketEventType.RACE_ENTER;
   data: {
     id: string;
@@ -36,13 +31,13 @@ export interface RaceEnterEvent {
     };
   };
 }
-export interface RaceNotFoundEvent {
+export interface ServerRaceNotFoundEvent {
   event: SocketEventType.NOT_FOUND;
   data: object;
 }
 
-export type SocketEvent =
-  | ChangeEvent
-  | RaceFinishEvent
-  | RaceEnterEvent
-  | RaceNotFoundEvent;
+export type FrontendEventType = FrontendRaceChangeEvent;
+export type ServerEventType =
+  | ServerRaceChangeEvent
+  | ServerRaceEnterEvent
+  | ServerRaceNotFoundEvent;
