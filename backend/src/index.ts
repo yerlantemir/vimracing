@@ -25,13 +25,14 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
   const urlParams = new URLSearchParams(req.url?.split('?')[1]);
   const raceId = urlParams.get('raceId');
   const definedUserId = urlParams.get('userId');
+  const username = urlParams.get('username');
 
   const userId = definedUserId ?? uuid();
-  if (!raceId || !userId) {
+  if (!raceId || !userId || !username) {
     console.error('invalid params');
     return;
   }
-  RacesConnectionManager.onRaceEnter(raceId, userId, ws);
+  RacesConnectionManager.onRaceEnter(raceId, userId, username, ws);
 });
 
 server.listen(process.env.PORT || 8999, () => {

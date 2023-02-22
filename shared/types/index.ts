@@ -17,14 +17,14 @@ export interface FrontendRaceChangeEvent {
 export interface ServerRaceChangeEvent {
   event: SocketEventType.CHANGE;
   data: {
-    usersPayload: { id: string; completeness: number }[];
+    usersPayload: { id: string; completeness: number; username: string }[];
   };
 }
 
 export interface ServerRaceEnterEvent {
   event: SocketEventType.RACE_ENTER;
   data: {
-    id: string;
+    userId: string;
     raceDoc: {
       start: string[];
       goal: string[];

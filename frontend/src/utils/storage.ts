@@ -1,12 +1,18 @@
 export enum CacheStorageKey {
-  UserId = 'userId'
+  User = 'user'
 }
 
 export class CacheStorage {
-  public static get(key: CacheStorageKey) {
-    return localStorage.getItem(key);
+  public static getUser(): { id: string; username: string } | null {
+    const userPayload = localStorage.getItem(CacheStorageKey.User);
+    if (!userPayload) return null;
+
+    return JSON.parse(userPayload);
   }
-  public static set(key: CacheStorageKey, value: string) {
-    localStorage.setItem(key, value);
+  public static setUser({ id, username }: { id: string; username: string }) {
+    localStorage.setItem(
+      CacheStorageKey.User,
+      JSON.stringify({ id, username })
+    );
   }
 }

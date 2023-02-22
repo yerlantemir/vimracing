@@ -24,7 +24,12 @@ export class RacesConnectionManager {
     return newRacePayload;
   }
 
-  static onRaceEnter(raceId: string, userId: string, ws: WebSocket) {
+  static onRaceEnter(
+    raceId: string,
+    userId: string,
+    username: string,
+    ws: WebSocket
+  ) {
     const race = this._getRaceById(raceId);
     if (!race || !RacesConnectionManager._raceExists(raceId)) {
       const payload: ServerRaceNotFoundEvent = {
@@ -36,12 +41,16 @@ export class RacesConnectionManager {
       return;
     }
 
-    if (!RacesConnectionManager._userExistsOnRace(raceId, userId)) {
+    const user = race.users.find((u) => u.id === userId);
+    if (!user) {
       RacesConnectionManager._addUserToRace(raceId, {
         id: userId,
         connection: ws,
-        currentDoc: race.doc.start
+        currentDoc: race.doc.start,
+        username
       });
+    } else {
+      user.connection = ws;
     }
 
     ws.on('message', this._onUserMessage.bind(this));
@@ -49,8 +58,11 @@ export class RacesConnectionManager {
     const payload: ServerRaceEnterEvent = {
       event: SocketEventType.RACE_ENTER,
       data: {
-        id: userId,
-        raceDoc: race.doc
+        userId,
+        raceDoc: {
+          start: user?.currentDoc ?? race.doc.start,
+          goal: race.doc.goal
+        }
       }
     };
 
@@ -88,23 +100,10 @@ export class RacesConnectionManager {
     userId: string;
     userDoc: string[];
   }) {
-    this.racesConnection = this.racesConnection.map((r) => {
-      if (r.id !== race.id) {
-        return r;
-      }
-      return {
-        ...r,
-        users: r.users.map((user) => {
-          if (user.id !== userId) {
-            return user;
-          }
-          return {
-            ...user,
-            currentDoc: userDoc
-          };
-        })
-      };
-    });
+    const user = race.users.find((u) => u.id === userId);
+    if (user) {
+      user.currentDoc = userDoc;
+    }
 
     race.users.forEach((user) => {
       const payload: ServerRaceChangeEvent = {
@@ -112,6 +111,7 @@ export class RacesConnectionManager {
         data: {
           usersPayload: race.users.map((user) => ({
             id: user.id,
+            username: user.username,
             completeness: this._getCompletenessPercentage(
               user.currentDoc,
               race.doc.goal

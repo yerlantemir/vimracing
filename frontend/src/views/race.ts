@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import Editor from '../utils/editor';
 import router from '../router';
 import {
@@ -29,6 +29,15 @@ export class Race extends LitElement {
   @property()
   socketConnection?: WebSocket;
 
+  @property()
+  showUsernameModal = false;
+
+  @property()
+  username?: string;
+
+  @query('#username')
+  usernameInput?: HTMLInputElement;
+
   static styles = css`
     .content {
       display: flex;
@@ -48,14 +57,15 @@ export class Race extends LitElement {
     }
   `;
   private _sendChangeEvent(doc: string[]) {
-    const userId = CacheStorage.get(CacheStorageKey.UserId);
+    const user = CacheStorage.getUser();
     const raceId = this.raceId;
 
-    if (!userId || !raceId) {
-      console.error('No userId or raceId', { userId, raceId });
+    if (!user || !raceId) {
+      console.error('No userId or raceId');
       return;
     }
 
+    const { id: userId } = user;
     const eventDataString: FrontendRaceChangeEvent = {
       event: SocketEventType.CHANGE,
       data: {
@@ -71,11 +81,11 @@ export class Race extends LitElement {
     this._sendChangeEvent.apply(this, [doc]);
   }
 
-  private _onRaceEnter({ id, raceDoc }: ServerRaceEnterEvent['data']) {
-    const definedUserId = CacheStorage.get(CacheStorageKey.UserId);
+  private _onRaceEnter({ userId, raceDoc }: ServerRaceEnterEvent['data']) {
+    const user = CacheStorage.getUser();
 
-    if (!definedUserId && id) {
-      CacheStorage.set(CacheStorageKey.UserId, id);
+    if (!user && userId && this.username) {
+      CacheStorage.setUser({ id: userId, username: this.username });
     }
 
     const parentElement = this.renderRoot.querySelector('#cm');
@@ -91,8 +101,6 @@ export class Race extends LitElement {
 
   private _onMessage(event: WebSocketEventMap['message']) {
     const { event: socketEvent, data } = parseData(event.data);
-
-    console.log(socketEvent);
 
     if (socketEvent === SocketEventType.RACE_ENTER) {
       this._onRaceEnter.apply(this, [data]);
@@ -110,12 +118,20 @@ export class Race extends LitElement {
   connectedCallback() {
     super.connectedCallback();
 
+    const user = CacheStorage.getUser();
+    if (!user) {
+      this.showUsernameModal = true;
+    } else {
+      this._connectToRace({ userId: user.id, username: user.username });
+    }
+  }
+
+  _connectToRace({ userId, username }: { userId?: string; username: string }) {
     this.raceId = router.location.params.raceId as string;
-    const definedUserId = CacheStorage.get(CacheStorageKey.UserId);
 
     this.socketConnection = new WebSocket(
-      `ws://localhost:8999/?raceId=${this.raceId}${
-        definedUserId ? `&userId=${definedUserId}` : ''
+      `ws://localhost:8999/?raceId=${this.raceId}&username=${username}${
+        userId ? `&userId=${userId}` : ''
       }`
     );
 
@@ -124,6 +140,7 @@ export class Race extends LitElement {
       this._onMessage.bind(this)
     );
   }
+
   disconnectedCallback(): void {
     this.socketConnection?.close();
   }
@@ -136,22 +153,46 @@ export class Race extends LitElement {
         ${this.usersPayload
           .sort((a, b) => a['completeness'] - b['completeness'])
           .map(
-            ({ id, completeness }) => html`<li>${id} - ${completeness}</li>`
+            ({ username, completeness }) =>
+              html`<li>${username} - ${completeness}</li>`
           )}
       </ul>
     `;
   }
+
+  onUsernameSave() {
+    const username = this.usernameInput?.value;
+
+    if (!username) return;
+
+    this.username = username;
+    this.showUsernameModal = false;
+    this._connectToRace({ username });
+  }
+
+  renderUsernameModal() {
+    return html` <div>
+      <h5>Enter your username</h5>
+      <input id="username" />
+      <button @click=${this.onUsernameSave}>save</button>
+    </div>`;
+  }
+
   render() {
     return html`
-      ${this.renderUsers()}
-      <content-card>
-        <div class="content">
-          <h5>The race is on! Refactor the code below:</h5>
-          <div class="editor">
-            <div id="cm"></div>
-          </div>
-        </div>
-      </content-card>
+      ${this.showUsernameModal
+        ? this.renderUsernameModal()
+        : html`
+            <content-card>
+              ${this.renderUsers()}
+              <div class="content">
+                <h5>The race is on! Refactor the code below:</h5>
+                <div class="editor">
+                  <div id="cm"></div>
+                </div>
+              </div>
+            </content-card>
+          `}
     `;
   }
 }
