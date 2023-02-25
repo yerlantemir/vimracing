@@ -11,6 +11,7 @@ export interface FrontendRaceChangeEvent {
     userId: string;
     raceDoc: string[];
     raceId: string;
+    username: string;
   };
 }
 
@@ -25,6 +26,7 @@ export interface ServerRaceEnterEvent {
   event: SocketEventType.RACE_ENTER;
   data: {
     userId: string;
+    username: string;
     raceDoc: {
       start: string[];
       goal: string[];

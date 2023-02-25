@@ -1,5 +1,5 @@
-import { LitElement, html, css } from 'lit';
-import { customElement, property, query } from 'lit/decorators.js';
+import { LitElement, html, css, PropertyValueMap } from 'lit';
+import { customElement, state, query, property } from 'lit/decorators.js';
 import Editor from '../utils/editor';
 import router from '../router';
 import {
@@ -9,34 +9,31 @@ import {
   SocketEventType
 } from '@vimracing/shared';
 import { parseData, stringifyData } from '../utils/raw';
-import { CacheStorage, CacheStorageKey } from '../utils/storage';
+import { CacheStorage } from '../utils/storage';
 import '../components/ContentCard.ts';
+import '../components/Modal.ts';
+import '../components/UserCard.ts';
 
 @customElement('race-view')
 export class Race extends LitElement {
-  @property()
+  @state()
   editor?: Editor;
 
-  @property()
+  @state()
   raceId?: string;
 
-  @property()
-  goalDoc?: string[];
-
-  @property()
+  @state()
   usersPayload?: ServerRaceChangeEvent['data']['usersPayload'];
 
-  @property()
+  @state()
   socketConnection?: WebSocket;
 
-  @property()
-  showUsernameModal = false;
-
-  @property()
-  username?: string;
-
-  @query('#username')
-  usernameInput?: HTMLInputElement;
+  @state()
+  currentUser?: {
+    id: string;
+    username: string;
+    doc: string[];
+  };
 
   static styles = css`
     .content {
@@ -55,38 +52,43 @@ export class Race extends LitElement {
       border-radius: 0.75rem;
       padding: 0.25rem;
     }
-  `;
-  private _sendChangeEvent(doc: string[]) {
-    const user = CacheStorage.getUser();
-    const raceId = this.raceId;
 
-    if (!user || !raceId) {
+    .usersContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      justify-content: center;
+      align-items: center;
+    }
+  `;
+  private _sendChangeEvent() {
+    if (!this.raceId || !this.currentUser || !this.currentUser) {
       console.error('No userId or raceId');
       return;
     }
 
-    const { id: userId } = user;
     const eventDataString: FrontendRaceChangeEvent = {
       event: SocketEventType.CHANGE,
       data: {
-        userId,
-        raceId,
-        raceDoc: doc
+        userId: this.currentUser.id,
+        raceId: this.raceId,
+        raceDoc: this.currentUser.doc,
+        username: this.currentUser.username
       }
     };
     this.socketConnection?.send(stringifyData(eventDataString));
   }
 
   private _onDocChange(doc: string[]) {
-    this._sendChangeEvent.apply(this, [doc]);
+    if (this.currentUser) this.currentUser = { ...this.currentUser, doc };
   }
 
-  private _onRaceEnter({ userId, raceDoc }: ServerRaceEnterEvent['data']) {
-    const user = CacheStorage.getUser();
-
-    if (!user && userId && this.username) {
-      CacheStorage.setUser({ id: userId, username: this.username });
-    }
+  private _onRaceEnter({
+    userId,
+    username,
+    raceDoc
+  }: ServerRaceEnterEvent['data']) {
+    this.currentUser = { id: userId, username, doc: raceDoc.start };
 
     const parentElement = this.renderRoot.querySelector('#cm');
 
@@ -115,24 +117,14 @@ export class Race extends LitElement {
     this.usersPayload = usersPayload;
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-
-    const user = CacheStorage.getUser();
-    if (!user) {
-      this.showUsernameModal = true;
-    } else {
-      this._connectToRace({ userId: user.id, username: user.username });
-    }
-  }
-
-  _connectToRace({ userId, username }: { userId?: string; username: string }) {
+  _connectToRace() {
     this.raceId = router.location.params.raceId as string;
+    const user = CacheStorage.getUser();
 
     this.socketConnection = new WebSocket(
-      `ws://localhost:8999/?raceId=${this.raceId}&username=${username}${
-        userId ? `&userId=${userId}` : ''
-      }`
+      `ws://localhost:8999/?raceId=${this.raceId}${
+        user?.username ? `&username=${user.username}` : ''
+      }${user?.id ? `&userId=${user.id}` : ''}`
     );
 
     this.socketConnection.addEventListener(
@@ -141,58 +133,78 @@ export class Race extends LitElement {
     );
   }
 
+  _onCurrentUserUsernameChange(newUsername: string) {
+    const currentUser = this.currentUser;
+    if (!currentUser) return;
+
+    this.usersPayload = this.usersPayload?.map((u) => {
+      if (currentUser.id === u.id) {
+        return { ...u, username: newUsername };
+      }
+
+      return u;
+    });
+
+    this.currentUser = { ...currentUser, username: newUsername };
+  }
+
+  _renderUsers() {
+    const currentUser = this.currentUser;
+    if (!this.usersPayload || !this.currentUser) return null;
+
+    return html`
+      <div class="usersContainer">
+        ${this.usersPayload
+          .sort((a, b) => b['completeness'] - a['completeness'])
+          .map(
+            ({ id, username, completeness }, index) =>
+              html`<user-card-element
+                place="${index + 1}"
+                userId="${id}"
+                username="${username}${currentUser?.id === id ? ' (you)' : ''}"
+                completeness="${completeness}"
+                ?isCurrentUser="${currentUser?.id === id}"
+                .onUsernameChangeCallback="${this._onCurrentUserUsernameChange.bind(
+                  this
+                )}"
+              ></user-card-element> `
+          )}
+      </div>
+    `;
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+
+    this._connectToRace();
+  }
+
   disconnectedCallback(): void {
     this.socketConnection?.close();
   }
 
-  renderUsers() {
-    if (!this.usersPayload) return null;
+  update(
+    changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>
+  ): void {
+    super.update(changedProperties);
 
-    return html`
-      <ul>
-        ${this.usersPayload
-          .sort((a, b) => a['completeness'] - b['completeness'])
-          .map(
-            ({ username, completeness }) =>
-              html`<li>${username} - ${completeness}</li>`
-          )}
-      </ul>
-    `;
-  }
-
-  onUsernameSave() {
-    const username = this.usernameInput?.value;
-
-    if (!username) return;
-
-    this.username = username;
-    this.showUsernameModal = false;
-    this._connectToRace({ username });
-  }
-
-  renderUsernameModal() {
-    return html` <div>
-      <h5>Enter your username</h5>
-      <input id="username" />
-      <button @click=${this.onUsernameSave}>save</button>
-    </div>`;
+    if (changedProperties.has('currentUser')) {
+      this._sendChangeEvent();
+    }
   }
 
   render() {
     return html`
-      ${this.showUsernameModal
-        ? this.renderUsernameModal()
-        : html`
-            <content-card>
-              ${this.renderUsers()}
-              <div class="content">
-                <h5>The race is on! Refactor the code below:</h5>
-                <div class="editor">
-                  <div id="cm"></div>
-                </div>
-              </div>
-            </content-card>
-          `}
+      <content-card>
+        <div class="content">
+          <h5>The race is on! Refactor the code below:</h5>
+
+          ${this._renderUsers()}
+          <div class="editor">
+            <div id="cm"></div>
+          </div>
+        </div>
+      </content-card>
     `;
   }
 }

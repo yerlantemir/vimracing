@@ -28,7 +28,7 @@ wss.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
   const username = urlParams.get('username');
 
   const userId = definedUserId ?? uuid();
-  if (!raceId || !userId || !username) {
+  if (!raceId || !userId) {
     console.error('invalid params');
     return;
   }

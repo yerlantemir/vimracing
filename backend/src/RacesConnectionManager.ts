@@ -27,7 +27,7 @@ export class RacesConnectionManager {
   static onRaceEnter(
     raceId: string,
     userId: string,
-    username: string,
+    existingUsername: string | null,
     ws: WebSocket
   ) {
     const race = this._getRaceById(raceId);
@@ -42,6 +42,8 @@ export class RacesConnectionManager {
     }
 
     const user = race.users.find((u) => u.id === userId);
+    const username = existingUsername ?? `Guest`;
+
     if (!user) {
       RacesConnectionManager._addUserToRace(raceId, {
         id: userId,
@@ -59,6 +61,7 @@ export class RacesConnectionManager {
       event: SocketEventType.RACE_ENTER,
       data: {
         userId,
+        username,
         raceDoc: {
           start: user?.currentDoc ?? race.doc.start,
           goal: race.doc.goal
@@ -67,12 +70,14 @@ export class RacesConnectionManager {
     };
 
     ws.send(JSON.stringify(payload));
+
+    this._broadcastRaceChange(raceId);
   }
 
   static _onUserMessage(data: WebSocket.RawData) {
     const request: FrontendRaceChangeEvent = JSON.parse(data.toString());
     const {
-      data: { raceId, userId, raceDoc },
+      data: { raceId, username, userId, raceDoc },
       event
     } = request;
 
@@ -87,23 +92,44 @@ export class RacesConnectionManager {
       return;
 
     if (event === SocketEventType.CHANGE) {
-      this._onDocChange({ race: currentRace, userId, userDoc: raceDoc });
+      this._onUserPayloadChange({
+        race: currentRace,
+        user: {
+          id: userId,
+          doc: raceDoc,
+          username: username
+        }
+      });
     }
   }
 
-  static _onDocChange({
+  static _onUserPayloadChange({
     race,
-    userId,
-    userDoc
+    user: { id, doc, username }
   }: {
     race: RaceConnection;
-    userId: string;
-    userDoc: string[];
+    user: {
+      id: string;
+      doc: string[];
+      username: string;
+    };
   }) {
-    const user = race.users.find((u) => u.id === userId);
-    if (user) {
-      user.currentDoc = userDoc;
-    }
+    race.users = race.users.map((u) => {
+      if (u.id === id) {
+        return {
+          ...u,
+          currentDoc: doc,
+          username
+        };
+      }
+      return u;
+    });
+    this._broadcastRaceChange(race.id);
+  }
+
+  static _broadcastRaceChange(raceId: string) {
+    const race = this._getRaceById(raceId);
+    if (!race) return;
 
     race.users.forEach((user) => {
       const payload: ServerRaceChangeEvent = {
