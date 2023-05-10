@@ -9,6 +9,7 @@ import {
   rectangularSelection,
   ViewUpdate
 } from '@codemirror/view';
+import { oneDark } from '@codemirror/theme-one-dark';
 import { Text } from '@codemirror/state';
 
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
@@ -36,6 +37,7 @@ const createDefaultConfig = (config?: EditorConfig) => ({
       dropCursor(),
       rectangularSelection(),
       drawSelection(),
+      oneDark,
       EditorView.updateListener.of((v: ViewUpdate) => {
         if (v.docChanged) {
           console.log(v.state);
@@ -50,6 +52,7 @@ const createDefaultConfig = (config?: EditorConfig) => ({
     extensions: [
       lineNumbers(),
       javascript(),
+      oneDark,
       EditorView.theme({
         '&': {
           pointerEvents: 'none',

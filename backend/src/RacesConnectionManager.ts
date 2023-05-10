@@ -31,6 +31,7 @@ export class RacesConnectionManager {
     ws: WebSocket
   ) {
     const race = this._getRaceById(raceId);
+
     if (!race || !RacesConnectionManager._raceExists(raceId)) {
       const payload: ServerRaceNotFoundEvent = {
         event: SocketEventType.NOT_FOUND,
@@ -61,7 +62,7 @@ export class RacesConnectionManager {
       event: SocketEventType.RACE_ENTER,
       data: {
         userId,
-        username,
+        username: 'HUI TAM',
         raceDoc: {
           start: user?.currentDoc ?? race.doc.start,
           goal: race.doc.goal

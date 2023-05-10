@@ -1,38 +1,35 @@
 {
-  "name": "@vimracing/frontend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "src/index.ts",
+  "name": "frontend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "tsc:watch": "tsc --watch",
-    "dev": "rimraf dist && rollup -c rollup.config.js --watch"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@codemirror/commands": "^6.0.1",
     "@codemirror/lang-javascript": "^6.1.2",
     "@codemirror/merge": "github:codemirror/merge",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.1.0",
-    "@replit/codemirror-vim": "^6.0.1",
-    "@types/codemirror": "^5.60.6",
-    "@vaadin/router": "^1.7.4",
-    "@vimracing/shared": "^1.0.0",
-    "axios": "^1.2.2",
+    "@replit/codemirror-vim": "^6.0.14",
+    "@types/node": "20.1.0",
+    "@types/react": "18.2.6",
+    "@types/react-dom": "18.2.4",
+    "@types/styled-components": "^5.1.26",
+    "@uiw/codemirror-theme-okaidia": "^4.19.16",
+    "@uiw/codemirror-theme-xcode": "^4.19.16",
+    "@uiw/react-codemirror": "^4.19.16",
+    "axios": "^1.4.0",
     "codemirror": "^6.0.1",
-    "lit": "^2.6.0"
-  },
-  "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-html": "^1.0.1",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "@rollup/plugin-typescript": "^11.0.0",
-    "@web/rollup-plugin-html": "^1.11.0",
-    "eslint-plugin-lit": "^1.7.2",
-    "rimraf": "^4.0.7",
-    "rollup": "^2.79.1",
-    "rollup-plugin-serve": "^2.0.2",
-    "tslib": "^2.4.1",
-    "typescript": "^4.9.4"
+    "eslint": "8.40.0",
+    "eslint-config-next": "13.4.1",
+    "next": "13.4.1",
+    "react": "18.2.0",
+    "react-codemirror-merge": "^4.19.16",
+    "react-dom": "18.2.0",
+    "typescript": "5.0.4"
   }
 }

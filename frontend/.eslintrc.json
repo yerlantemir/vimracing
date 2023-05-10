@@ -1,5 +1,3 @@
 {
-    "extends": [
-        "plugin:lit/recommended"
-    ]
+  "extends": "next/core-web-vitals"
 }
