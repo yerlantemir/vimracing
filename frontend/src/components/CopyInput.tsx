@@ -35,7 +35,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
     <div
       className="flex justify-between py-1 px-3 pr-0 items-center rounded-xl gap-4 h-10"
       style={{
-        background: 'var(--white-3)'
+        background: 'var(--primary-text-2)'
       }}
     >
       <input
@@ -48,7 +48,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
       <button
         className="border-none rounded py-2 px-4 cursor-pointer w-24 transition duration-300 ease-linear"
         style={{
-          color: 'var(--white-1)',
+          color: 'var(--primary-text)',
           background: copied ? 'var(--green-1)' : 'var(--blue-1)'
         }}
         onClick={onCopyClick}

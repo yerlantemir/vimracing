@@ -13,7 +13,7 @@ export const Header = () => {
       <h1 className="text-3xl">
         <a
           style={{
-            color: 'var(--black-1)'
+            color: 'var(--primary-text)'
           }}
           className="no-underline"
           href="https://vimracing.com"
@@ -23,7 +23,10 @@ export const Header = () => {
         </a>
       </h1>
 
-      <div className="flex items-center gap-4">
+      <div
+        className="flex items-center gap-4"
+        style={{ color: 'var(--primary-text)' }}
+      >
         <Sun /> <Github />
       </div>
     </div>

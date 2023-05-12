@@ -19,11 +19,14 @@ export default function Corridor({ params }: { params: { raceId: string } }) {
   return (
     <ContentCard>
       <div className="flex gap-4 flex-col">
-        <h5>Join race, whenever you’re ready</h5>
+        <h5 style={{ color: 'var(--primary-text)' }}>
+          Join race, whenever you’re ready
+        </h5>
         <CopyInput link="https://vimracing.com/race/${this.raceId}"></CopyInput>
         <Button
           style={{
-            width: '10rem'
+            width: '12rem',
+            color: 'var(--text-3)'
           }}
           onClick={onRaceEnterClick}
         >

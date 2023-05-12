@@ -12,7 +12,7 @@ export const Button: React.FC<HTMLAttributes<HTMLButtonElement>> = ({
       className={`py-2 px-4 rounded cursor-pointer transition duration-200 ease-in ${className}`}
       style={{
         background: 'var(--blue-2)',
-        color: 'var(--white-1)',
+        color: 'var(--primary-text)',
         ...style
       }}
     >

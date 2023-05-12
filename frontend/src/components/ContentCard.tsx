@@ -9,7 +9,8 @@ export const ContentCard: React.FC<HTMLAttributes<HTMLDivElement>> = ({
       {...rest}
       className="block p-8 rounded-xl"
       style={{
-        background: 'var(--white-1)'
+        background: 'var(--background-2)',
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.2)'
       }}
     >
       {children}
