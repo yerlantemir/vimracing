@@ -48,7 +48,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
       <button
         className="border-none rounded py-2 px-4 cursor-pointer w-24 transition duration-300 ease-linear"
         style={{
-          color: 'var(--primary-text)',
+          color: 'var(--text-3)',
           background: copied ? 'var(--green-1)' : 'var(--blue-1)'
         }}
         onClick={onCopyClick}

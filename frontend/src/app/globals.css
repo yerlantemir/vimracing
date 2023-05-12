@@ -9,6 +9,7 @@
 
   --primary-text: #abb2bf;
   --primary-text-2: #c5c8d3;
+  --text-3: #142446;
   --white-1: #f8f8f8;
   --white-2: #282c34;
   --white-3: #e1e1e1;
@@ -16,7 +17,7 @@
   --blue-1: #61afef;
   --blue-2: #a7cded;
 
-  --green-1: #7bdc90;
+  --green-1: #98c379;
   --other-dots: #c29a4d;
 }
 .cm-editor .cm-content {
