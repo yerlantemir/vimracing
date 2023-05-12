@@ -14,9 +14,9 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
   useEffect(() => {
     if (!editorParentElement.current || !raceDoc) return;
     new Editor({
-      onChange: onDocChange,
+      raceDoc,
       parent: editorParentElement.current,
-      raceDoc
+      onChange: onDocChange
     });
   }, [onDocChange, raceDoc]);
 
