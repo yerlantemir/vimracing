@@ -8,30 +8,8 @@ import { useEffect, useRef } from 'react';
 
 export default function RacePage({ params }: { params: { raceId: string } }) {
   const { raceId } = params;
-  const { raceDoc, currentUser, onDocChange } = useRace(raceId);
+  const { usersPayload, raceDoc, currentUser, onDocChange } = useRace(raceId);
   const editorParentElement = useRef<HTMLDivElement | null>(null);
-  const usersPayload = [
-    {
-      id: 1,
-      username: 'firts-user',
-      completeness: 0.5
-    },
-    {
-      id: 2,
-      username: 'second',
-      completeness: 0.6
-    },
-    {
-      id: 3,
-      username: 'three',
-      completeness: 0.7
-    },
-    {
-      id: 4,
-      username: '4k',
-      completeness: 0.8
-    }
-  ];
 
   useEffect(() => {
     if (
@@ -49,19 +27,44 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
 
   const renderUsers = () => {
     if (!usersPayload) return null;
+
+    const currentUserPlace =
+      usersPayload
+        ?.sort((a, b) => b.completeness - a.completeness)
+        ?.findIndex((user) => user.id === currentUser?.id) + 1;
+
     return (
-      <div className="flex flex-col gap-3 justify-center grow">
-        {usersPayload.map(({ id, username, completeness }, index) => {
-          return (
-            <UserCard
-              key={id}
-              username={username}
-              completeness={completeness}
-              place={index + 1}
-              isCurrentUser={index === 0}
-            />
-          );
-        })}
+      <div className="flex gap-4">
+        <div className="flex flex-col gap-3 justify-center grow">
+          {usersPayload.map(({ id, username, completeness }, index) => {
+            return (
+              <UserCard
+                key={id}
+                username={username}
+                completeness={completeness}
+                isCurrentUser={index === 0}
+              />
+            );
+          })}
+        </div>
+        <div
+          style={{
+            width: '0.3px',
+            background: ' #abb2bf'
+          }}
+        />
+        <div
+          style={{
+            width: '20%',
+            fontSize: '64px',
+            textAlign: 'center',
+            alignItems: 'center',
+            margin: 'auto'
+          }}
+          className="text-white"
+        >
+          {currentUserPlace}
+        </div>
       </div>
     );
   };

@@ -9,8 +9,10 @@ export const Header = () => {
   const onHeaderClick = (e: any) => {
     e.preventDefault();
     router.push('/');
-    // TODO: route to '/'
   };
+
+  const iconClassNames =
+    'text-gray hover:text-gray-2 transition duration-200 cursor-pointer outline-1';
 
   return (
     <div className="flex justify-between items-center h-20">
@@ -25,7 +27,8 @@ export const Header = () => {
       </h1>
 
       <div className="flex items-center gap-4 text-gray">
-        <Sun /> <Github />
+        <Sun className={iconClassNames} tabIndex={0} />{' '}
+        <Github className={iconClassNames} tabIndex={0} />
       </div>
     </div>
   );
