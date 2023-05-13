@@ -16,10 +16,7 @@ export const Header = () => {
     <div className="flex justify-between items-center h-20">
       <h1 className="text-3xl">
         <Link
-          style={{
-            color: 'var(--primary-text)'
-          }}
-          className="no-underline"
+          className="no-underline text-gray"
           href="/"
           onClick={onHeaderClick}
         >
@@ -27,10 +24,7 @@ export const Header = () => {
         </Link>
       </h1>
 
-      <div
-        className="flex items-center gap-4"
-        style={{ color: 'var(--primary-text)' }}
-      >
+      <div className="flex items-center gap-4 text-gray">
         <Sun /> <Github />
       </div>
     </div>

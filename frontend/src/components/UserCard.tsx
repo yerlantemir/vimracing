@@ -18,10 +18,9 @@ export const UserCard: React.FC<UserCardProps> = ({
     <div style={{ background: isCurrentUser ? '#4a505a' : '' }}>
       <div
         style={{
-          width: '40%',
-          color: 'var(--primary-text-2)'
+          width: '40%'
         }}
-        className="flex py-0 gap-4 items-center"
+        className="flex py-0 gap-4 items-center text-gray-2"
       >
         <span className="text-xs font-bold text-white">{place}</span>
         <span className="opacity-80" style={{ width: '25%' }}>

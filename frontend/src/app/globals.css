@@ -4,21 +4,6 @@
 
 :root {
   font-family: 'Roboto Mono', monospace;
-  --background: #282c34;
-  --background-2: #3c4049;
-
-  --primary-text: #abb2bf;
-  --primary-text-2: #c5c8d3;
-  --text-3: #142446;
-  --white-1: #f8f8f8;
-  --white-2: #282c34;
-  --white-3: #e1e1e1;
-
-  --blue-1: #61afef;
-  --blue-2: #a7cded;
-
-  --green-1: #98c379;
-  --other-dots: #c29a4d;
 }
 .cm-editor .cm-content {
   font-family: 'Roboto Mono', monospace;
@@ -31,7 +16,6 @@ body {
 
   width: 100vw;
   height: 100vh;
-  background: var(--background);
   box-sizing: border-box;
   padding: 0 7.5rem;
 }

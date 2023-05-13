@@ -69,7 +69,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
   return (
     <ContentCard>
       <div className="flex flex-col gap-4">
-        <h5 style={{ color: 'var(--primary-text-2)' }}>
+        <h5 className="text-gray-2">
           The race is on! Refactor the code below:
         </h5>
         <div
