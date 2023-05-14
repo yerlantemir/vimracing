@@ -23,7 +23,7 @@ export const UserCard: React.FC<UserCardProps> = ({
         <span className="opacity-80" style={{ width: '25%' }}>
           {username}
         </span>
-        <span className="opacity-50">{completeness}</span>
+        <span className="opacity-50">{completeness}%</span>
       </div>
     </div>
   );

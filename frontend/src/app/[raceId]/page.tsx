@@ -35,7 +35,10 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
 
     return (
       <div className="flex gap-4">
-        <div className="flex flex-col gap-3 justify-center grow">
+        <div
+          className="flex flex-col gap-3 grow justify-start overflow-y-scroll"
+          style={{ maxHeight: '120px' }}
+        >
           {usersPayload.map(({ id, username, completeness }, index) => {
             return (
               <UserCard
@@ -49,19 +52,17 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
         </div>
         <div
           style={{
-            width: '0.3px',
-            background: ' #abb2bf'
+            width: '0.3px'
           }}
+          className="bg-gray"
         />
         <div
           style={{
             width: '20%',
             fontSize: '64px',
-            textAlign: 'center',
-            alignItems: 'center',
-            margin: 'auto'
+            lineHeight: '100%'
           }}
-          className="text-white"
+          className="text-white items-center text-center m-auto"
         >
           {currentUserPlace}
         </div>
@@ -75,14 +76,10 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
         <h5 className="text-gray-2">
           The race is on! Refactor the code below:
         </h5>
-        <div
-          style={{ height: '0.3px', width: '100%', background: ' #abb2bf' }}
-        />
+        <div style={{ height: '0.3px' }} className="bg-gray w-full" />
         {renderUsers()}
 
-        <div
-          style={{ height: '0.3px', width: '100%', background: ' #abb2bf' }}
-        />
+        <div style={{ height: '0.3px' }} className="bg-gray w-full" />
         {raceDoc && <div ref={editorParentElement} />}
       </div>
     </ContentCard>

@@ -62,7 +62,7 @@ export class RacesConnectionManager {
       event: SocketEventType.RACE_ENTER,
       data: {
         userId,
-        username: 'HUI TAM',
+        username,
         raceDoc: {
           start: user?.currentDoc ?? race.doc.start,
           goal: race.doc.goal
