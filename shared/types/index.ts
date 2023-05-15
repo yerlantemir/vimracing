@@ -1,45 +1,92 @@
-export enum SocketEventType {
-  CHANGE = 'Change',
-  RACE_FINISH = 'RaceFinish',
-  RACE_ENTER = 'RaceEnter',
-  NOT_FOUND = 'NotFound'
+/* 
+Frontend Event types:
+1. HostRaceStartClick
+2. DocumentChange
+
+/* 
+Backend Event Types:
+1. RaceInit
+2. NewUser
+3. RaceTimerUpdate
+4. RaceStart
+5. UserDocumentChange()
+6. RaceFinish 
+*/
+
+type Player = {
+  id: string;
+  username: string;
+  completeness?: number;
+  raceDoc?: string[];
+  place?: number;
+};
+
+export enum RaceState {
+  WAITING,
+  ON,
+  FINISHED
 }
 
-export interface FrontendRaceChangeEvent {
-  event: SocketEventType.CHANGE;
-  data: {
-    userId: string;
-    raceDoc: string[];
-    raceId: string;
-    username: string;
+export enum FrontendEventType {
+  HOST_RACE_START_CLICK = 'HostRaceStartClick',
+  DOCUMENT_CHANGE = 'DocumentChange'
+}
+
+export enum BackendEventType {
+  RACE_INIT = 'RaceInit',
+  NEW_PLAYER = 'NewPlayer',
+  RACE_TIMER_UPDATE = 'RaceTimerUpdate',
+  RACE_START = 'RaceStart',
+  PLAYER_DATA_CHANGE = 'PlayerDataChange',
+  RACE_FINISH = 'RaceFinish'
+}
+
+export interface FrontendRaceEnterEvent {
+  event: FrontendEventType.HOST_RACE_START_CLICK;
+}
+export interface FrontendDocumentChangeEvent {
+  event: FrontendEventType.DOCUMENT_CHANGE;
+  payload: {
+    newDocument: string[];
   };
 }
 
-export interface ServerRaceChangeEvent {
-  event: SocketEventType.CHANGE;
-  data: {
-    usersPayload: { id: string; completeness: number; username: string }[];
+export interface BackendRaceInitEvent {
+  event: BackendEventType.RACE_INIT;
+  payload: {
+    you: Player;
+    players: Player[];
   };
 }
-
-export interface ServerRaceEnterEvent {
-  event: SocketEventType.RACE_ENTER;
-  data: {
-    userId: string;
-    username: string;
+export interface BackendNewPlayerEvent {
+  event: BackendEventType.NEW_PLAYER;
+  payload: {
+    newPlayer: Player;
+  };
+}
+export interface BackendRaceTimerUpdateEvent {
+  event: BackendEventType.RACE_TIMER_UPDATE;
+  payload: {
+    raceState: RaceState;
+    timerInSeconds: number;
+  };
+}
+export interface BackendRaceStartEvent {
+  event: BackendEventType.RACE_START;
+  payload: {
     raceDoc: {
       start: string[];
-      goal: string[];
+      target: string[];
     };
   };
 }
-export interface ServerRaceNotFoundEvent {
-  event: SocketEventType.NOT_FOUND;
-  data: object;
+export interface BackendPlayerDataChangeEvent {
+  event: BackendEventType.PLAYER_DATA_CHANGE;
+  payload: Pick<Player, 'id' | 'completeness'>;
 }
-
-export type FrontendEventType = FrontendRaceChangeEvent;
-export type ServerEventType =
-  | ServerRaceChangeEvent
-  | ServerRaceEnterEvent
-  | ServerRaceNotFoundEvent;
+export interface BackendRaceFinishEvent {
+  event: BackendEventType.RACE_FINISH;
+  payload: {
+    players: Player[];
+  };
+}
