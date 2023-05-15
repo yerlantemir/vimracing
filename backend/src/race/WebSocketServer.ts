@@ -1,5 +1,5 @@
 import * as http from 'http';
-import WebSocket from 'ws';
+import * as WebSocket from 'ws';
 import { Race } from './Race';
 import { uuid } from 'uuidv4';
 import {
@@ -11,6 +11,7 @@ import {
   BackendRaceTimerUpdateEvent,
   FrontendDocumentChangeEvent,
   FrontendEventType,
+  FrontendRaceHostStartEvent,
   RaceState
 } from '@vimracing/shared';
 import { Player } from './Player';
@@ -20,8 +21,8 @@ export class WebSocketServer {
   private races: Record<string, Race> = {};
   private userIdWebsocketMapping: Record<string, WebSocket> = {};
 
-  constructor(port: number) {
-    this.server = new WebSocket.Server({ port });
+  constructor(server: http.Server) {
+    this.server = new WebSocket.Server({ server });
 
     this.server.on('connection', (ws: WebSocket, req: http.IncomingMessage) => {
       const urlParams = new URLSearchParams(req.url?.split('?')[1]);
@@ -38,20 +39,17 @@ export class WebSocketServer {
   }
   handleMessage(
     ws: WebSocket,
-    payload: { event: FrontendEventType; data: any },
+    data: FrontendRaceHostStartEvent | FrontendDocumentChangeEvent,
     race: Race,
     playerId: string
   ) {
-    const { event, data } = payload;
+    const { event, payload } = data;
     switch (event) {
       case FrontendEventType.HOST_RACE_START_CLICK:
         if (playerId === race.hostId) race.start();
         break;
       case FrontendEventType.DOCUMENT_CHANGE:
-        race.changeDoc(
-          playerId,
-          (data as FrontendDocumentChangeEvent['payload']).newDocument
-        );
+        race.changeDoc(playerId, payload.newDocument);
         break;
     }
   }
