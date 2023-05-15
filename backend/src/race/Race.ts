@@ -1,16 +1,21 @@
 import { RaceState } from '@vimracing/shared';
 import { Player } from './Player';
 import { EventEmitter } from 'events';
+import { Tail } from '../types/Tail';
 
 const DEFAULT_WAITING_TIME_IN_S = 3;
 const DEFAULT_RACE_TIME_IN_S = 60;
 const RACE_TIMER_UPDATE_INTERVAL_IN_MS = 1000;
 
 interface RaceEvents {
-  playerAdded: (player: Player) => void;
-  raceStarted: () => void;
-  timerUpdate: (params: { raceStatus: RaceState; timer: number }) => void;
-  raceFinished: () => void;
+  playerAdded: (race: Race, player: Player) => void;
+  raceStarted: (race: Race) => void;
+  timerUpdated: (
+    race: Race,
+    params: { raceStatus: RaceState; timer: number }
+  ) => void;
+  raceFinished: (race: Race) => void;
+  playerDataChanged: (race: Race, player: Player) => void;
 }
 
 export class Race {
@@ -34,7 +39,7 @@ export class Race {
         clearInterval(currentInterval);
       } else {
         timer--;
-        this.emit('timerUpdate', { raceStatus: this.state, timer });
+        this.emit('timerUpdated', { raceStatus: this.state, timer });
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
@@ -48,7 +53,7 @@ export class Race {
         this.onRaceEnd();
         clearInterval(interval);
       } else {
-        this.emit('timerUpdate', { raceStatus: this.state, timer });
+        this.emit('timerUpdated', { raceStatus: this.state, timer });
         timer--;
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
@@ -64,7 +69,29 @@ export class Race {
 
   public changeDoc(playerId: string, doc: string[]) {
     const player = this.getPlayer(playerId);
-    player?.updateDoc(doc);
+    if (!player) return;
+    player.updateDoc(doc);
+    this.emit('playerDataChanged', player);
+  }
+  public getRaceDoc() {
+    return {
+      start: [
+        'if (true) {',
+        '  console.log(hello);',
+        '}',
+        'else {',
+        '   console.log(fuck you!)',
+        '}'
+      ],
+      target: [
+        'if (false) {',
+        '  console.log(hello);',
+        '}',
+        'else {',
+        "  console.log('fuck you!')",
+        '}'
+      ]
+    };
   }
   private getPlayer(id: string) {
     return this.players.find((p) => p.id === id);
@@ -79,8 +106,8 @@ export class Race {
 
   private emit<Event extends keyof RaceEvents>(
     event: Event,
-    ...args: Parameters<RaceEvents[Event]>
+    ...args: Tail<Parameters<RaceEvents[Event]>>
   ) {
-    this.eventEmitter.emit(event, ...args);
+    this.eventEmitter.emit(event, this, ...args);
   }
 }
