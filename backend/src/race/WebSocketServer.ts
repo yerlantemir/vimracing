@@ -28,7 +28,7 @@ export class WebSocketServer {
       const urlParams = new URLSearchParams(req.url?.split('?')[1]);
       const userId = urlParams.get('userId') ?? uuid();
       const raceIdParam = urlParams.get('raceId');
-      const race = this.races[raceIdParam || ''] || this.createRace(userId);
+      const race = this.races[raceIdParam || ''];
       this.userIdWebsocketMapping[userId] = ws;
 
       ws.on('message', (message: string) => {
@@ -46,7 +46,13 @@ export class WebSocketServer {
     const { event, payload } = data;
     switch (event) {
       case FrontendEventType.HOST_RACE_START_CLICK:
-        if (playerId === race.hostId) race.start();
+        if (payload.hostToken !== race.hostToken) return;
+        // listen for all events
+        race.on('raceStarted', this.onRaceStart);
+        race.on('playerAdded', this.onPlayerAdded);
+        race.on('timerUpdated', this.onTimerUpdated);
+        race.on('playerDataChanged', this.onPlayerDataChanged);
+        race.on('raceFinished', this.onRaceFinished);
         break;
       case FrontendEventType.DOCUMENT_CHANGE:
         race.changeDoc(playerId, payload.newDocument);
@@ -54,18 +60,13 @@ export class WebSocketServer {
     }
   }
 
-  createRace(hostId: string) {
+  createRace() {
     const newRaceId = uuid();
-    const newRace = new Race(newRaceId, hostId);
+    const hostToken = uuid();
+    const newRace = new Race(newRaceId, hostToken);
 
-    // listen for all events
-    newRace.on('raceStarted', this.onRaceStart);
-    newRace.on('playerAdded', this.onPlayerAdded);
-    newRace.on('timerUpdated', this.onTimerUpdated);
-    newRace.on('playerDataChanged', this.onPlayerDataChanged);
-    newRace.on('raceFinished', this.onRaceFinished);
     this.races[newRaceId] = newRace;
-    return newRace;
+    return { raceId: newRaceId, hostToken };
   }
   onRaceStart(race: Race) {
     race.getPlayers().forEach((player) => {

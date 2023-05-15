@@ -22,8 +22,7 @@ export class Race {
   private eventEmitter = new EventEmitter();
   private state: RaceState = RaceState.WAITING;
   private players: Player[] = [];
-
-  constructor(public id: string, public hostId: string) {}
+  constructor(public id: string, public hostToken: string) {}
 
   addPlayer(player: Player) {
     if (this.getPlayer(player.id) || this.state !== RaceState.WAITING) return;

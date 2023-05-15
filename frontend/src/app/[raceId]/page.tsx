@@ -1,6 +1,7 @@
 'use client';
 
 import { ContentCard } from '@/components/ContentCard';
+import { CopyInput } from '@/components/CopyInput';
 import Editor from '@/components/Editor';
 import { UserCard } from '@/components/UserCard';
 import { useRace } from '@/hooks/useRace';
@@ -73,6 +74,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
   return (
     <ContentCard>
       <div className="flex flex-col gap-4">
+        <CopyInput link="https://vimracing.com/race/${this.raceId}" />
         <h5 className="text-gray-2">
           The race is on! Refactor the code below:
         </h5>

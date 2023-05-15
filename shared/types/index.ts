@@ -13,7 +13,7 @@ Backend Event Types:
 6. RaceFinish 
 */
 
-type Player = {
+export type Player = {
   id: string;
   username: string;
   completeness?: number;
@@ -41,8 +41,9 @@ export enum BackendEventType {
   RACE_FINISH = 'RaceFinish'
 }
 
-export interface FrontendRaceEnterEvent {
+export interface FrontendRaceHostStartEvent {
   event: FrontendEventType.HOST_RACE_START_CLICK;
+  payload: { hostToken: string };
 }
 export interface FrontendDocumentChangeEvent {
   event: FrontendEventType.DOCUMENT_CHANGE;

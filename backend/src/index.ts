@@ -11,7 +11,15 @@ app.use(cors());
 const port = Number(process.env.PORT) || 8999;
 const server = http.createServer(app);
 
-new WebSocketServer(server);
+const raceSocketServer = new WebSocketServer(server);
+
+app.post('/race/create', (req, res) => {
+  const { raceId, hostToken } = raceSocketServer.createRace();
+  res.send({
+    raceId,
+    hostToken
+  });
+});
 
 server.listen(port, () => {
   console.log(

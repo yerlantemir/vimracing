@@ -1,4 +1,4 @@
-import { FrontendEventType, ServerEventType } from '@vimracing/shared';
+import { FrontendEventType } from '@vimracing/shared';
 
 export const parseData = (data: string): ServerEventType => {
   return JSON.parse(data);

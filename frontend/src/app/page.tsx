@@ -2,16 +2,23 @@
 
 import { ContentCard } from '@/components/ContentCard';
 import { Button } from '@/components/Button';
-import { createRoom } from '@/api/createRoom';
+import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
+import { LocalStorageManager } from '@/utils/storage';
 
 export default function Home() {
   const router = useRouter();
 
   const onCreateRaceClick = async () => {
-    const newRoomId = await createRoom();
+    const response = await createRace();
+    if (!response) return;
 
-    router.push(`${newRoomId}/corridor`);
+    const { hostToken, raceId } = response;
+    LocalStorageManager.setHostToken({
+      raceId,
+      hostToken
+    });
+    router.push(raceId);
   };
 
   return (
