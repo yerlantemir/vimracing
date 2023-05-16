@@ -12,7 +12,8 @@ import {
   FrontendDocumentChangeEvent,
   FrontendEventType,
   FrontendRaceHostStartEvent,
-  RaceState
+  RaceState,
+  BackendRaceInitEvent
 } from '@vimracing/shared';
 import { Player } from './Player';
 
@@ -29,7 +30,19 @@ export class WebSocketServer {
       const userId = urlParams.get('userId') ?? uuid();
       const raceIdParam = urlParams.get('raceId');
       const race = this.races[raceIdParam || ''];
+
       this.userIdWebsocketMapping[userId] = ws;
+
+      const currentPlayer = new Player(userId, 'haa', race.getRaceDoc().start);
+      race.addPlayer(currentPlayer);
+      const initRacePayload: BackendRaceInitEvent = {
+        event: BackendEventType.RACE_INIT,
+        payload: {
+          you: currentPlayer,
+          players: race.getPlayers().filter((p) => p.id !== currentPlayer.id)
+        }
+      };
+      ws.send(JSON.stringify(initRacePayload));
 
       ws.on('message', (message: string) => {
         const payload = JSON.parse(message);
@@ -47,12 +60,7 @@ export class WebSocketServer {
     switch (event) {
       case FrontendEventType.HOST_RACE_START_CLICK:
         if (payload.hostToken !== race.hostToken) return;
-        // listen for all events
-        race.on('raceStarted', this.onRaceStart);
-        race.on('playerAdded', this.onPlayerAdded);
-        race.on('timerUpdated', this.onTimerUpdated);
-        race.on('playerDataChanged', this.onPlayerDataChanged);
-        race.on('raceFinished', this.onRaceFinished);
+        race.start();
         break;
       case FrontendEventType.DOCUMENT_CHANGE:
         race.changeDoc(playerId, payload.newDocument);
@@ -64,6 +72,13 @@ export class WebSocketServer {
     const newRaceId = uuid();
     const hostToken = uuid();
     const newRace = new Race(newRaceId, hostToken);
+
+    // listen for all events
+    newRace.on('raceStarted', this.onRaceStart.bind(this));
+    newRace.on('playerAdded', this.onPlayerAdded.bind(this));
+    newRace.on('timerUpdated', this.onTimerUpdated.bind(this));
+    newRace.on('playerDataChanged', this.onPlayerDataChanged.bind(this));
+    newRace.on('raceFinished', this.onRaceFinished.bind(this));
 
     this.races[newRaceId] = newRace;
     return { raceId: newRaceId, hostToken };
