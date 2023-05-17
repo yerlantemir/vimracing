@@ -44,7 +44,7 @@ export const useRace = (raceId: string) => {
     const hostTokenString = LocalStorageManager.getHostToken();
     if (!hostTokenString) return false;
     const { raceId: hostTokenRaceId, hostToken } = hostTokenString;
-    return hostTokenRaceId === raceId && hostToken;
+    return hostTokenRaceId === raceId && !!hostToken;
   }, [raceId]);
 
   const onRaceInit = (payload: BackendRaceInitEvent['payload']) => {
@@ -149,6 +149,7 @@ export const useRace = (raceId: string) => {
 
     socketConnection.current = newSocketConnection;
     return () => {
+      newSocketConnection.removeEventListener('message', onMessageFromServer);
       socketConnection.current?.close();
     };
   }, [onMessageFromServer, raceId]);
