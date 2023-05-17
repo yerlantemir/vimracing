@@ -72,27 +72,51 @@ export class Race {
     player.updateDoc(doc);
     this.emit('playerDataChanged', player);
   }
-  public getRaceDoc() {
-    return {
-      start: [
-        'if (true) {',
-        '  console.log(hello);',
-        '}',
-        'else {',
-        '   console.log(fuck you!)',
-        '}'
-      ],
-      target: [
-        'if (false) {',
-        '  console.log(hello);',
-        '}',
-        'else {',
-        "  console.log('fuck you!')",
-        '}'
-      ]
-    };
+  public getRaceDocs() {
+    return [
+      {
+        start: [
+          'if (true) {',
+          '  console.log(hello);',
+          '}',
+          'else {',
+          '   console.log(fuck you!)',
+          '}'
+        ],
+        target: [
+          'if (false) {',
+          '  console.log(hello);',
+          '}',
+          'else {',
+          "  console.log('fuck you!')",
+          '}'
+        ]
+      },
+      {
+        start: ['print(hey)', '   print(mey)', 'print(ss)'],
+        target: ['print()', 'print()', 'print()']
+      },
+      {
+        start: [
+          'if (true) {',
+          '  console.log(hello);',
+          '}',
+          'else {',
+          '   console.log(fuck you!)',
+          '}'
+        ],
+        target: [
+          'if (false) {',
+          '  console.log(hello);',
+          '}',
+          'else {',
+          "  console.log('fuck you!')",
+          '}'
+        ]
+      }
+    ];
   }
-  private getPlayer(id: string) {
+  public getPlayer(id: string) {
     return this.players.find((p) => p.id === id);
   }
 

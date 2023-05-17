@@ -17,8 +17,8 @@ export type Player = {
   id: string;
   username: string;
   completeness?: number;
-  raceDoc?: string[];
-  place?: number;
+  raceDocs?: string[][];
+  currentPlace?: number;
 };
 
 export enum RaceState {
@@ -48,6 +48,7 @@ export interface FrontendRaceHostStartEvent {
 export interface FrontendDocumentChangeEvent {
   event: FrontendEventType.DOCUMENT_CHANGE;
   payload: {
+    docIndex: number;
     newDocument: string[];
   };
 }
@@ -75,10 +76,10 @@ export interface BackendRaceTimerUpdateEvent {
 export interface BackendRaceStartEvent {
   event: BackendEventType.RACE_START;
   payload: {
-    raceDoc: {
+    raceDocs: {
       start: string[];
       target: string[];
-    };
+    }[];
   };
 }
 export interface BackendPlayerDataChangeEvent {

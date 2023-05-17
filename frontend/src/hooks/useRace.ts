@@ -28,11 +28,11 @@ type BackendRaceEvent =
 export const useRace = (raceId: string) => {
   const socketConnection = useRef<WebSocket | undefined>();
 
-  const [raceDoc, setRaceDoc] = useState<
+  const [raceDocs, setRaceDocs] = useState<
     | {
         start: string[];
         target: string[];
-      }
+      }[]
     | undefined
   >(undefined);
 
@@ -72,8 +72,8 @@ export const useRace = (raceId: string) => {
     setRaceStatus(raceState);
   };
   const onRaceStart = (payload: BackendRaceStartEvent['payload']) => {
-    const { raceDoc: newRaceDoc } = payload;
-    setRaceDoc(newRaceDoc);
+    const { raceDocs: newRaceDoc } = payload;
+    setRaceDocs(newRaceDoc);
   };
   const onOtherPlayerDataChange = (
     payload: BackendPlayerDataChangeEvent['payload']
@@ -117,10 +117,14 @@ export const useRace = (raceId: string) => {
     [onNewPlayerJoin]
   );
 
-  const onCurrentPlayerDocumentChange = (newDocument: string[]) => {
+  const onCurrentPlayerDocumentChange = (
+    newDocument: string[],
+    documentIndex: number
+  ) => {
     const payload: FrontendDocumentChangeEvent = {
       event: FrontendEventType.DOCUMENT_CHANGE,
       payload: {
+        docIndex: documentIndex,
         newDocument
       }
     };
@@ -156,7 +160,7 @@ export const useRace = (raceId: string) => {
   }, [onMessageFromServer, raceId]);
 
   return {
-    raceDoc,
+    raceDocs,
     players,
     currentPlayer,
     raceTimer,

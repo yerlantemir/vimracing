@@ -8,7 +8,7 @@ const Circle = ({ taskStatus }: { taskStatus: TaskStatus }) => {
     if (taskStatus === 'doing') return 'bg-orange';
     return 'bg-gray-4';
   }, [taskStatus]);
-  return <div className={`h-4 w-4 rounded-full ${bgColor}`} />;
+  return <div className={`h-3 w-3 rounded-full ${bgColor}`} />;
 };
 
 const Line = ({

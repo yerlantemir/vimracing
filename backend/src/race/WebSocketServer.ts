@@ -99,7 +99,7 @@ export class WebSocketServer {
       ({ connection }) => {
         const payload: BackendRaceStartEvent = {
           event: BackendEventType.RACE_START,
-          payload: { raceDoc: race.getRaceDoc() }
+          payload: { raceDocs: race.getRaceDocs() }
         };
         connection.send(JSON.stringify(payload));
       }
