@@ -20,7 +20,10 @@ import { Player } from './Player';
 export class WebSocketServer {
   private server: WebSocket.Server;
   private races: Record<string, Race> = {};
-  private userIdWebsocketMapping: Record<string, WebSocket> = {};
+  private raceIdWebsocketConnectionsMapping: Record<
+    string,
+    { playerId: string; connection: WebSocket }[]
+  > = {};
 
   constructor(server: http.Server) {
     this.server = new WebSocket.Server({ server });
@@ -33,7 +36,10 @@ export class WebSocketServer {
 
       if (!race) return;
 
-      this.userIdWebsocketMapping[userId] = ws;
+      this.raceIdWebsocketConnectionsMapping[race.id].push({
+        playerId: userId,
+        connection: ws
+      });
 
       const currentPlayer =
         race.getPlayer(userId) ?? new Player(userId, race.getRaceDoc().start);
@@ -85,24 +91,24 @@ export class WebSocketServer {
     newRace.on('raceFinished', this.onRaceFinished.bind(this));
 
     this.races[newRaceId] = newRace;
+    this.raceIdWebsocketConnectionsMapping[newRaceId] = [];
     return { raceId: newRaceId, hostToken };
   }
   onRaceStart(race: Race) {
-    race.getPlayers().forEach((player) => {
-      const connection = this.userIdWebsocketMapping[player.id];
-      const payload: BackendRaceStartEvent = {
-        event: BackendEventType.RACE_START,
-        payload: { raceDoc: race.getRaceDoc() }
-      };
-      connection.send(JSON.stringify(payload));
-    });
+    this.raceIdWebsocketConnectionsMapping[race.id].forEach(
+      ({ connection }) => {
+        const payload: BackendRaceStartEvent = {
+          event: BackendEventType.RACE_START,
+          payload: { raceDoc: race.getRaceDoc() }
+        };
+        connection.send(JSON.stringify(payload));
+      }
+    );
   }
   onPlayerAdded(race: Race, newPlayer: Player) {
-    race
-      .getPlayers()
-      .filter((p) => p.id !== newPlayer.id)
-      .forEach((player) => {
-        const connection = this.userIdWebsocketMapping[player.id];
+    this.raceIdWebsocketConnectionsMapping[race.id].forEach(
+      ({ playerId, connection }) => {
+        if (playerId === newPlayer.id) return;
         const payload: BackendNewPlayerEvent = {
           event: BackendEventType.NEW_PLAYER,
           payload: {
@@ -110,30 +116,31 @@ export class WebSocketServer {
           }
         };
         connection.send(JSON.stringify(payload));
-      });
+      }
+    );
   }
   onTimerUpdated(
     race: Race,
     { timer, raceStatus }: { timer: number; raceStatus: RaceState }
   ) {
-    race.getPlayers().forEach((player) => {
-      const connection = this.userIdWebsocketMapping[player.id];
-      const payload: BackendRaceTimerUpdateEvent = {
-        event: BackendEventType.RACE_TIMER_UPDATE,
-        payload: {
-          timerInSeconds: timer,
-          raceState: raceStatus
-        }
-      };
-      connection.send(JSON.stringify(payload));
-    });
+    this.raceIdWebsocketConnectionsMapping[race.id].forEach(
+      ({ connection }) => {
+        const payload: BackendRaceTimerUpdateEvent = {
+          event: BackendEventType.RACE_TIMER_UPDATE,
+          payload: {
+            timerInSeconds: timer,
+            raceState: raceStatus
+          }
+        };
+        connection.send(JSON.stringify(payload));
+      }
+    );
   }
   onPlayerDataChanged(race: Race, newPlayer: Player) {
-    race
-      .getPlayers()
-      .filter((p) => p.id !== newPlayer.id)
-      .forEach((player) => {
-        const connection = this.userIdWebsocketMapping[player.id];
+    this.raceIdWebsocketConnectionsMapping[race.id].forEach(
+      ({ playerId, connection }) => {
+        if (playerId === newPlayer.id) return;
+
         const payload: BackendPlayerDataChangeEvent = {
           event: BackendEventType.PLAYER_DATA_CHANGE,
           payload: {
@@ -142,18 +149,20 @@ export class WebSocketServer {
           }
         };
         connection.send(JSON.stringify(payload));
-      });
+      }
+    );
   }
   onRaceFinished(race: Race) {
-    race.getPlayers().forEach((player) => {
-      const connection = this.userIdWebsocketMapping[player.id];
-      const payload: BackendRaceFinishEvent = {
-        event: BackendEventType.RACE_FINISH,
-        payload: {
-          players: race.getPlayers()
-        }
-      };
-      connection.send(JSON.stringify(payload));
-    });
+    this.raceIdWebsocketConnectionsMapping[race.id].forEach(
+      ({ connection }) => {
+        const payload: BackendRaceFinishEvent = {
+          event: BackendEventType.RACE_FINISH,
+          payload: {
+            players: race.getPlayers()
+          }
+        };
+        connection.send(JSON.stringify(payload));
+      }
+    );
   }
 }

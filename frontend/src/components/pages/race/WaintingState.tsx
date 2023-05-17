@@ -38,16 +38,26 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
         />
       )}
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
-      {isHost && players && players.length > 0 && (
-        <Button
-          onClick={onHostRaceStartClick}
-          className="text-gray-3"
-          style={{ maxWidth: '200px' }}
-        >
-          Start the race!
-        </Button>
+      {isHost && !raceTimer && (
+        <>
+          {players && players.length > 0 ? (
+            <Button
+              onClick={onHostRaceStartClick}
+              className="text-gray-3"
+              style={{ maxWidth: '200px' }}
+            >
+              Start the race!
+            </Button>
+          ) : (
+            <>
+              <p className="text-gray-2">Waiting for other players to join</p>
+            </>
+          )}
+        </>
       )}
-      <p className="text-gray-2">Waiting for host to start</p>
+      {!isHost && !raceTimer && (
+        <p className="text-gray-2">Waiting for host to start</p>
+      )}
     </>
   );
 };
