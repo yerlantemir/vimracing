@@ -1,16 +1,19 @@
 'use client';
 
-type UserCardProps = {
+import { RaceState } from '@vimracing/shared';
+
+type PlayerCardProps = {
   username: string;
-  onUsernameChangeCallback?: (newUsername: string) => void;
   completeness: number;
   isCurrentUser: boolean;
+  raceStatus?: RaceState;
 };
 
-export const UserCard: React.FC<UserCardProps> = ({
+export const PlayerCard: React.FC<PlayerCardProps> = ({
   isCurrentUser,
   username,
-  completeness
+  completeness,
+  raceStatus
 }) => {
   return (
     <div style={{ background: isCurrentUser ? '#4a505a' : '' }}>
@@ -23,7 +26,9 @@ export const UserCard: React.FC<UserCardProps> = ({
         <span className="opacity-80" style={{ width: '25%' }}>
           {username}
         </span>
-        <span className="opacity-50">{completeness}%</span>
+        {raceStatus !== RaceState.WAITING && (
+          <span className="opacity-50">{completeness}%</span>
+        )}
       </div>
     </div>
   );

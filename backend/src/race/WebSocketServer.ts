@@ -31,9 +31,13 @@ export class WebSocketServer {
       const raceIdParam = urlParams.get('raceId');
       const race = this.races[raceIdParam || ''];
 
+      if (!race) return;
+
       this.userIdWebsocketMapping[userId] = ws;
 
-      const currentPlayer = new Player(userId, 'haa', race.getRaceDoc().start);
+      const currentPlayer =
+        race.getPlayer(userId) ?? new Player(userId, race.getRaceDoc().start);
+
       race.addPlayer(currentPlayer);
       const initRacePayload: BackendRaceInitEvent = {
         event: BackendEventType.RACE_INIT,

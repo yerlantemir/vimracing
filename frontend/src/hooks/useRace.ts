@@ -1,5 +1,11 @@
 import { LocalStorageManager } from '@/utils/storage';
-import { Player, RaceState } from '@vimracing/shared';
+import {
+  FrontendDocumentChangeEvent,
+  FrontendEventType,
+  FrontendRaceHostStartEvent,
+  Player,
+  RaceState
+} from '@vimracing/shared';
 import {
   BackendEventType,
   BackendNewPlayerEvent,
@@ -9,7 +15,7 @@ import {
   BackendRaceStartEvent,
   BackendRaceTimerUpdateEvent
 } from '@vimracing/shared';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type BackendRaceEvent =
   | BackendRaceInitEvent
@@ -34,9 +40,19 @@ export const useRace = (raceId: string) => {
   const [players, setPlayers] = useState<Player[]>();
   const [raceTimer, setRaceTimer] = useState<number>();
   const [raceStatus, setRaceStatus] = useState<RaceState>();
+  const isHost = useMemo(() => {
+    const hostTokenString = LocalStorageManager.getHostToken();
+    if (!hostTokenString) return false;
+    const { raceId: hostTokenRaceId, hostToken } = hostTokenString;
+    return hostTokenRaceId === raceId && hostToken;
+  }, [raceId]);
 
   const onRaceInit = (payload: BackendRaceInitEvent['payload']) => {
     const { you, players: otherPlayers } = payload;
+    LocalStorageManager.setUser({
+      id: you.id,
+      username: you.username
+    });
     setCurrentPlayer(you);
     setPlayers(otherPlayers);
     setRaceStatus(RaceState.WAITING);
@@ -100,6 +116,27 @@ export const useRace = (raceId: string) => {
     [onNewPlayerJoin]
   );
 
+  const onCurrentPlayerDocumentChange = (newDocument: string[]) => {
+    const payload: FrontendDocumentChangeEvent = {
+      event: FrontendEventType.DOCUMENT_CHANGE,
+      payload: {
+        newDocument
+      }
+    };
+    socketConnection.current?.send(JSON.stringify(payload));
+  };
+
+  const onHostRaceStartClick = () => {
+    if (!isHost) return;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const { hostToken } = LocalStorageManager.getHostToken()!;
+
+    const payload: FrontendRaceHostStartEvent = {
+      event: FrontendEventType.HOST_RACE_START_CLICK,
+      payload: { hostToken }
+    };
+    socketConnection.current?.send(JSON.stringify(payload));
+  };
   useEffect(() => {
     const user = LocalStorageManager.getUser();
     const userIdParam = user?.id ? `&userId=${user.id}` : '';
@@ -121,6 +158,9 @@ export const useRace = (raceId: string) => {
     players,
     currentPlayer,
     raceTimer,
-    raceStatus
+    raceStatus,
+    onDocChange: onCurrentPlayerDocumentChange,
+    isHost,
+    onHostRaceStartClick
   };
 };
