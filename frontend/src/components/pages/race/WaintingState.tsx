@@ -2,12 +2,12 @@ import { Button } from '@/components/Button';
 import { CopyInput } from '@/components/CopyInput';
 import { Player, RaceState } from '@vimracing/shared';
 import { Players } from './Players';
+import { ProgressBar } from './ProgressBar';
 
 interface WaitingStateProps {
   raceTimer?: number;
   players?: Player[];
   currentPlayer?: Player;
-  raceStatus: RaceState;
   onHostRaceStartClick: () => void;
   isHost: boolean;
 }
@@ -16,7 +16,6 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
   players,
   currentPlayer,
   onHostRaceStartClick,
-  raceStatus,
   isHost
 }) => {
   return (
@@ -33,7 +32,7 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
       {currentPlayer && players && (
         <Players
           currentPlayer={currentPlayer}
-          raceStatus={raceStatus}
+          raceStatus={RaceState.WAITING}
           players={players}
         />
       )}

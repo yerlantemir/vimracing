@@ -4,7 +4,6 @@ import { Players } from './Players';
 import { Player, RaceState } from '@vimracing/shared';
 
 interface RaceOnStateProps {
-  raceStatus: RaceState;
   raceDoc?: { start: string[]; target: string[] };
   onDocChange: (newDoc: string[]) => void;
   players?: Player[];
@@ -12,7 +11,6 @@ interface RaceOnStateProps {
 }
 
 export const RaceOnState: React.FC<RaceOnStateProps> = ({
-  raceStatus,
   raceDoc,
   onDocChange,
   players,
@@ -37,11 +35,13 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
     <>
       <h5 className="text-gray-2">The race is on! Refactor the code below:</h5>
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
-      <Players
-        raceStatus={raceStatus}
-        players={players}
-        currentPlayer={currentPlayer}
-      />
+      {players && currentPlayer && (
+        <Players
+          raceStatus={RaceState.ON}
+          players={players}
+          currentPlayer={currentPlayer}
+        />
+      )}
 
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {raceDoc && <div ref={editorParentElement} />}

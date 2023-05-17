@@ -25,7 +25,6 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
         return (
           <WaitingState
             raceTimer={raceTimer}
-            raceStatus={raceStatus}
             players={players}
             currentPlayer={currentPlayer}
             onHostRaceStartClick={onHostRaceStartClick}
@@ -35,7 +34,6 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
       case RaceState.ON:
         return (
           <RaceOnState
-            raceStatus={raceStatus}
             raceDoc={raceDoc}
             onDocChange={onDocChange}
             players={players}

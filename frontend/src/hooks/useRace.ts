@@ -67,8 +67,9 @@ export const useRace = (raceId: string) => {
   const onRaceTimerUpdate = (
     payload: BackendRaceTimerUpdateEvent['payload']
   ) => {
-    const { timerInSeconds } = payload;
+    const { timerInSeconds, raceState } = payload;
     setRaceTimer(timerInSeconds);
+    setRaceStatus(raceState);
   };
   const onRaceStart = (payload: BackendRaceStartEvent['payload']) => {
     const { raceDoc: newRaceDoc } = payload;
