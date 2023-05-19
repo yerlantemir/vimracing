@@ -1,8 +1,8 @@
-import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import './progressBar.css';
+import { HTMLAttributes, useMemo } from 'react';
 
 type TaskStatus = 'done' | 'doing' | 'todo';
+
+const TRANSITION_DURATION = 1000;
 
 const Circle = ({ taskStatus }: { taskStatus: TaskStatus }) => {
   const bgColor = useMemo(() => {
@@ -10,7 +10,14 @@ const Circle = ({ taskStatus }: { taskStatus: TaskStatus }) => {
     if (taskStatus === 'doing') return 'bg-orange';
     return 'bg-gray-4';
   }, [taskStatus]);
-  return <div className={`h-3 w-3 rounded-full ${bgColor}`} />;
+  return (
+    <div
+      className={`h-3 w-3 rounded-full transition ease-in-out ${bgColor}`}
+      style={{
+        transitionDuration: `${TRANSITION_DURATION}ms`
+      }}
+    />
+  );
 };
 
 export const Line = ({
@@ -20,70 +27,44 @@ export const Line = ({
   taskStatus: TaskStatus;
   currentTaskCompleteness: number;
 }) => {
-  const ANIMATION_TIMEOUT = 300;
-  const [hasRendered, setHasRendered] = useState(false);
-  const nodeRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    setHasRendered(true);
-  }, []);
+  const sharedContainerClasses = 'flex flex-grow transition ease-in-out';
+  const containerBgClass = useMemo(() => {
+    if (taskStatus === 'done') return 'bg-green-2';
+    if (taskStatus === 'todo') return 'bg-gray-4';
+    return '';
+  }, [taskStatus]);
 
   return (
-    <TransitionGroup className="flex flex-grow">
-      {taskStatus === 'doing' && (
-        <CSSTransition
-          key="doing"
-          timeout={ANIMATION_TIMEOUT}
-          classNames={hasRendered ? 'line' : ''}
-          nodeRef={nodeRef}
-        >
-          <div className="flex flex-grow" ref={nodeRef}>
-            <div
-              className="bg-orange flex-grow "
-              style={{
-                width: `${currentTaskCompleteness}%`,
-                height: 4
-              }}
-            ></div>
-            <div
-              className="bg-gray-4 flex-grow "
-              style={{
-                width: `${100 - currentTaskCompleteness}%`,
-                height: 4
-              }}
-            ></div>
-          </div>
-        </CSSTransition>
-      )}
-      {taskStatus === 'done' && (
-        <CSSTransition
-          key="done"
-          timeout={ANIMATION_TIMEOUT}
-          classNames={hasRendered ? 'line' : ''}
-          nodeRef={nodeRef}
-        >
-          <div
-            className="bg-green-2 flex-grow"
-            style={{ height: 4 }}
-            ref={nodeRef}
-          />
-        </CSSTransition>
-      )}
-      {taskStatus === 'todo' && (
-        <CSSTransition
-          key="todo"
-          timeout={ANIMATION_TIMEOUT}
-          classNames={hasRendered ? 'line' : ''}
-          nodeRef={nodeRef}
-        >
-          <div
-            style={{ height: 4 }}
-            className="bg-gray-4 flex-grow"
-            ref={nodeRef}
-          />
-        </CSSTransition>
-      )}
-    </TransitionGroup>
+    <div
+      className={`${sharedContainerClasses} ${containerBgClass}`}
+      style={{ height: 1, transitionDuration: `${TRANSITION_DURATION}ms` }}
+    >
+      <div
+        className={sharedContainerClasses}
+        style={{
+          opacity: 1,
+          ...(taskStatus !== 'doing' && { opacity: 0 }),
+          transition: `opacity ${TRANSITION_DURATION}ms`
+        }}
+      >
+        <div
+          className="bg-orange flex-grow"
+          style={{
+            width: `${currentTaskCompleteness}%`,
+            height: 1,
+            transition: 'width 0.2s'
+          }}
+        />
+        <div
+          className="bg-gray-4 flex-grow "
+          style={{
+            width: `${100 - currentTaskCompleteness}%`,
+            height: 1,
+            transition: 'width 0.2s'
+          }}
+        />
+      </div>
+    </div>
   );
 };
 
@@ -93,32 +74,24 @@ interface IProgressBarProps extends HTMLAttributes<HTMLDivElement> {
   currentTaskCompleteness: number;
 }
 
-export const ProgressBar: React.FC<IProgressBarProps> = ({ className }) => {
-  const [currentTaskCompleteness, setCurrentTaskCompleteness] = useState(0);
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
-  const tasksCount = 4;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTaskCompleteness((prev) => {
-        console.log(prev);
-
-        if (prev >= 100) {
-          setCurrentTaskIndex((p) => p + 1);
-          return 0;
-        }
-        return prev + 60;
-      });
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, [currentTaskCompleteness]);
-
+export const ProgressBar: React.FC<IProgressBarProps> = ({
+  tasksCount,
+  currentTaskIndex,
+  currentTaskCompleteness,
+  className
+}) => {
   const getTaskStatus = (taskIndex: number): TaskStatus => {
+    if (currentTaskIndex === tasksCount - 1) return 'done';
+
     if (taskIndex === currentTaskIndex) return 'doing';
     if (taskIndex < currentTaskIndex) return 'done';
     return 'todo';
+  };
+
+  const getTaskCompleteness = (taskStatus: TaskStatus) => {
+    if (taskStatus === 'done') return 100;
+    if (taskStatus === 'doing') return currentTaskCompleteness;
+    return 0;
   };
   return (
     <div className={`flex items-center flex-grow ${className}`}>
@@ -132,7 +105,7 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({ className }) => {
               {index !== tasksCount - 1 && (
                 <Line
                   taskStatus={taskStatus}
-                  currentTaskCompleteness={currentTaskCompleteness}
+                  currentTaskCompleteness={getTaskCompleteness(taskStatus)}
                 />
               )}
             </>
