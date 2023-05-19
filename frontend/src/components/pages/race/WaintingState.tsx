@@ -2,7 +2,6 @@ import { Button } from '@/components/Button';
 import { CopyInput } from '@/components/CopyInput';
 import { Player, RaceState } from '@vimracing/shared';
 import { Players } from './Players';
-import { ProgressBar } from './ProgressBar';
 
 interface WaitingStateProps {
   raceTimer?: number;

@@ -1,4 +1,6 @@
-import { HTMLAttributes, useMemo } from 'react';
+import { HTMLAttributes, useEffect, useMemo, useRef, useState } from 'react';
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import './progressBar.css';
 
 type TaskStatus = 'done' | 'doing' | 'todo';
 
@@ -11,29 +13,78 @@ const Circle = ({ taskStatus }: { taskStatus: TaskStatus }) => {
   return <div className={`h-3 w-3 rounded-full ${bgColor}`} />;
 };
 
-const Line = ({
+export const Line = ({
   taskStatus,
   currentTaskCompleteness
 }: {
   taskStatus: TaskStatus;
   currentTaskCompleteness: number;
 }) => {
-  if (taskStatus === 'done')
-    return <div className="bg-green-2 flex-grow" style={{ height: 1 }} />;
-  if (taskStatus === 'doing')
-    return (
-      <div className="flex flex-grow">
-        <div
-          className="bg-orange flex-grow"
-          style={{ width: `${currentTaskCompleteness}%`, height: 1 }}
-        ></div>
-        <div
-          className="bg-gray-4 flex-grow"
-          style={{ width: `${100 - currentTaskCompleteness}%`, height: 1 }}
-        ></div>
-      </div>
-    );
-  return <div style={{ height: 1 }} className="bg-gray-4 flex-grow" />;
+  const ANIMATION_TIMEOUT = 300;
+  const [hasRendered, setHasRendered] = useState(false);
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setHasRendered(true);
+  }, []);
+
+  return (
+    <TransitionGroup className="flex flex-grow">
+      {taskStatus === 'doing' && (
+        <CSSTransition
+          key="doing"
+          timeout={ANIMATION_TIMEOUT}
+          classNames={hasRendered ? 'line' : ''}
+          nodeRef={nodeRef}
+        >
+          <div className="flex flex-grow" ref={nodeRef}>
+            <div
+              className="bg-orange flex-grow "
+              style={{
+                width: `${currentTaskCompleteness}%`,
+                height: 4
+              }}
+            ></div>
+            <div
+              className="bg-gray-4 flex-grow "
+              style={{
+                width: `${100 - currentTaskCompleteness}%`,
+                height: 4
+              }}
+            ></div>
+          </div>
+        </CSSTransition>
+      )}
+      {taskStatus === 'done' && (
+        <CSSTransition
+          key="done"
+          timeout={ANIMATION_TIMEOUT}
+          classNames={hasRendered ? 'line' : ''}
+          nodeRef={nodeRef}
+        >
+          <div
+            className="bg-green-2 flex-grow"
+            style={{ height: 4 }}
+            ref={nodeRef}
+          />
+        </CSSTransition>
+      )}
+      {taskStatus === 'todo' && (
+        <CSSTransition
+          key="todo"
+          timeout={ANIMATION_TIMEOUT}
+          classNames={hasRendered ? 'line' : ''}
+          nodeRef={nodeRef}
+        >
+          <div
+            style={{ height: 4 }}
+            className="bg-gray-4 flex-grow"
+            ref={nodeRef}
+          />
+        </CSSTransition>
+      )}
+    </TransitionGroup>
+  );
 };
 
 interface IProgressBarProps extends HTMLAttributes<HTMLDivElement> {
@@ -42,12 +93,28 @@ interface IProgressBarProps extends HTMLAttributes<HTMLDivElement> {
   currentTaskCompleteness: number;
 }
 
-export const ProgressBar: React.FC<IProgressBarProps> = ({
-  tasksCount,
-  currentTaskIndex,
-  currentTaskCompleteness,
-  className
-}) => {
+export const ProgressBar: React.FC<IProgressBarProps> = ({ className }) => {
+  const [currentTaskCompleteness, setCurrentTaskCompleteness] = useState(0);
+  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
+  const tasksCount = 4;
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTaskCompleteness((prev) => {
+        console.log(prev);
+
+        if (prev >= 100) {
+          setCurrentTaskIndex((p) => p + 1);
+          return 0;
+        }
+        return prev + 60;
+      });
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [currentTaskCompleteness]);
+
   const getTaskStatus = (taskIndex: number): TaskStatus => {
     if (taskIndex === currentTaskIndex) return 'doing';
     if (taskIndex < currentTaskIndex) return 'done';
