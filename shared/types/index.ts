@@ -16,9 +16,12 @@ Backend Event Types:
 export type Player = {
   id: string;
   username: string;
-  completeness?: number;
-  raceDocs?: string[][];
-  currentPlace?: number;
+  raceData?: {
+    completeness?: number;
+    currentDocIndex?: number;
+    docs?: string[][];
+    currentPlace?: number;
+  };
 };
 
 export enum RaceState {
@@ -84,7 +87,7 @@ export interface BackendRaceStartEvent {
 }
 export interface BackendPlayerDataChangeEvent {
   event: BackendEventType.PLAYER_DATA_CHANGE;
-  payload: Pick<Player, 'id' | 'completeness'>;
+  payload: Pick<Player, 'id' | 'raceData'>;
 }
 export interface BackendRaceFinishEvent {
   event: BackendEventType.RACE_FINISH;
