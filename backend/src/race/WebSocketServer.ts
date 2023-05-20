@@ -41,8 +41,7 @@ export class WebSocketServer {
         connection: ws
       });
 
-      const currentPlayer =
-        race.getPlayer(userId) ?? new Player(userId, race.getRaceDoc().start);
+      const currentPlayer = race.getPlayer(userId) ?? new Player(userId);
 
       race.addPlayer(currentPlayer);
       const initRacePayload: BackendRaceInitEvent = {
@@ -73,7 +72,7 @@ export class WebSocketServer {
         race.start();
         break;
       case FrontendEventType.DOCUMENT_CHANGE:
-        race.changeDoc(playerId, payload.newDocument);
+        race.changeDoc(playerId, payload.docIndex, payload.newDocument);
         break;
     }
   }
@@ -138,14 +137,15 @@ export class WebSocketServer {
   }
   onPlayerDataChanged(race: Race, newPlayer: Player) {
     this.raceIdWebsocketConnectionsMapping[race.id].forEach(
-      ({ playerId, connection }) => {
-        if (playerId === newPlayer.id) return;
-
+      ({ connection }) => {
         const payload: BackendPlayerDataChangeEvent = {
           event: BackendEventType.PLAYER_DATA_CHANGE,
           payload: {
             id: newPlayer.id,
-            completeness: 20 // TBD
+            raceData: {
+              completeness: newPlayer.raceData?.completeness,
+              currentDocIndex: newPlayer.raceData?.currentDocIndex
+            }
           }
         };
         connection.send(JSON.stringify(payload));

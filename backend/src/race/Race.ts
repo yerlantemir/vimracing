@@ -2,6 +2,7 @@ import { RaceState } from '@vimracing/shared';
 import { Player } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
+import { generateRaceDocs } from './raceDocsGenerator';
 
 const DEFAULT_WAITING_TIME_IN_S = 3;
 const DEFAULT_RACE_TIME_IN_S = 60;
@@ -22,7 +23,13 @@ export class Race {
   private eventEmitter = new EventEmitter();
   private state: RaceState = RaceState.WAITING;
   private players: Player[] = [];
-  constructor(public id: string, public hostToken: string) {}
+  private raceDocs: {
+    start: string[];
+    target: string[];
+  }[];
+  constructor(public id: string, public hostToken: string) {
+    this.raceDocs = generateRaceDocs();
+  }
 
   addPlayer(player: Player) {
     if (this.getPlayer(player.id) || this.state !== RaceState.WAITING) return;
@@ -66,58 +73,31 @@ export class Race {
     return this.players;
   }
 
-  public changeDoc(playerId: string, doc: string[]) {
+  public changeDoc(playerId: string, documentIndex: number, newDoc: string[]) {
     const player = this.getPlayer(playerId);
     if (!player) return;
-    player.updateDoc(doc);
+    player.updateDoc(
+      newDoc,
+      documentIndex,
+      this.getDocCompleteness(newDoc, documentIndex)
+    );
+
     this.emit('playerDataChanged', player);
   }
   public getRaceDocs() {
-    return [
-      {
-        start: [
-          'if (true) {',
-          '  console.log(hello);',
-          '}',
-          'else {',
-          '   console.log(fuck you!)',
-          '}'
-        ],
-        target: [
-          'if (false) {',
-          '  console.log(hello);',
-          '}',
-          'else {',
-          "  console.log('fuck you!')",
-          '}'
-        ]
-      },
-      {
-        start: ['print(hey)', '   print(mey)', 'print(ss)'],
-        target: ['print()', 'print()', 'print()']
-      },
-      {
-        start: [
-          'if (true) {',
-          '  console.log(hello);',
-          '}',
-          'else {',
-          '   console.log(fuck you!)',
-          '}'
-        ],
-        target: [
-          'if (false) {',
-          '  console.log(hello);',
-          '}',
-          'else {',
-          "  console.log('fuck you!')",
-          '}'
-        ]
-      }
-    ];
+    return this.raceDocs;
   }
   public getPlayer(id: string) {
     return this.players.find((p) => p.id === id);
+  }
+  public getDocCompleteness(doc: string[], docIndex: number): number {
+    const targetDoc = this.raceDocs[docIndex].target;
+    let completeness = 0;
+    for (let i = 0; i < doc.length; i++) {
+      if (doc[i] === targetDoc[i]) completeness++;
+    }
+    const completenessPercentage = (completeness / targetDoc.length) * 100;
+    return Math.round(completenessPercentage);
   }
 
   on<Event extends keyof RaceEvents>(
