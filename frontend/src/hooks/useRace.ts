@@ -75,19 +75,38 @@ export const useRace = (raceId: string) => {
     const { raceDocs: newRaceDoc } = payload;
     setRaceDocs(newRaceDoc);
   };
-  const onOtherPlayerDataChange = (
-    payload: BackendPlayerDataChangeEvent['payload']
-  ) => {
-    const { id, completeness } = payload;
-    setPlayers((prev) =>
-      prev?.map((player) => {
-        if (player.id === id) {
-          return { ...player, completeness };
-        }
-        return player;
-      })
-    );
-  };
+
+  const onRacePlayerDataChange = useCallback(
+    (payload: BackendPlayerDataChangeEvent['payload']) => {
+      const { id, raceData } = payload;
+
+      if (id === currentPlayer.id) {
+        setCurrentPlayer((prev: Player) => ({
+          ...prev,
+          raceData: {
+            ...prev?.raceData,
+            ...raceData
+          }
+        }));
+        return;
+      }
+      setPlayers((prev) =>
+        prev?.map((player) => {
+          if (player.id === id) {
+            return {
+              ...player,
+              raceData: {
+                ...player.raceData,
+                ...raceData
+              }
+            };
+          }
+          return player;
+        })
+      );
+    },
+    [currentPlayer?.id]
+  );
   const onMessageFromServer = useCallback(
     (event: WebSocketEventMap['message']) => {
       const { event: socketEvent, payload } = JSON.parse(
@@ -108,28 +127,28 @@ export const useRace = (raceId: string) => {
           onRaceStart(payload);
           break;
         case BackendEventType.PLAYER_DATA_CHANGE:
-          onOtherPlayerDataChange(payload);
+          onRacePlayerDataChange(payload);
           break;
         case BackendEventType.RACE_FINISH:
           break;
       }
     },
-    [onNewPlayerJoin]
+    [onNewPlayerJoin, onRacePlayerDataChange]
   );
 
-  const onCurrentPlayerDocumentChange = (
-    newDocument: string[],
-    documentIndex: number
-  ) => {
-    const payload: FrontendDocumentChangeEvent = {
-      event: FrontendEventType.DOCUMENT_CHANGE,
-      payload: {
-        docIndex: documentIndex,
-        newDocument
-      }
-    };
-    socketConnection.current?.send(JSON.stringify(payload));
-  };
+  const onCurrentPlayerDocumentChange = useCallback(
+    (newDocument: string[], documentIndex: number) => {
+      const payload: FrontendDocumentChangeEvent = {
+        event: FrontendEventType.DOCUMENT_CHANGE,
+        payload: {
+          docIndex: documentIndex,
+          newDocument
+        }
+      };
+      socketConnection.current?.send(JSON.stringify(payload));
+    },
+    []
+  );
 
   const onHostRaceStartClick = () => {
     if (!isHost) return;

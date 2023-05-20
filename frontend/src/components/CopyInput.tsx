@@ -14,7 +14,6 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
 
   const onCopyClick = () => {
     if (copied) return;
-    console.log('ha?');
 
     raceInput?.current?.select();
     navigator.clipboard.writeText(raceInput?.current?.value ?? '');
@@ -26,8 +25,6 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
   };
 
   const onInputClick = (e: any) => {
-    console.log(e.target);
-
     e.target.select();
   };
 

@@ -1,21 +1,25 @@
 'use client';
 
-import { RaceState } from '@vimracing/shared';
+import { Player, RaceState } from '@vimracing/shared';
 import { ProgressBar } from './pages/race/ProgressBar';
 
 type PlayerCardProps = {
-  username: string;
-  completeness: number;
   isCurrentUser: boolean;
   raceStatus?: RaceState;
+  raceDocsCount: number;
+  player: Player;
 };
 
 export const PlayerCard: React.FC<PlayerCardProps> = ({
   isCurrentUser,
-  username,
-  completeness,
+  player,
+  raceDocsCount,
   raceStatus
 }) => {
+  const { username, raceData } = player;
+
+  const completeness = raceData?.completeness ?? 0;
+  const currentDocIndex = raceData?.currentDocIndex ?? 0;
   return (
     <div
       className="flex"
@@ -29,9 +33,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       </div>
 
       <ProgressBar
-        tasksCount={5}
-        currentTaskIndex={2}
-        currentTaskCompleteness={15}
+        tasksCount={raceDocsCount}
+        currentTaskIndex={currentDocIndex}
+        currentTaskCompleteness={completeness}
         className="pr-4"
       />
     </div>

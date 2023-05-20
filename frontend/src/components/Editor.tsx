@@ -42,8 +42,6 @@ class Editor extends EditorView {
         oneDark,
         EditorView.updateListener.of((v: ViewUpdate) => {
           if (v.docChanged) {
-            console.log(v.state);
-
             config?.onChange?.(v.state.doc.toJSON());
           }
         }),

@@ -5,18 +5,23 @@ interface PlayersProps {
   players: Player[];
   currentPlayer: Player;
   raceStatus: RaceState;
+  raceDocsCount: number;
 }
 export const Players: React.FC<PlayersProps> = ({
   players,
   currentPlayer,
-  raceStatus
+  raceStatus,
+  raceDocsCount
 }) => {
   if (!players || !currentPlayer) return null;
 
   const allPlayers = [currentPlayer, ...players];
   const currentPlayerPlace =
     allPlayers
-      ?.sort((a, b) => (b.completeness ?? 0) - (a.completeness ?? 0))
+      ?.sort(
+        (a, b) =>
+          (b.raceData?.completeness ?? 0) - (a.raceData?.completeness ?? 0)
+      )
       ?.findIndex((user) => user.id === currentPlayer?.id) + 1;
 
   return (
@@ -25,14 +30,14 @@ export const Players: React.FC<PlayersProps> = ({
         className="flex flex-col gap-3 grow justify-start overflow-y-scroll"
         style={{ maxHeight: '120px' }}
       >
-        {allPlayers.map(({ id, username, completeness }) => {
+        {allPlayers.map((player) => {
           return (
             <PlayerCard
-              key={id}
-              username={username}
-              completeness={completeness ?? 0}
-              isCurrentUser={id === currentPlayer.id}
+              key={player.id}
+              player={player}
+              isCurrentUser={player.id === currentPlayer.id}
               raceStatus={raceStatus}
+              raceDocsCount={raceDocsCount}
             />
           );
         })}

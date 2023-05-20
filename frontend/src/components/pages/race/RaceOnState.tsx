@@ -47,6 +47,7 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
       editorParentElement.current.childNodes.length !== 0
     )
       return;
+
     const editor = new Editor({
       raceDoc: raceDocs[documentIndex],
       parent: editorParentElement.current,
@@ -63,6 +64,7 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {players && currentPlayer && (
         <Players
+          raceDocsCount={raceDocs.length}
           raceStatus={RaceState.ON}
           players={players}
           currentPlayer={currentPlayer}
