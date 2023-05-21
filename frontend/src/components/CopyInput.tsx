@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import './input.css';
 
 const COPIED_INTERNAL_MS = 3000;
 

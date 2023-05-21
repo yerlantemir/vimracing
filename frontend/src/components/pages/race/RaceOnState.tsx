@@ -2,19 +2,22 @@ import Editor, { isTextEqual } from '@/components/Editor';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
 import { Player, RaceState } from '@vimracing/shared';
+import { Timer } from '@/components/Timer';
 
 interface RaceOnStateProps {
   raceDocs: { start: string[]; target: string[] }[];
   onDocChange: (newDoc: string[], documentIndex: number) => void;
   players?: Player[];
   currentPlayer?: Player;
+  raceTimer: number;
 }
 
 export const RaceOnState: React.FC<RaceOnStateProps> = ({
   raceDocs,
   onDocChange,
   players,
-  currentPlayer
+  currentPlayer,
+  raceTimer
 }) => {
   const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [documentIndex, setDocumentIndex] = useState(0);
@@ -65,7 +68,10 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   const isFinished = documentIndex === raceDocs.length - 1;
   return (
     <>
-      <h5 className="text-gray-2">The race is on! Refactor the code below:</h5>
+      <div className="flex justify-between">
+        <h5 className="text-gray-2">The race is about to start!</h5>
+        <Timer time={raceTimer} />
+      </div>
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {players && currentPlayer && (
         <Players

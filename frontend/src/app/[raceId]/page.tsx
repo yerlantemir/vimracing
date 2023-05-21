@@ -39,6 +39,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
               onDocChange={onDocChange}
               players={players}
               currentPlayer={currentPlayer}
+              raceTimer={raceTimer || 0}
             />
           )
         );

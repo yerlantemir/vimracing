@@ -2,6 +2,7 @@ import { Button } from '@/components/Button';
 import { CopyInput } from '@/components/CopyInput';
 import { Player, RaceState } from '@vimracing/shared';
 import { Players } from './Players';
+import { Timer } from '@/components/Timer';
 
 interface WaitingStateProps {
   raceTimer?: number;
@@ -20,11 +21,14 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
   return (
     <>
       {raceTimer ? (
-        <div>{raceTimer}</div>
+        <div className="flex justify-between">
+          <h5 className="text-gray-2">The race is about to start!</h5>
+          <Timer time={raceTimer} />
+        </div>
       ) : (
         <>
           <h5 className="text-gray-2">Share the link below</h5>
-          <CopyInput link="https://vimracing.com/race/${this.raceId}" />
+          <CopyInput link={window.location.href} />
         </>
       )}
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />

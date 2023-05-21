@@ -5,13 +5,13 @@ interface PlayersProps {
   players: Player[];
   currentPlayer: Player;
   raceStatus: RaceState;
-  raceDocsCount: number;
+  raceDocsCount?: number;
 }
 export const Players: React.FC<PlayersProps> = ({
   players,
   currentPlayer,
   raceStatus,
-  raceDocsCount
+  raceDocsCount = 2 // to show the progress bar in the waiting state component
 }) => {
   if (!players || !currentPlayer) return null;
 
