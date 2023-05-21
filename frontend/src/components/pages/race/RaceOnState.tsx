@@ -1,4 +1,4 @@
-import Editor from '@/components/Editor';
+import Editor, { isTextEqual } from '@/components/Editor';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
 import { Player, RaceState } from '@vimracing/shared';
@@ -20,22 +20,25 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   const [documentIndex, setDocumentIndex] = useState(0);
 
   const isDocFinished = (current: string[], target: string[]) => {
-    return current.join('') === target.join();
+    return isTextEqual(current, target);
   };
 
   const onCurrentDocumentChange = useCallback(
     (newDoc: string[]) => {
-      const isLastDocument = documentIndex === raceDocs.length - 1;
-
-      if (isDocFinished(newDoc, raceDocs[documentIndex].target)) {
-        if (isLastDocument) {
-          // TODO: FINISH...
-        } else {
-          setDocumentIndex(documentIndex + 1);
-        }
-      } else {
+      const isFinished = isDocFinished(newDoc, raceDocs[documentIndex].target);
+      if (!isFinished) {
         onDocChange(newDoc, documentIndex);
+        return;
       }
+
+      // TODO: FINISH
+      const isLastDocument = documentIndex === raceDocs.length - 1;
+      if (isLastDocument) {
+        return;
+      }
+
+      setDocumentIndex(documentIndex + 1);
+      onDocChange(newDoc, documentIndex + 1);
     },
     [documentIndex, onDocChange, raceDocs]
   );
@@ -53,11 +56,13 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
       parent: editorParentElement.current,
       onChange: onCurrentDocumentChange
     });
+    editor.focus();
     return () => {
       editor?.destroy();
     };
   }, [documentIndex, onCurrentDocumentChange, onDocChange, raceDocs]);
 
+  const isFinished = documentIndex === raceDocs.length - 1;
   return (
     <>
       <h5 className="text-gray-2">The race is on! Refactor the code below:</h5>
@@ -72,7 +77,8 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
       )}
 
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
-      {raceDocs && <div ref={editorParentElement} />}
+      {raceDocs && !isFinished && <div ref={editorParentElement} />}
+      {isFinished && <div>FINISHED</div>}
     </>
   );
 };

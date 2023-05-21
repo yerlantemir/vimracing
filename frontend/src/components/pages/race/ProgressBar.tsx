@@ -4,12 +4,20 @@ type TaskStatus = 'done' | 'doing' | 'todo';
 
 const TRANSITION_DURATION = 1000;
 
-const Circle = ({ taskStatus }: { taskStatus: TaskStatus }) => {
+const Circle = ({
+  taskStatus,
+  isFinished
+}: {
+  taskStatus: TaskStatus;
+  isFinished: boolean;
+}) => {
   const bgColor = useMemo(() => {
+    if (isFinished) return 'bg-green-3';
     if (taskStatus === 'done') return 'bg-green-2';
     if (taskStatus === 'doing') return 'bg-orange';
     return 'bg-gray-4';
-  }, [taskStatus]);
+  }, [isFinished, taskStatus]);
+
   return (
     <div
       className={`h-3 w-3 rounded-full transition ease-in-out ${bgColor}`}
@@ -22,17 +30,20 @@ const Circle = ({ taskStatus }: { taskStatus: TaskStatus }) => {
 
 export const Line = ({
   taskStatus,
-  currentTaskCompleteness
+  currentTaskCompleteness,
+  isFinished
 }: {
   taskStatus: TaskStatus;
   currentTaskCompleteness: number;
+  isFinished: boolean;
 }) => {
   const sharedContainerClasses = 'flex flex-grow transition ease-in-out';
   const containerBgClass = useMemo(() => {
+    if (isFinished) return 'bg-green-3';
     if (taskStatus === 'done') return 'bg-green-2';
     if (taskStatus === 'todo') return 'bg-gray-4';
     return '';
-  }, [taskStatus]);
+  }, [isFinished, taskStatus]);
 
   return (
     <div
@@ -93,6 +104,9 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
     if (taskStatus === 'doing') return currentTaskCompleteness;
     return 0;
   };
+
+  const isFinished = currentTaskIndex === tasksCount - 1;
+
   return (
     <div className={`flex items-center flex-grow ${className}`}>
       {Array(tasksCount)
@@ -101,11 +115,12 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
           const taskStatus = getTaskStatus(index);
           return (
             <>
-              <Circle taskStatus={taskStatus} />
+              <Circle taskStatus={taskStatus} isFinished={isFinished} />
               {index !== tasksCount - 1 && (
                 <Line
                   taskStatus={taskStatus}
                   currentTaskCompleteness={getTaskCompleteness(taskStatus)}
+                  isFinished={isFinished}
                 />
               )}
             </>

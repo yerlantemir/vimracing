@@ -54,3 +54,7 @@ class Editor extends EditorView {
   }
 }
 export default Editor;
+
+export const isTextEqual = (a: string[], b: string[]) => {
+  return Text.of(a).eq(Text.of(b));
+};
