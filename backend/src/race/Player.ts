@@ -10,9 +10,10 @@ export class Player implements PlayerType {
     currentPlace?: number;
   };
 
-  constructor(id: string) {
+  constructor(id: string, username: string) {
     this.id = id;
-    this.username = this.getRandomUsername();
+
+    this.username = username;
     this.raceData = {
       completeness: 0,
       currentDocIndex: 0,

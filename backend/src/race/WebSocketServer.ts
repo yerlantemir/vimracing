@@ -17,6 +17,7 @@ import {
   FrontendUsernameChangeEvent
 } from '@vimracing/shared';
 import { Player } from './Player';
+import { validateUsername } from '../utils/validateUsername';
 
 export class WebSocketServer {
   private server: WebSocket.Server;
@@ -34,6 +35,11 @@ export class WebSocketServer {
       const userId = urlParams.get('userId') ?? uuid();
       const raceIdParam = urlParams.get('raceId');
       const race = this.races[raceIdParam || ''];
+      const usernameParam = urlParams.get('username');
+
+      const username =
+        (validateUsername(usernameParam) && usernameParam) ||
+        `Guest${race.getPlayers().length + 1}`;
 
       if (!race) return;
 
@@ -42,7 +48,8 @@ export class WebSocketServer {
         connection: ws
       });
 
-      const currentPlayer = race.getPlayer(userId) ?? new Player(userId);
+      const currentPlayer =
+        race.getPlayer(userId) ?? new Player(userId, username);
 
       race.addPlayer(currentPlayer);
       const initRacePayload: BackendRaceInitEvent = {

@@ -12,6 +12,7 @@ type PlayerCardProps = {
   player: Player;
 };
 
+const USERNAME_MAX_LENGTH = 15;
 export const PlayerCard: React.FC<PlayerCardProps> = ({
   isCurrentUser,
   player,
@@ -31,11 +32,21 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
     }
   };
   const onUsernameInputBlur = useCallback(() => {
-    setEditingUsername(!isEditingUsername);
-  }, [isEditingUsername]);
+    setEditingUsername(false);
+    if (username.length === 0) {
+      setUsername(initialUsername);
+      return;
+    }
+    if (username === initialUsername) {
+      return;
+    }
+    onUsernameChangeCallback?.(username);
+  }, [initialUsername, onUsernameChangeCallback, username]);
 
   const onUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+    const newUsername = e.target.value.trim();
+    if (newUsername.length > USERNAME_MAX_LENGTH) return;
+    setUsername(newUsername);
   };
 
   const renderUsername = () => {
@@ -69,17 +80,19 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
   useEffect(() => {
     const onOutsideClick = (e: any) => {
-      if (!usernameInputRef.current) return;
-      if (usernameInputRef.current.contains(e.target)) return;
-      onUsernameInputBlur();
+      if (
+        usernameInputRef.current &&
+        !usernameInputRef.current.contains(e.target)
+      ) {
+        onUsernameInputBlur();
+      }
     };
     const onEnterPress = (e: any) => {
       if (e.key === 'Enter') {
         onUsernameInputBlur();
-        onUsernameChangeCallback?.(username);
       }
     };
-    if (usernameInputRef.current) {
+    if (usernameInputRef.current && isEditingUsername) {
       window.addEventListener('click', onOutsideClick);
       window.addEventListener('keydown', onEnterPress);
     }
@@ -87,7 +100,14 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       window.removeEventListener('click', onOutsideClick);
       window.removeEventListener('keydown', onEnterPress);
     };
-  }, [onUsernameChangeCallback, onUsernameInputBlur, username]);
+  }, [isEditingUsername, onUsernameChangeCallback, onUsernameInputBlur]);
+
+  useEffect(() => {
+    if (usernameInputRef.current && isEditingUsername) {
+      usernameInputRef.current.focus();
+      usernameInputRef.current.select();
+    }
+  }, [isEditingUsername]);
 
   return (
     <div

@@ -87,6 +87,10 @@ export const useRace = (raceId: string) => {
       };
 
       socketConnection.current?.send(JSON.stringify(payload));
+      LocalStorageManager.setUser({
+        id: currentPlayer.id,
+        username: newUsername
+      });
     },
     [currentPlayer]
   );
@@ -184,9 +188,10 @@ export const useRace = (raceId: string) => {
   useEffect(() => {
     const user = LocalStorageManager.getUser();
     const userIdParam = user?.id ? `&userId=${user.id}` : '';
+    const usernameParam = user?.username ? `&username=${user.username}` : '';
 
     const newSocketConnection = new WebSocket(
-      `ws://localhost:8999/?raceId=${raceId}${userIdParam}`
+      `ws://localhost:8999/?raceId=${raceId}${userIdParam}${usernameParam}`
     );
 
     newSocketConnection.addEventListener('message', onMessageFromServer);
