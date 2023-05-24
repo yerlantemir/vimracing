@@ -57,7 +57,10 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       return (
         <input
           type="text"
-          className="w-full"
+          className="border-none outline-none bg-transparent text-gray-2 italic"
+          style={{
+            width: '80%'
+          }}
           ref={usernameInputRef}
           value={username}
           onChange={onUsernameChange}
@@ -105,7 +108,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   useEffect(() => {
     if (usernameInputRef.current && isEditingUsername) {
       usernameInputRef.current.focus();
-      usernameInputRef.current.select();
     }
   }, [isEditingUsername]);
 

@@ -40,7 +40,7 @@ export class Race {
   start() {
     let timer = DEFAULT_WAITING_TIME_IN_S;
     const currentInterval = setInterval(() => {
-      if (timer === 0) {
+      if (timer === 1) {
         this.onRaceOn();
         clearInterval(currentInterval);
       } else {
@@ -55,7 +55,7 @@ export class Race {
 
     let timer = DEFAULT_RACE_TIME_IN_S;
     const interval = setInterval(() => {
-      if (timer === 0) {
+      if (timer === 1) {
         this.onRaceEnd();
         clearInterval(interval);
       } else {
