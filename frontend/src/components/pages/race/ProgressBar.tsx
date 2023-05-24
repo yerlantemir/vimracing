@@ -92,6 +92,7 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
   className
 }) => {
   const getTaskStatus = (taskIndex: number): TaskStatus => {
+    if (currentTaskCompleteness === 100) return 'done';
     if (currentTaskIndex === tasksCount - 1) return 'done';
 
     if (taskIndex === currentTaskIndex) return 'doing';
@@ -105,7 +106,7 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
     return 0;
   };
 
-  const isFinished = currentTaskIndex === tasksCount - 1;
+  const isFinished = currentTaskIndex === tasksCount;
 
   return (
     <div className={`flex items-center flex-grow ${className}`}>

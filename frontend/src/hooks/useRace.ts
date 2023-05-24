@@ -131,6 +131,11 @@ export const useRace = (raceId: string) => {
     },
     [currentPlayer?.id]
   );
+
+  const onRaceFinish = () => {
+    setRaceStatus(RaceState.FINISHED);
+  };
+
   const onMessageFromServer = useCallback(
     (event: WebSocketEventMap['message']) => {
       const { event: socketEvent, payload } = JSON.parse(
@@ -154,6 +159,7 @@ export const useRace = (raceId: string) => {
           onRacePlayerDataChange(payload);
           break;
         case BackendEventType.RACE_FINISH:
+          onRaceFinish();
           break;
       }
     },

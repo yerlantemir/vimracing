@@ -37,6 +37,7 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
       // TODO: FINISH
       const isLastDocument = documentIndex === raceDocs.length - 1;
       if (isLastDocument) {
+        onDocChange(newDoc, documentIndex);
         return;
       }
 
@@ -65,7 +66,7 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
     };
   }, [documentIndex, onCurrentDocumentChange, onDocChange, raceDocs]);
 
-  const isFinished = documentIndex === raceDocs.length - 1;
+  const isFinished = documentIndex === raceDocs.length;
   return (
     <>
       <div className="flex justify-between">
@@ -78,7 +79,13 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
           raceDocsCount={raceDocs.length}
           raceStatus={RaceState.ON}
           players={players}
-          currentPlayer={currentPlayer}
+          currentPlayer={{
+            ...currentPlayer,
+            raceData: {
+              ...currentPlayer.raceData,
+              currentDocIndex: documentIndex
+            }
+          }}
         />
       )}
 

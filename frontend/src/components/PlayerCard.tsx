@@ -124,7 +124,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       </div>
 
       <ProgressBar
-        tasksCount={raceDocsCount}
+        tasksCount={raceDocsCount + 1}
         currentTaskIndex={currentDocIndex}
         currentTaskCompleteness={completeness}
         className="pr-4"

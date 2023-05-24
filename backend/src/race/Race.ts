@@ -74,6 +74,7 @@ export class Race {
   }
 
   public changeDoc(playerId: string, documentIndex: number, newDoc: string[]) {
+    if (this.state !== RaceState.ON) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
     player.updateDoc(
@@ -85,6 +86,7 @@ export class Race {
     this.emit('playerDataChanged', player);
   }
   public changeUsername(playerId: string, newUsername: string) {
+    if (this.state !== RaceState.WAITING) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
     player.updateUsername(newUsername);
