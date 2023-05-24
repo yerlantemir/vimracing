@@ -6,16 +6,19 @@ interface PlayersProps {
   currentPlayer: Player;
   raceStatus: RaceState;
   raceDocsCount?: number;
+  onCurrentPlayerUsernameChangeCallback?: (newUsername: string) => void;
 }
 export const Players: React.FC<PlayersProps> = ({
   players,
   currentPlayer,
   raceStatus,
-  raceDocsCount = 2 // to show the progress bar in the waiting state component
+  raceDocsCount = 2, // to show the progress bar in the waiting state component
+  onCurrentPlayerUsernameChangeCallback
 }) => {
   if (!players || !currentPlayer) return null;
 
   const allPlayers = [currentPlayer, ...players];
+
   const currentPlayerPlace =
     allPlayers
       ?.sort(
@@ -38,6 +41,7 @@ export const Players: React.FC<PlayersProps> = ({
               isCurrentUser={player.id === currentPlayer.id}
               raceStatus={raceStatus}
               raceDocsCount={raceDocsCount}
+              onUsernameChangeCallback={onCurrentPlayerUsernameChangeCallback}
             />
           );
         })}

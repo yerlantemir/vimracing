@@ -10,13 +10,15 @@ interface WaitingStateProps {
   currentPlayer?: Player;
   onHostRaceStartClick: () => void;
   isHost: boolean;
+  onCurrentPlayerUsernameChangeCallback: (newUsername: string) => void;
 }
 export const WaitingState: React.FC<WaitingStateProps> = ({
   raceTimer,
   players,
   currentPlayer,
   onHostRaceStartClick,
-  isHost
+  isHost,
+  onCurrentPlayerUsernameChangeCallback
 }) => {
   return (
     <>
@@ -37,6 +39,9 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
           currentPlayer={currentPlayer}
           raceStatus={RaceState.WAITING}
           players={players}
+          onCurrentPlayerUsernameChangeCallback={
+            onCurrentPlayerUsernameChangeCallback
+          }
         />
       )}
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />

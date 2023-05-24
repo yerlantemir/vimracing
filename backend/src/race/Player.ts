@@ -36,6 +36,9 @@ export class Player implements PlayerType {
       };
     }
   }
+  updateUsername(newUsername: string) {
+    this.username = newUsername;
+  }
 
   private getRandomUsername() {
     const usernames = ['bob', 'martin', 'jack', 'john', 'zan', 'jason'];

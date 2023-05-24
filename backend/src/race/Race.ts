@@ -40,7 +40,7 @@ export class Race {
   start() {
     let timer = DEFAULT_WAITING_TIME_IN_S;
     const currentInterval = setInterval(() => {
-      if (timer === 1) {
+      if (timer === 0) {
         this.onRaceOn();
         clearInterval(currentInterval);
       } else {
@@ -55,7 +55,7 @@ export class Race {
 
     let timer = DEFAULT_RACE_TIME_IN_S;
     const interval = setInterval(() => {
-      if (timer === 1) {
+      if (timer === 0) {
         this.onRaceEnd();
         clearInterval(interval);
       } else {
@@ -82,6 +82,12 @@ export class Race {
       this.getDocCompleteness(newDoc, documentIndex)
     );
 
+    this.emit('playerDataChanged', player);
+  }
+  public changeUsername(playerId: string, newUsername: string) {
+    const player = this.getPlayer(playerId);
+    if (!player) return;
+    player.updateUsername(newUsername);
     this.emit('playerDataChanged', player);
   }
   public getRaceDocs() {

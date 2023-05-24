@@ -16,7 +16,8 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
     currentPlayer,
     onDocChange,
     isHost,
-    onHostRaceStartClick
+    onHostRaceStartClick,
+    onCurrentPlayerUsernameChange
   } = useRace(raceId);
 
   const renderRaceByStatus = () => {
@@ -29,6 +30,9 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
             currentPlayer={currentPlayer}
             onHostRaceStartClick={onHostRaceStartClick}
             isHost={isHost}
+            onCurrentPlayerUsernameChangeCallback={
+              onCurrentPlayerUsernameChange
+            }
           />
         );
       case RaceState.ON:

@@ -1,12 +1,11 @@
 import { LocalStorageManager } from '@/utils/storage';
 import {
+  FrontendUsernameChangeEvent,
   FrontendDocumentChangeEvent,
   FrontendEventType,
   FrontendRaceHostStartEvent,
   Player,
-  RaceState
-} from '@vimracing/shared';
-import {
+  RaceState,
   BackendEventType,
   BackendNewPlayerEvent,
   BackendPlayerDataChangeEvent,
@@ -76,25 +75,46 @@ export const useRace = (raceId: string) => {
     setRaceDocs(newRaceDoc);
   };
 
+  const onCurrentPlayerUsernameChange = useCallback(
+    (newUsername: string) => {
+      if (!currentPlayer) return;
+
+      const payload: FrontendUsernameChangeEvent = {
+        event: FrontendEventType.USERNAME_CHANGE,
+        payload: {
+          newUsername
+        }
+      };
+
+      socketConnection.current?.send(JSON.stringify(payload));
+    },
+    [currentPlayer]
+  );
+
   const onRacePlayerDataChange = useCallback(
     (payload: BackendPlayerDataChangeEvent['payload']) => {
-      const { id, raceData } = payload;
+      const { id, username, raceData } = payload;
 
-      if (id === currentPlayer.id) {
-        setCurrentPlayer((prev: Player) => ({
-          ...prev,
-          raceData: {
-            ...prev?.raceData,
-            ...raceData
-          }
-        }));
-        return;
+      if (id === currentPlayer?.id) {
+        setCurrentPlayer((prev: Player | undefined) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            username,
+            raceData: {
+              ...prev.raceData,
+              ...raceData
+            }
+          };
+        });
       }
+
       setPlayers((prev) =>
         prev?.map((player) => {
           if (player.id === id) {
             return {
               ...player,
+              username,
               raceData: {
                 ...player.raceData,
                 ...raceData
@@ -186,6 +206,7 @@ export const useRace = (raceId: string) => {
     raceStatus,
     onDocChange: onCurrentPlayerDocumentChange,
     isHost,
-    onHostRaceStartClick
+    onHostRaceStartClick,
+    onCurrentPlayerUsernameChange
   };
 };

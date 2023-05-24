@@ -32,7 +32,8 @@ export enum RaceState {
 
 export enum FrontendEventType {
   HOST_RACE_START_CLICK = 'HostRaceStartClick',
-  DOCUMENT_CHANGE = 'DocumentChange'
+  DOCUMENT_CHANGE = 'DocumentChange',
+  USERNAME_CHANGE = 'UsernameChange'
 }
 
 export enum BackendEventType {
@@ -53,6 +54,12 @@ export interface FrontendDocumentChangeEvent {
   payload: {
     docIndex: number;
     newDocument: string[];
+  };
+}
+export interface FrontendUsernameChangeEvent {
+  event: FrontendEventType.USERNAME_CHANGE;
+  payload: {
+    newUsername: string;
   };
 }
 
@@ -87,7 +94,7 @@ export interface BackendRaceStartEvent {
 }
 export interface BackendPlayerDataChangeEvent {
   event: BackendEventType.PLAYER_DATA_CHANGE;
-  payload: Pick<Player, 'id' | 'raceData'>;
+  payload: Pick<Player, 'id' | 'username' | 'raceData'>;
 }
 export interface BackendRaceFinishEvent {
   event: BackendEventType.RACE_FINISH;

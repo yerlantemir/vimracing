@@ -13,7 +13,8 @@ import {
   FrontendEventType,
   FrontendRaceHostStartEvent,
   RaceState,
-  BackendRaceInitEvent
+  BackendRaceInitEvent,
+  FrontendUsernameChangeEvent
 } from '@vimracing/shared';
 import { Player } from './Player';
 
@@ -61,7 +62,10 @@ export class WebSocketServer {
   }
   handleMessage(
     ws: WebSocket,
-    data: FrontendRaceHostStartEvent | FrontendDocumentChangeEvent,
+    data:
+      | FrontendRaceHostStartEvent
+      | FrontendDocumentChangeEvent
+      | FrontendUsernameChangeEvent,
     race: Race,
     playerId: string
   ) {
@@ -73,6 +77,9 @@ export class WebSocketServer {
         break;
       case FrontendEventType.DOCUMENT_CHANGE:
         race.changeDoc(playerId, payload.docIndex, payload.newDocument);
+        break;
+      case FrontendEventType.USERNAME_CHANGE:
+        race.changeUsername(playerId, payload.newUsername);
         break;
     }
   }
@@ -142,6 +149,7 @@ export class WebSocketServer {
           event: BackendEventType.PLAYER_DATA_CHANGE,
           payload: {
             id: newPlayer.id,
+            username: newPlayer.username,
             raceData: {
               completeness: newPlayer.raceData?.completeness,
               currentDocIndex: newPlayer.raceData?.currentDocIndex
