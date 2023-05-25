@@ -24,15 +24,15 @@ export default function Home() {
   return (
     <ContentCard>
       <div className="flex flex-col gap-16">
-        <h5 className="font-medium m-0 text-2xl text-gray">
-          Vimracing - the global vim competition
+        <h5 className="font-medium m-0 text-xl text-gray">
+          vimracing - Compete with Your Friends in Vim Mastery
         </h5>
         <Button
           style={{ width: '200px' }}
           className="text-gray-3"
           onClick={onCreateRaceClick}
         >
-          Create race
+          Create a race
         </Button>
       </div>
     </ContentCard>

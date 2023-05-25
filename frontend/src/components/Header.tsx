@@ -16,13 +16,13 @@ export const Header = () => {
 
   return (
     <div className="flex justify-between items-center h-20">
-      <h1 className="text-3xl">
+      <h1 className="text-2xl">
         <Link
           className="no-underline text-gray"
           href="/"
           onClick={onHeaderClick}
         >
-          Vimracing
+          vimracing
         </Link>
       </h1>
 

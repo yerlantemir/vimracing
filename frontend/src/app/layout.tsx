@@ -3,7 +3,7 @@ import './globals.css';
 import { Footer } from '@/components/Footer';
 
 export const metadata = {
-  title: 'Vimracing',
+  title: 'vimracing',
   description: 'Vimracing is a website for racing in vim'
 };
 

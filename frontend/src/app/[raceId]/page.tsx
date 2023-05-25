@@ -48,7 +48,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
           )
         );
       case RaceStatus.FINISHED:
-        return <div>finished</div>;
+        return <div className="text-gray">finished</div>;
     }
   };
   return (

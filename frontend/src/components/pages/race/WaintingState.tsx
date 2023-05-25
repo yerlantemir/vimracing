@@ -29,7 +29,9 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
         </div>
       ) : (
         <>
-          <h5 className="text-gray-2">Share the link below</h5>
+          <h5 className="text-gray-2">
+            Share the link below with your friends
+          </h5>
           <CopyInput link={window.location.href} />
         </>
       )}
