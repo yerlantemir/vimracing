@@ -1,10 +1,12 @@
+import _ from 'lodash';
 import { PlayerCard } from '@/components/PlayerCard';
-import { Player, RaceState } from '@vimracing/shared';
+import { Player, RaceStatus } from '@vimracing/shared';
+import { useMemo } from 'react';
 
 interface PlayersProps {
   players: Player[];
   currentPlayer: Player;
-  raceStatus: RaceState;
+  raceStatus: RaceStatus;
   raceDocsCount?: number;
   onCurrentPlayerUsernameChangeCallback?: (newUsername: string) => void;
 }
@@ -15,18 +17,16 @@ export const Players: React.FC<PlayersProps> = ({
   raceDocsCount, // to show the progress bar in the waiting state component
   onCurrentPlayerUsernameChangeCallback
 }) => {
+  const allPlayers = useMemo(
+    () =>
+      _.sortBy(
+        [currentPlayer, ...players],
+        ['raceData.currentDocIndex', 'raceData.completeness']
+      ).reverse(),
+    [currentPlayer, players]
+  );
+
   if (!players || !currentPlayer) return null;
-
-  const allPlayers = [currentPlayer, ...players];
-
-  const currentPlayerPlace =
-    allPlayers
-      ?.sort(
-        (a, b) =>
-          (b.raceData?.completeness ?? 0) - (a.raceData?.completeness ?? 0)
-      )
-      ?.findIndex((user) => user.id === currentPlayer?.id) + 1;
-
   return (
     <div className="flex gap-4">
       <div
@@ -46,26 +46,6 @@ export const Players: React.FC<PlayersProps> = ({
           );
         })}
       </div>
-      {raceStatus !== RaceState.WAITING && (
-        <>
-          <div
-            style={{
-              width: '0.3px'
-            }}
-            className="bg-gray"
-          />
-          <div
-            style={{
-              width: '20%',
-              fontSize: '64px',
-              lineHeight: '100%'
-            }}
-            className="text-white items-center text-center m-auto"
-          >
-            {currentPlayerPlace}
-          </div>
-        </>
-      )}
     </div>
   );
 };
