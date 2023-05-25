@@ -12,7 +12,7 @@ import {
   FrontendDocumentChangeEvent,
   FrontendEventType,
   FrontendRaceHostStartEvent,
-  RaceState,
+  RaceStatus,
   BackendRaceInitEvent,
   FrontendUsernameChangeEvent
 } from '@vimracing/shared';
@@ -56,7 +56,8 @@ export class WebSocketServer {
         event: BackendEventType.RACE_INIT,
         payload: {
           you: currentPlayer,
-          players: race.getPlayers().filter((p) => p.id !== currentPlayer.id)
+          players: race.getPlayers().filter((p) => p.id !== currentPlayer.id),
+          raceStatus: race.getRaceStatus()
         }
       };
       ws.send(JSON.stringify(initRacePayload));
@@ -134,7 +135,7 @@ export class WebSocketServer {
   }
   onTimerUpdated(
     race: Race,
-    { timer, raceStatus }: { timer: number; raceStatus: RaceState }
+    { timer, raceStatus }: { timer: number; raceStatus: RaceStatus }
   ) {
     this.raceIdWebsocketConnectionsMapping[race.id].forEach(
       ({ connection }) => {
@@ -142,7 +143,7 @@ export class WebSocketServer {
           event: BackendEventType.RACE_TIMER_UPDATE,
           payload: {
             timerInSeconds: timer,
-            raceState: raceStatus
+            raceStatus: raceStatus
           }
         };
         connection.send(JSON.stringify(payload));

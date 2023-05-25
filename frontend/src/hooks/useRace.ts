@@ -5,7 +5,7 @@ import {
   FrontendEventType,
   FrontendRaceHostStartEvent,
   Player,
-  RaceState,
+  RaceStatus,
   BackendEventType,
   BackendNewPlayerEvent,
   BackendPlayerDataChangeEvent,
@@ -38,7 +38,7 @@ export const useRace = (raceId: string) => {
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
   const [players, setPlayers] = useState<Player[]>();
   const [raceTimer, setRaceTimer] = useState<number>();
-  const [raceStatus, setRaceStatus] = useState<RaceState>();
+  const [raceStatus, setRaceStatus] = useState<RaceStatus>();
   const isHost = useMemo(() => {
     const hostTokenString = LocalStorageManager.getHostToken();
     if (!hostTokenString) return false;
@@ -47,14 +47,14 @@ export const useRace = (raceId: string) => {
   }, [raceId]);
 
   const onRaceInit = (payload: BackendRaceInitEvent['payload']) => {
-    const { you, players: otherPlayers } = payload;
+    const { you, players: otherPlayers, raceStatus } = payload;
     LocalStorageManager.setUser({
       id: you.id,
       username: you.username
     });
     setCurrentPlayer(you);
     setPlayers(otherPlayers);
-    setRaceStatus(RaceState.WAITING);
+    setRaceStatus(raceStatus);
   };
   const onNewPlayerJoin = useCallback(
     (payload: BackendNewPlayerEvent['payload']) => {
@@ -66,9 +66,9 @@ export const useRace = (raceId: string) => {
   const onRaceTimerUpdate = (
     payload: BackendRaceTimerUpdateEvent['payload']
   ) => {
-    const { timerInSeconds, raceState } = payload;
+    const { timerInSeconds, raceStatus } = payload;
     setRaceTimer(timerInSeconds);
-    setRaceStatus(raceState);
+    setRaceStatus(raceStatus);
   };
   const onRaceStart = (payload: BackendRaceStartEvent['payload']) => {
     const { raceDocs: newRaceDoc } = payload;
@@ -133,7 +133,7 @@ export const useRace = (raceId: string) => {
   );
 
   const onRaceFinish = () => {
-    setRaceStatus(RaceState.FINISHED);
+    setRaceStatus(RaceStatus.FINISHED);
   };
 
   const onMessageFromServer = useCallback(

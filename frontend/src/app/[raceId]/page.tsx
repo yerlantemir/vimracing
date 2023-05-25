@@ -4,7 +4,7 @@ import { ContentCard } from '@/components/ContentCard';
 import { RaceOnState } from '@/components/pages/race/RaceOnState';
 import { WaitingState } from '@/components/pages/race/WaintingState';
 import { useRace } from '@/hooks/useRace';
-import { RaceState } from '@vimracing/shared';
+import { RaceStatus } from '@vimracing/shared';
 
 export default function RacePage({ params }: { params: { raceId: string } }) {
   const { raceId } = params;
@@ -22,7 +22,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
 
   const renderRaceByStatus = () => {
     switch (raceStatus) {
-      case RaceState.WAITING:
+      case RaceStatus.WAITING:
         return (
           <WaitingState
             raceTimer={raceTimer}
@@ -35,7 +35,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
             }
           />
         );
-      case RaceState.ON:
+      case RaceStatus.ON:
         return (
           raceDocs && (
             <RaceOnState
@@ -47,7 +47,7 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
             />
           )
         );
-      case RaceState.FINISHED:
+      case RaceStatus.FINISHED:
         return <div>finished</div>;
     }
   };

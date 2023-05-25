@@ -24,7 +24,7 @@ export type Player = {
   };
 };
 
-export enum RaceState {
+export enum RaceStatus {
   WAITING,
   ON,
   FINISHED
@@ -68,6 +68,7 @@ export interface BackendRaceInitEvent {
   payload: {
     you: Player;
     players: Player[];
+    raceStatus: RaceStatus;
   };
 }
 export interface BackendNewPlayerEvent {
@@ -79,7 +80,7 @@ export interface BackendNewPlayerEvent {
 export interface BackendRaceTimerUpdateEvent {
   event: BackendEventType.RACE_TIMER_UPDATE;
   payload: {
-    raceState: RaceState;
+    raceStatus: RaceStatus;
     timerInSeconds: number;
   };
 }

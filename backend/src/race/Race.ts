@@ -1,4 +1,4 @@
-import { RaceState } from '@vimracing/shared';
+import { RaceStatus } from '@vimracing/shared';
 import { Player } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
@@ -13,7 +13,7 @@ interface RaceEvents {
   raceStarted: (race: Race) => void;
   timerUpdated: (
     race: Race,
-    params: { raceStatus: RaceState; timer: number }
+    params: { raceStatus: RaceStatus; timer: number }
   ) => void;
   raceFinished: (race: Race) => void;
   playerDataChanged: (race: Race, player: Player) => void;
@@ -21,7 +21,7 @@ interface RaceEvents {
 
 export class Race {
   private eventEmitter = new EventEmitter();
-  private state: RaceState = RaceState.WAITING;
+  private status: RaceStatus = RaceStatus.WAITING;
   private players: Player[] = [];
   private raceDocs: {
     start: string[];
@@ -32,7 +32,7 @@ export class Race {
   }
 
   addPlayer(player: Player) {
-    if (this.getPlayer(player.id) || this.state !== RaceState.WAITING) return;
+    if (this.getPlayer(player.id) || this.status !== RaceStatus.WAITING) return;
     this.players.push(player);
     this.emit('playerAdded', player);
   }
@@ -45,12 +45,12 @@ export class Race {
         clearInterval(currentInterval);
       } else {
         timer--;
-        this.emit('timerUpdated', { raceStatus: this.state, timer });
+        this.emit('timerUpdated', { raceStatus: this.status, timer });
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
   onRaceOn() {
-    this.state = RaceState.ON;
+    this.status = RaceStatus.ON;
     this.emit('raceStarted');
 
     let timer = DEFAULT_RACE_TIME_IN_S;
@@ -59,13 +59,13 @@ export class Race {
         this.onRaceEnd();
         clearInterval(interval);
       } else {
-        this.emit('timerUpdated', { raceStatus: this.state, timer });
+        this.emit('timerUpdated', { raceStatus: this.status, timer });
         timer--;
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
   onRaceEnd() {
-    this.state = RaceState.FINISHED;
+    this.status = RaceStatus.FINISHED;
     this.emit('raceFinished');
   }
 
@@ -74,7 +74,7 @@ export class Race {
   }
 
   public changeDoc(playerId: string, documentIndex: number, newDoc: string[]) {
-    if (this.state !== RaceState.ON) return;
+    if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
     player.updateDoc(
@@ -86,7 +86,7 @@ export class Race {
     this.emit('playerDataChanged', player);
   }
   public changeUsername(playerId: string, newUsername: string) {
-    if (this.state !== RaceState.WAITING) return;
+    if (this.status !== RaceStatus.WAITING) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
     player.updateUsername(newUsername);
@@ -106,6 +106,9 @@ export class Race {
     }
     const completenessPercentage = (completeness / targetDoc.length) * 100;
     return Math.round(completenessPercentage);
+  }
+  public getRaceStatus() {
+    return this.status;
   }
 
   on<Event extends keyof RaceEvents>(

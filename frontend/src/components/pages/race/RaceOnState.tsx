@@ -1,7 +1,7 @@
 import Editor, { isTextEqual } from '@/components/Editor';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
-import { Player, RaceState } from '@vimracing/shared';
+import { Player, RaceStatus } from '@vimracing/shared';
 import { Timer } from '@/components/Timer';
 
 interface RaceOnStateProps {
@@ -70,14 +70,14 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   return (
     <>
       <div className="flex justify-between">
-        <h5 className="text-gray-2">The race is about to start!</h5>
+        <h5 className="text-gray-2">The race on!</h5>
         <Timer time={raceTimer} />
       </div>
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {players && currentPlayer && (
         <Players
           raceDocsCount={raceDocs.length}
-          raceStatus={RaceState.ON}
+          raceStatus={RaceStatus.ON}
           players={players}
           currentPlayer={{
             ...currentPlayer,

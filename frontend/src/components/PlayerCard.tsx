@@ -1,12 +1,12 @@
 'use client';
 
-import { Player, RaceState } from '@vimracing/shared';
+import { Player, RaceStatus } from '@vimracing/shared';
 import { ProgressBar } from './pages/race/ProgressBar';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type PlayerCardProps = {
   isCurrentUser: boolean;
-  raceStatus?: RaceState;
+  raceStatus?: RaceStatus;
   raceDocsCount: number;
   onUsernameChangeCallback?: (newUsername: string) => void;
   player: Player;
@@ -27,7 +27,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   const usernameInputRef = useRef<HTMLInputElement | null>(null);
 
   const onUsernameDblClick = () => {
-    if (isCurrentUser && raceStatus === RaceState.WAITING) {
+    if (isCurrentUser && raceStatus === RaceStatus.WAITING) {
       setEditingUsername(true);
     }
   };
