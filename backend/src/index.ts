@@ -1,7 +1,7 @@
-import * as express from 'express';
-import * as http from 'http';
-import * as WebSocket from 'ws';
-import * as cors from 'cors';
+import express from 'express';
+import http from 'http';
+import WebSocket from 'ws';
+import cors from 'cors';
 import { WebSocketServer } from './race/WebSocketServer';
 
 const app = express();

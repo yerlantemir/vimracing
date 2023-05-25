@@ -2,43 +2,45 @@ export const generateRaceDocs = () => {
   return [
     {
       start: [
-        'if (true) {',
-        '  console.log(hello);',
-        '}',
-        'else {',
-        '   console.log(fuck you!)',
+        'for(let i=0;i<5;i++){',
+        'console.log(i);',
         '}'
       ],
       target: [
-        'if (false) {',
-        '  console.log(hello);',
-        '}',
-        'else {',
-        "  console.log('fuck you!')",
+        'for (let i = 0; i < 10; i++) {',
+        '  console.log(i);',
         '}'
       ]
-    },
-    {
-      start: ['print(hey)', '   print(mey)', 'print(ss)'],
-      target: ['print()', 'print()', 'print()']
     },
     {
       start: [
-        'if (true) {',
-        '  console.log(hello);',
+        'let sum=0;',
+        'for(let i=0;i<5;i++){',
+        'sum+=i;',
         '}',
-        'else {',
-        '   console.log(fuck you!)',
-        '}'
+        'console.log(sum);'
       ],
       target: [
-        'if (false) {',
-        '  console.log(hello);',
+        'let sum = 0;',
+        'for (let i = 0; i < 10; i++) {',
+        '  sum += i;',
         '}',
-        'else {',
-        "  console.log('fuck you!')",
-        '}'
+        'console.log(sum);'
       ]
-    }
+    },
+    {
+      start: [
+        'let arr=[1,2,3,4,5];',
+        'arr.forEach((item)=>{',
+        'console.log(item)',
+        '});'
+      ],
+      target: [
+        'let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];',
+        'arr.forEach((item) => {',
+        '  console.log(item);',
+        '});'
+      ]
+    },
   ];
 };

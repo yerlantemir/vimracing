@@ -1,5 +1,5 @@
-import * as http from 'http';
-import * as WebSocket from 'ws';
+import http from 'http';
+import WebSocket from 'ws';
 import { Race } from './Race';
 import { uuid } from 'uuidv4';
 import {
