@@ -1,4 +1,4 @@
-import { HTMLAttributes, useMemo } from 'react';
+import { Fragment, HTMLAttributes, useMemo } from 'react';
 
 type TaskStatus = 'done' | 'doing' | 'todo';
 
@@ -115,7 +115,7 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
         .map((_, index) => {
           const taskStatus = getTaskStatus(index);
           return (
-            <>
+            <Fragment key={index}>
               <Circle taskStatus={taskStatus} isFinished={isFinished} />
               {index !== tasksCount - 1 && (
                 <Line
@@ -124,7 +124,7 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
                   isFinished={isFinished}
                 />
               )}
-            </>
+            </Fragment>
           );
         })}
     </div>

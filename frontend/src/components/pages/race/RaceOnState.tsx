@@ -20,7 +20,9 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   raceTimer
 }) => {
   const editorParentElement = useRef<HTMLDivElement | null>(null);
-  const [documentIndex, setDocumentIndex] = useState(0);
+  const [documentIndex, setDocumentIndex] = useState(
+    currentPlayer?.raceData?.currentDocIndex ?? 0
+  );
 
   const isDocFinished = (current: string[], target: string[]) => {
     return isTextEqual(current, target);
@@ -66,7 +68,9 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
     };
   }, [documentIndex, onCurrentDocumentChange, onDocChange, raceDocs]);
 
-  const isFinished = documentIndex === raceDocs.length;
+  const isFinished =
+    documentIndex === raceDocs.length - 1 &&
+    currentPlayer?.raceData?.completeness === 100;
   return (
     <>
       <div className="flex justify-between">

@@ -197,7 +197,7 @@ export const useRace = (raceId: string) => {
     const usernameParam = user?.username ? `&username=${user.username}` : '';
 
     const newSocketConnection = new WebSocket(
-      `wss://${process.env.NEXT_PUBLIC_BACKEND_URL}/?raceId=${raceId}${userIdParam}${usernameParam}`
+      `${process.env.NEXT_PUBLIC_BACKEND_WS_URL}/?raceId=${raceId}${userIdParam}${usernameParam}`
     );
 
     newSocketConnection.addEventListener('message', onMessageFromServer);

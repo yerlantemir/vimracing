@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const createRace = async () => {
   const createResponse = await axios.post(
-    `${process.env.NEXT_PUBLIC_BACKEND_FULL_URL}/race/create`
+    `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/race/create`
   );
   if (!createResponse) return null;
 
