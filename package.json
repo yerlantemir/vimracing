@@ -5,8 +5,9 @@
   "main": "index.js",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "frontend",
+    "backend",
+    "shared"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -29,8 +30,5 @@
     "eslint": "^8.31.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1"
-  },
-  "dependencies": {
-    "@vimracing/shared": "^1.0.0"
   }
 }
