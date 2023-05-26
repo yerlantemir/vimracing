@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 export const Header = () => {
   const router = useRouter();
-  const onHeaderClick = (e: any) => {
+  const onHeaderClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     router.push('/');
   };

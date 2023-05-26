@@ -82,15 +82,15 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   const currentDocIndex = raceData?.currentDocIndex ?? 0;
 
   useEffect(() => {
-    const onOutsideClick = (e: any) => {
+    const onOutsideClick = (e: MouseEvent) => {
       if (
         usernameInputRef.current &&
-        !usernameInputRef.current.contains(e.target)
+        !usernameInputRef.current.contains(e.target as Node)
       ) {
         onUsernameInputBlur();
       }
     };
-    const onEnterPress = (e: any) => {
+    const onEnterPress = (e: KeyboardEvent) => {
       if (e.key === 'Enter') {
         onUsernameInputBlur();
       }

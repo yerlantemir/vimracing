@@ -25,8 +25,8 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
     }, COPIED_INTERNAL_MS);
   };
 
-  const onInputClick = (e: any) => {
-    e.target.select();
+  const onInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    e.currentTarget.select();
   };
 
   return (

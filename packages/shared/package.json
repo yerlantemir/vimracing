@@ -6,6 +6,7 @@
   "main": "dist/types/index.js",
   "types": "dist/types/index.d.ts",
   "scripts": {
+    "build": "npm run tsc",
     "tsc": "rimraf ./dist && tsc"
   },
   "author": "",

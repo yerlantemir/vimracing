@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "env": {
+    "CUSTOM_ENV_VARIABLE": "value"
+  },
+  "routes": [{ "src": "/(.*)", "dest": "/index.html" }]
+}
