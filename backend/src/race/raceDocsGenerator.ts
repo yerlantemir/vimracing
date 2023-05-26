@@ -1,16 +1,8 @@
 export const generateRaceDocs = () => {
   return [
     {
-      start: [
-        'for(let i=0;i<5;i++){',
-        'console.log(i);',
-        '}'
-      ],
-      target: [
-        'for (let i = 0; i < 10; i++) {',
-        '  console.log(i);',
-        '}'
-      ]
+      start: ['for(let i=0;i<5;i++){', 'console.log(i);', '}'],
+      target: ['for (let i = 0; i < 10; i++) {', '  console.log(i);', '}']
     },
     {
       start: [
@@ -41,6 +33,6 @@ export const generateRaceDocs = () => {
         '  console.log(item);',
         '});'
       ]
-    },
+    }
   ];
 };
