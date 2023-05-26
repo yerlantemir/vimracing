@@ -1,38 +1,24 @@
 export const generateRaceDocs = () => {
   return [
     {
-      start: ['for(let i=0;i<5;i++){', 'console.log(i);', '}'],
-      target: ['for (let i = 0; i < 10; i++) {', '  console.log(i);', '}']
+      start: ['let a = 5'],
+      target: ['let a = 5;']
     },
     {
-      start: [
-        'let sum=0;',
-        'for(let i=0;i<5;i++){',
-        'sum+=i;',
-        '}',
-        'console.log(sum);'
-      ],
-      target: [
-        'let sum = 0;',
-        'for (let i = 0; i < 10; i++) {',
-        '  sum += i;',
-        '}',
-        'console.log(sum);'
-      ]
+      start: ['let array = [1, 2, 3, 4,]'],
+      target: ['let array = [1, 2, 3, 4];']
     },
     {
-      start: [
-        'let arr=[1,2,3,4,5];',
-        'arr.forEach((item)=>{',
-        'console.log(item)',
-        '});'
-      ],
-      target: [
-        'let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];',
-        'arr.forEach((item) => {',
-        '  console.log(item);',
-        '});'
-      ]
+      start: ['let str = "Hello, World'],
+      target: ['let str = "Hello, World";']
+    },
+    {
+      start: ['function helloWorld( { console.log("Hello, World!") }'],
+      target: ['function helloWorld() { console.log("Hello, World!"); }']
+    },
+    {
+      start: ['let obj = { key: "value" }; console.log(obj.key'],
+      target: ['let obj = { key: "value" }; console.log(obj.key);']
     }
   ];
 };

@@ -12,7 +12,12 @@ import {
 import { oneDark } from '@codemirror/theme-one-dark';
 import { Text } from '@codemirror/state';
 
-import { defaultKeymap, indentWithTab } from '@codemirror/commands';
+import {
+  defaultKeymap,
+  historyKeymap,
+  indentWithTab,
+  history
+} from '@codemirror/commands';
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
 import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
@@ -30,9 +35,10 @@ class Editor extends EditorView {
       parent: config?.parent,
       extensions: [
         vim(),
+        history(),
         lineNumbers(),
         javascript(),
-        keymap.of([...defaultKeymap, indentWithTab]),
+        keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
         highlightActiveLineGutter(),
         highlightSpecialChars(),
         highlightActiveLine(),
