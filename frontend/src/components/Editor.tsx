@@ -7,11 +7,11 @@ import {
   drawSelection,
   dropCursor,
   rectangularSelection,
-  ViewUpdate
+  ViewUpdate,
+  EditorView
 } from '@codemirror/view';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { Text } from '@codemirror/state';
-
 import {
   defaultKeymap,
   historyKeymap,
@@ -21,7 +21,6 @@ import {
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
 import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
-import { EditorView } from 'codemirror';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange: (doc: string[]) => void;
