@@ -1,8 +1,6 @@
 import {
   keymap,
   lineNumbers,
-  highlightActiveLine,
-  highlightActiveLineGutter,
   highlightSpecialChars,
   drawSelection,
   dropCursor,
@@ -38,9 +36,7 @@ class Editor extends EditorView {
         lineNumbers(),
         javascript(),
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
-        highlightActiveLineGutter(),
         highlightSpecialChars(),
-        highlightActiveLine(),
         dropCursor(),
         rectangularSelection(),
         drawSelection(),
