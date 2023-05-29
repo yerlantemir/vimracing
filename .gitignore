@@ -2,3 +2,5 @@ node_modules
 dist
 .vercel
 .env*
+codemirror-merge
+codemirror-vim

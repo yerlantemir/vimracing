@@ -3,6 +3,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
 import { Player, RaceStatus } from '@vimracing/shared';
 import { Timer } from '@/components/Timer';
+import { Hotkeys } from './Hotkeys';
 
 interface RaceOnStateProps {
   raceDocs: { start: string[]; target: string[] }[];
@@ -95,6 +96,7 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
 
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {raceDocs && !isFinished && <div ref={editorParentElement} />}
+      <Hotkeys />
       {isFinished && <div>FINISHED</div>}
     </>
   );

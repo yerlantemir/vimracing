@@ -2,6 +2,7 @@
 
 import { ContentCard } from '@/components/ContentCard';
 import Editor from '@/components/Editor';
+import { Hotkeys } from '@/components/pages/race/Hotkeys';
 import { useEffect, useRef } from 'react';
 
 const TestPage = () => {
@@ -34,6 +35,8 @@ const TestPage = () => {
       <ContentCard>
         <div ref={editorParentElement} />
       </ContentCard>
+
+      <Hotkeys />
     </div>
   );
 };
