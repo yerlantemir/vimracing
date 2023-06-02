@@ -33,10 +33,13 @@ const TestPage = () => {
   return (
     <div>
       <ContentCard>
-        <div ref={editorParentElement} />
-      </ContentCard>
+        <div className="flex flex-col gap-4">
+          <div ref={editorParentElement} />
 
-      <Hotkeys />
+          <div style={{ height: '0.3px' }} className="bg-gray w-full" />
+          <Hotkeys />
+        </div>
+      </ContentCard>
     </div>
   );
 };
