@@ -24,77 +24,41 @@ export const Hotkeys = () => {
   }, []);
 
   useEffect(() => {
-    const onVimCommand = (event: any) => {
-      if (event.detail.type === 'action') {
-        setExecutedCommands([
-          ...executedCommands,
-          {
-            isFailed: false,
-            command: event.detail.keys.replace('<character>', '')
+    const onVimCommandDone = (event: any) => {
+      const { matchType }: { matchType: 'partial' | 'full' } = event.detail;
+      // case with i, a, {, (, etc.
+      if (matchType === 'full') {
+        const { type, keys } = event.detail.command;
+        if (type === 'operator') {
+          // double d, c, y, etc.
+          if (currentCommand === keys) {
+            setExecutedCommands((prev) => [
+              ...prev,
+              {
+                isFailed: false,
+                command: currentCommand + currentCommand
+              }
+            ]);
+          } else {
+            setCurrentCommand(keys);
           }
-        ]);
-        return;
-      }
-      if (event.detail.type === 'operator') {
-        // g~, gu, gU, gg, gw...
-        if (event.detail.keys.length > 1) {
-          setExecutedCommands([
-            ...executedCommands,
-            { isFailed: false, command: event.detail.keys }
+        } else {
+          setExecutedCommands((prev) => [
+            ...prev,
+            {
+              isFailed: false,
+              command:
+                currentCommand +
+                keys.replace('<character>', lastPressedKey.current)
+            }
           ]);
+          setCurrentCommand('');
         }
-        const pressedKey = event.detail.keys;
-        if (currentCommand === '') {
-          setCurrentCommand(pressedKey);
-          return;
-        }
-        setExecutedCommands([
-          ...executedCommands,
-          {
-            isFailed: pressedKey !== currentCommand,
-            command: pressedKey + currentCommand
-          }
-        ]);
       }
-      if (event.detail.type === 'operatorMotion') {
-        // x, X, d, D, Y, C, c, s, S, ~
-        setExecutedCommands([
-          ...executedCommands,
-          { isFailed: false, command: event.detail.keys }
-        ]);
-      }
-      if (event.detail.type === 'motion') {
-        const pressedKeys = event.detail.keys as string;
-
-        let command = '';
-        // handle diw, viw, ciw, daw, vaw, yaw, yiw, di", ci", yi", vi", di}, ci}, yi}, vi}, etc.
-        // currentCommand is the operator(d,y,c,etc.)
-        // last pressedKey is the character(w, ", }, etc.)
-        if (currentCommand && pressedKeys.includes('<character>')) {
-          command =
-            currentCommand +
-            pressedKeys.replace('<character>', lastPressedKey.current);
-        }
-        // dw, yw, cw, d$, y$, c$, etc.
-        if (currentCommand && pressedKeys.length === 1) {
-          command = currentCommand + pressedKeys;
-        }
-        // H, L, ge, gg, etc.
-        if (!currentCommand) {
-          command = pressedKeys;
-        }
-        setExecutedCommands([
-          ...executedCommands,
-          { isFailed: false, command }
-        ]);
-      }
-
-      setCurrentCommand('');
     };
-
-    window.addEventListener('vimracing-command', onVimCommand);
+    window.addEventListener('vimracing-command-done', onVimCommandDone);
     return () => {
-      window.removeEventListener('vimracing-command', onVimCommand);
+      window.removeEventListener('vimracing-command-done', onVimCommandDone);
     };
   }, [currentCommand, executedCommands, lastPressedKey]);
   return <div>{JSON.stringify(executedCommands)}</div>;
