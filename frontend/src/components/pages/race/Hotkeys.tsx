@@ -39,7 +39,7 @@ export const Hotkeys = () => {
     const onVimCommandDone = (event: any) => {
       const { matchType }: { matchType: 'partial' | 'full' | 'none' } =
         event.detail;
-      let newExecutedCommand: ExecutedCommand;
+      let newExecutedCommand: ExecutedCommand | null = null;
       // case with i, a, "{"", "(", etc.
       if (matchType === 'full') {
         const { type, keys } = event.detail.command;
@@ -80,7 +80,7 @@ export const Hotkeys = () => {
       } else if (matchType === 'none') {
         setCurrentCommand('');
       }
-      if (!!newExecutedCommand) {
+      if (newExecutedCommand) {
         if (
           executedCommands[executedCommands.length - 1]?.command ===
           newExecutedCommand?.command
