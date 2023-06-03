@@ -15,6 +15,7 @@ module.exports = {
         'gray-2': '#c5c8d3',
         'gray-3': '#142446',
         'gray-4': '#32363F',
+        'gray-5': '#2B2F38',
 
         'white-1': '#f8f8f8',
         'white-2': '#282c34',
@@ -28,7 +29,9 @@ module.exports = {
         'green-2': '#27AE60',
         'green-3': '#2ecc71',
 
-        orange: '#E67E22'
+        orange: '#E67E22',
+
+        'red-1': '#e06c75'
       }
     }
   },
