@@ -2,7 +2,7 @@
 
 import { ContentCard } from '@/components/ContentCard';
 import Editor from '@/components/Editor';
-import { Hotkeys } from '@/components/pages/race/Hotkeys';
+import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useEffect, useRef } from 'react';
 
 const TestPage = () => {

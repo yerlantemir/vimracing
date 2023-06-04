@@ -3,7 +3,7 @@ import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
 import { Player, RaceStatus } from '@vimracing/shared';
 import { Timer } from '@/components/Timer';
-import { Hotkeys } from './Hotkeys';
+import { Hotkeys } from './Hotkeys/Hotkeys';
 
 interface RaceOnStateProps {
   raceDocs: { start: string[]; target: string[] }[];

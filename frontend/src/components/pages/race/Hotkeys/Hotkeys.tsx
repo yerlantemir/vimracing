@@ -1,39 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-
-const ArrowKeyIconMapping = {
-  '<Down>': '↓',
-  '<Up>': '↑',
-  '<Left>': '←',
-  '<Right>': '→'
-};
-type ExecutedCommand = {
-  isFailed: boolean;
-  command: string;
-  count?: number;
-  isArrowKey?: boolean;
-};
-
-const Command: React.FC<ExecutedCommand> = ({ command, count }) => {
-  const isArrowKey = Object.keys(ArrowKeyIconMapping).includes(command);
-  return (
-    <div
-      className={`py-2 px-3 bg-gray-5 text-gray border relative ${
-        isArrowKey ? 'border-red-1' : 'border-blue-2'
-      }`}
-    >
-      {isArrowKey ? (
-        <span>
-          {ArrowKeyIconMapping[command as keyof typeof ArrowKeyIconMapping]}
-        </span>
-      ) : (
-        <span>{command}</span>
-      )}
-      <span className="absolute top-0 right-1 text-xs opacity-80">{count}</span>
-    </div>
-  );
-};
+import { Command, ExecutedCommand } from './Command';
 
 export const Hotkeys = () => {
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[]>(
@@ -137,7 +105,7 @@ export const Hotkeys = () => {
   ]);
 
   return (
-    <div className="flex gap-3 flex-wrap">
+    <div className="flex gap-3">
       {executedCommands.map((command, index) => {
         return <Command key={index} {...command} />;
       })}
