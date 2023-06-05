@@ -13,7 +13,7 @@ export type ExecutedCommand = {
   command: string;
   count?: number;
   isArrowKey?: boolean;
-  index: number;
+  index?: number;
 };
 
 export const Command: React.FC<ExecutedCommand> = ({
