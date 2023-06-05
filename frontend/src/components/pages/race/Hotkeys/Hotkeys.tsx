@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Command, ExecutedCommand } from './Command';
+import { AnimatePresence } from 'framer-motion';
 
 export const Hotkeys = () => {
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[]>(
@@ -76,21 +77,7 @@ export const Hotkeys = () => {
         setCurrentCommand('');
       }
       if (newExecutedCommand) {
-        if (
-          executedCommands[executedCommands.length - 1]?.command ===
-          newExecutedCommand?.command
-        ) {
-          setExecutedCommands([
-            ...executedCommands.slice(0, executedCommands.length - 1),
-            {
-              ...newExecutedCommand,
-              count:
-                (executedCommands[executedCommands.length - 1].count || 0) + 1
-            }
-          ]);
-        } else {
-          setExecutedCommands([...executedCommands, newExecutedCommand]);
-        }
+        setExecutedCommands([...executedCommands, newExecutedCommand]);
       }
     };
     window.addEventListener('vimracing-command-done', onVimCommandDone);
@@ -103,13 +90,45 @@ export const Hotkeys = () => {
     lastPressedKey,
     partialCommandExecuted
   ]);
+  useLayoutEffect(() => {
+    const timeout = setTimeout(() => {
+      const lastCommand = executedCommands[executedCommands.length - 1];
+      const lastLastCommand = executedCommands[executedCommands.length - 2];
+      console.log({ executedCommands });
+
+      if (
+        lastCommand &&
+        lastLastCommand &&
+        lastCommand.command === lastLastCommand.command
+      ) {
+        setExecutedCommands([
+          ...executedCommands.slice(0, executedCommands.length - 2),
+          {
+            ...lastLastCommand,
+            count: (lastLastCommand?.count ?? 0) + (lastCommand?.count ?? 0)
+          }
+        ]);
+      }
+    }, 300);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [executedCommands]);
 
   return (
     <div className="flex gap-3">
-      {executedCommands.map((command, index) => {
-        return <Command key={index} {...command} />;
-      })}
-      {currentCommand && <Command isFailed={false} command={currentCommand} />}
+      <AnimatePresence>
+        {executedCommands.map((command, index) => {
+          return <Command key={index} {...command} index={index} />;
+        })}
+      </AnimatePresence>
+      {currentCommand && (
+        <Command
+          isFailed={false}
+          command={currentCommand}
+          index={executedCommands.length}
+        />
+      )}
     </div>
   );
 };
