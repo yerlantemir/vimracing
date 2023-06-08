@@ -33,7 +33,7 @@ export const Hotkeys = () => {
         ['<Down>', '<Up>', '<Left>', '<Right>'].includes(lastPressedKey.current)
       ) {
         newExecutedCommand = {
-          isFailed: false,
+          isFailed: true,
           command: lastPressedKey.current,
           count: 1
         };
@@ -47,7 +47,15 @@ export const Hotkeys = () => {
               command: currentCommand + currentCommand,
               count: 1
             };
+            setCurrentCommand('');
           } else {
+            if (currentCommand) {
+              newExecutedCommand = {
+                isFailed: true,
+                command: currentCommand,
+                count: 1
+              };
+            }
             setCurrentCommand(keys);
           }
         } else {
@@ -73,7 +81,7 @@ export const Hotkeys = () => {
       } else if (matchType === 'partial') {
         setCurrentCommand((prev) => prev + lastPressedKey.current);
         setPartialCommandExecuted(true);
-      } else if (matchType === 'none') {
+      } else {
         setCurrentCommand('');
       }
       if (newExecutedCommand) {
@@ -90,11 +98,11 @@ export const Hotkeys = () => {
     lastPressedKey,
     partialCommandExecuted
   ]);
+
   useLayoutEffect(() => {
     const timeout = setTimeout(() => {
       const lastCommand = executedCommands[executedCommands.length - 1];
       const lastLastCommand = executedCommands[executedCommands.length - 2];
-      console.log({ executedCommands });
 
       if (
         lastCommand &&
@@ -115,20 +123,23 @@ export const Hotkeys = () => {
     };
   }, [executedCommands]);
 
+  const allCommands = currentCommand
+    ? [
+        ...executedCommands,
+        {
+          isFailed: false,
+          command: currentCommand,
+          count: 1
+        }
+      ]
+    : executedCommands;
   return (
     <div className="flex gap-3">
       <AnimatePresence>
-        {executedCommands.map((command, index) => {
+        {allCommands.map((command, index) => {
           return <Command key={index} {...command} index={index} />;
         })}
       </AnimatePresence>
-      {currentCommand && (
-        <Command
-          isFailed={false}
-          command={currentCommand}
-          index={executedCommands.length}
-        />
-      )}
     </div>
   );
 };
