@@ -16,7 +16,7 @@
     "@codemirror/state": "^6.0.0",
     "@codemirror/theme-one-dark": "^6.1.2",
     "@codemirror/view": "^6.11.0",
-    "@replit/codemirror-vim": "*",
+    "@replit/codemirror-vim": "https://github.com/yerlantemir/vimracing-vim-extension.git",
     "@types/lodash": "^4.14.194",
     "@types/node": "20.1.0",
     "@types/react": "18.2.6",
