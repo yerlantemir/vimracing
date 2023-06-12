@@ -1,4 +1,4 @@
-import { RaceStatus } from '@vimracing/shared';
+import { ExecutedCommand, RaceStatus } from '@vimracing/shared';
 import { Player } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
@@ -84,6 +84,17 @@ export class Race {
     );
 
     this.emit('playerDataChanged', player);
+  }
+  public finishPlayerRace(
+    playerId: string,
+    executedCommands: ExecutedCommand[][]
+  ) {
+    if (this.status !== RaceStatus.ON) return;
+    const player = this.getPlayer(playerId);
+    if (!player) return;
+    const raceFinished = player.finishRace(executedCommands);
+
+    if (raceFinished) this.emit('playerDataChanged', player);
   }
   public changeUsername(playerId: string, newUsername: string) {
     if (this.status !== RaceStatus.WAITING) return;

@@ -89,6 +89,9 @@ export class WebSocketServer {
       case FrontendEventType.USERNAME_CHANGE:
         race.changeUsername(playerId, payload.newUsername);
         break;
+      case FrontendEventType.RACE_FINISH:
+        race.finishPlayerRace(playerId, payload.executedCommands);
+        break;
     }
   }
 
@@ -160,7 +163,8 @@ export class WebSocketServer {
             username: newPlayer.username,
             raceData: {
               completeness: newPlayer.raceData?.completeness,
-              currentDocIndex: newPlayer.raceData?.currentDocIndex
+              currentDocIndex: newPlayer.raceData?.currentDocIndex,
+              executedCommands: newPlayer.raceData?.executedCommands
             }
           }
         };

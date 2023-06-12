@@ -1,4 +1,4 @@
-import { Player as PlayerType } from '@vimracing/shared';
+import { ExecutedCommand, Player as PlayerType } from '@vimracing/shared';
 
 export class Player implements PlayerType {
   id: string;
@@ -8,6 +8,8 @@ export class Player implements PlayerType {
     currentDocIndex?: number;
     docs?: string[][];
     currentPlace?: number;
+    executedCommands?: ExecutedCommand[][];
+    isFinished?: boolean;
   };
 
   constructor(id: string, username: string) {
@@ -37,12 +39,28 @@ export class Player implements PlayerType {
       };
     }
   }
-  updateUsername(newUsername: string) {
-    this.username = newUsername;
+
+  finishRace(executedCommands: ExecutedCommand[][]) {
+    if (!this._canFinishRace()) return false;
+
+    if (this.raceData) {
+      this.raceData = {
+        ...this.raceData,
+        executedCommands,
+        isFinished: true
+      };
+      return true;
+    }
   }
 
-  private getRandomUsername() {
-    const usernames = ['bob', 'martin', 'jack', 'john', 'zan', 'jason'];
-    return usernames[Math.floor(Math.random() * usernames.length)];
+  _canFinishRace(): boolean {
+    if (!this.raceData || !this.raceData.docs) return false;
+
+    const { currentDocIndex, docs, completeness } = this.raceData;
+    return currentDocIndex === docs?.length - 1 && completeness === 100;
+  }
+
+  updateUsername(newUsername: string) {
+    this.username = newUsername;
   }
 }
