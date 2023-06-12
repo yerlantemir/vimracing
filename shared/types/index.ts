@@ -13,6 +13,14 @@ Backend Event Types:
 6. RaceFinish 
 */
 
+export type ExecutedCommand = {
+  isFailed: boolean;
+  command: string;
+  count?: number;
+  isArrowKey?: boolean;
+  index?: number;
+};
+
 export type Player = {
   id: string;
   username: string;
@@ -21,6 +29,8 @@ export type Player = {
     currentDocIndex?: number;
     docs?: string[][];
     currentPlace?: number;
+    executedCommands?: ExecutedCommand[][];
+    isFinished?: boolean;
   };
 };
 
@@ -33,7 +43,8 @@ export enum RaceStatus {
 export enum FrontendEventType {
   HOST_RACE_START_CLICK = 'HostRaceStartClick',
   DOCUMENT_CHANGE = 'DocumentChange',
-  USERNAME_CHANGE = 'UsernameChange'
+  USERNAME_CHANGE = 'UsernameChange',
+  RACE_FINISH = 'RaceFinish'
 }
 
 export enum BackendEventType {
@@ -49,6 +60,13 @@ export interface FrontendRaceHostStartEvent {
   event: FrontendEventType.HOST_RACE_START_CLICK;
   payload: { hostToken: string };
 }
+export interface FrontendRaceFinishEvent {
+  event: FrontendEventType.RACE_FINISH;
+  payload: {
+    executedCommands: ExecutedCommand[][];
+  };
+}
+
 export interface FrontendDocumentChangeEvent {
   event: FrontendEventType.DOCUMENT_CHANGE;
   payload: {
@@ -56,6 +74,7 @@ export interface FrontendDocumentChangeEvent {
     newDocument: string[];
   };
 }
+
 export interface FrontendUsernameChangeEvent {
   event: FrontendEventType.USERNAME_CHANGE;
   payload: {
