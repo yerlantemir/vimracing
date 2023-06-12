@@ -25,15 +25,21 @@ export class Player implements PlayerType {
   }
 
   updateDoc(newDoc: string[], docIndex: number, newCompleteness: number) {
+    let newDocs = [];
+    if (this.raceData?.docs?.[docIndex]) {
+      newDocs = this.raceData.docs.map((doc, index) => {
+        if (index === docIndex) {
+          return newDoc;
+        }
+        return doc;
+      });
+    } else {
+      newDocs = [...(this.raceData?.docs ?? []), newDoc];
+    }
     if (this.raceData) {
       this.raceData = {
         ...this.raceData,
-        docs: this.raceData.docs?.map((doc, index) => {
-          if (index === docIndex) {
-            return newDoc;
-          }
-          return doc;
-        }),
+        docs: newDocs,
         completeness: newCompleteness,
         currentDocIndex: docIndex
       };
@@ -54,9 +60,11 @@ export class Player implements PlayerType {
   }
 
   _canFinishRace(): boolean {
+    console.log(this.raceData);
     if (!this.raceData || !this.raceData.docs) return false;
 
     const { currentDocIndex, docs, completeness } = this.raceData;
+
     return currentDocIndex === docs?.length - 1 && completeness === 100;
   }
 

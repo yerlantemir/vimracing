@@ -14,7 +14,8 @@ import {
   FrontendRaceHostStartEvent,
   RaceStatus,
   BackendRaceInitEvent,
-  FrontendUsernameChangeEvent
+  FrontendUsernameChangeEvent,
+  FrontendRaceFinishEvent
 } from '@vimracing/shared';
 import { Player } from './Player';
 import { validateUsername } from '../utils/validateUsername';
@@ -73,12 +74,16 @@ export class WebSocketServer {
     data:
       | FrontendRaceHostStartEvent
       | FrontendDocumentChangeEvent
-      | FrontendUsernameChangeEvent,
+      | FrontendUsernameChangeEvent
+      | FrontendRaceFinishEvent,
     race: Race,
     playerId: string
   ) {
     const { event, payload } = data;
     switch (event) {
+      case FrontendEventType.RACE_FINISH:
+        race.finishPlayerRace(playerId, payload.executedCommands);
+        break;
       case FrontendEventType.HOST_RACE_START_CLICK:
         if (payload.hostToken !== race.hostToken) return;
         race.start();
@@ -88,9 +93,6 @@ export class WebSocketServer {
         break;
       case FrontendEventType.USERNAME_CHANGE:
         race.changeUsername(playerId, payload.newUsername);
-        break;
-      case FrontendEventType.RACE_FINISH:
-        race.finishPlayerRace(playerId, payload.executedCommands);
         break;
     }
   }
