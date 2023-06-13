@@ -21,7 +21,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
-  onChange: (doc: string[]) => void;
+  onChange?: (doc: string[]) => void;
   raceDoc: { start: string[]; target: string[] };
 };
 

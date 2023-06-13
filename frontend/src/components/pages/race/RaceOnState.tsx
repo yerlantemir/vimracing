@@ -1,13 +1,14 @@
 import Editor, { isTextEqual } from '@/components/Editor';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
-import { Player, RaceStatus } from '@vimracing/shared';
+import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
 import { Timer } from '@/components/Timer';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 
 interface RaceOnStateProps {
   raceDocs: { start: string[]; target: string[] }[];
   onDocChange: (newDoc: string[], documentIndex: number) => void;
+  onRaceFinish: (executedCommands: ExecutedCommand[][]) => void;
   players?: Player[];
   currentPlayer?: Player;
   raceTimer: number;
@@ -18,8 +19,12 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   onDocChange,
   players,
   currentPlayer,
+  onRaceFinish,
   raceTimer
 }) => {
+  const [raceExecutedCommands, setRaceExecutedCommands] = useState<
+    ExecutedCommand[][]
+  >(currentPlayer?.raceData?.executedCommands ?? []);
   const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [documentIndex, setDocumentIndex] = useState(
     currentPlayer?.raceData?.currentDocIndex ?? 0
@@ -37,26 +42,34 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
         return;
       }
 
-      // TODO: FINISH
       const isLastDocument = documentIndex === raceDocs.length - 1;
+      setDocumentIndex(documentIndex + 1);
       if (isLastDocument) {
         onDocChange(newDoc, documentIndex);
+        setTimeout(() => {
+          setRaceExecutedCommands((prev) => {
+            onRaceFinish(prev);
+            return [];
+          });
+        }, 300);
         return;
       }
 
-      setDocumentIndex(documentIndex + 1);
       onDocChange(newDoc, documentIndex + 1);
     },
-    [documentIndex, onDocChange, raceDocs]
+    [documentIndex, onDocChange, onRaceFinish, raceDocs]
   );
 
   useEffect(() => {
     if (
       !editorParentElement.current ||
       !raceDocs ||
-      editorParentElement.current.childNodes.length !== 0
+      editorParentElement.current.childNodes.length !== 0 ||
+      !raceDocs[documentIndex]
     )
       return;
+
+    console.log('A?');
 
     const editor = new Editor({
       raceDoc: raceDocs[documentIndex],
@@ -69,13 +82,30 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
     };
   }, [documentIndex, onCurrentDocumentChange, onDocChange, raceDocs]);
 
+  const onExecutedCommandsChangeCallback = useCallback(
+    (executedCommands: ExecutedCommand[]) => {
+      setRaceExecutedCommands((prev) => {
+        if (documentIndex === prev.length - 1) {
+          return prev.map((commands, index) => {
+            if (index === documentIndex) {
+              return executedCommands;
+            }
+            return commands;
+          });
+        }
+        return [...prev, executedCommands];
+      });
+    },
+    [documentIndex]
+  );
+
   const isFinished =
     documentIndex === raceDocs.length - 1 &&
     currentPlayer?.raceData?.completeness === 100;
   return (
     <>
       <div className="flex justify-between">
-        <h5 className="text-gray-2">The race on!</h5>
+        <h5 className="text-gray-2">The race is on!</h5>
         <Timer time={raceTimer} />
       </div>
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
@@ -95,8 +125,14 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
       )}
 
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
-      {raceDocs && !isFinished && <div ref={editorParentElement} />}
-      <Hotkeys />
+
+      {!isFinished && <>{raceDocs && <div ref={editorParentElement} />}</>}
+
+      <Hotkeys
+        onExecutedCommandsChangeCallback={onExecutedCommandsChangeCallback}
+        key={documentIndex}
+      />
+
       {isFinished && <div>FINISHED</div>}
     </>
   );

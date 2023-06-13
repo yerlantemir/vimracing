@@ -12,7 +12,9 @@ import {
   BackendRaceFinishEvent,
   BackendRaceInitEvent,
   BackendRaceStartEvent,
-  BackendRaceTimerUpdateEvent
+  BackendRaceTimerUpdateEvent,
+  FrontendRaceFinishEvent,
+  ExecutedCommand
 } from '@vimracing/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -180,6 +182,19 @@ export const useRace = (raceId: string) => {
     []
   );
 
+  const onCurrentPlayerRaceFinish = useCallback(
+    (executedCommands: ExecutedCommand[][]) => {
+      const payload: FrontendRaceFinishEvent = {
+        event: FrontendEventType.RACE_FINISH,
+        payload: {
+          executedCommands
+        }
+      };
+      socketConnection.current?.send(JSON.stringify(payload));
+    },
+    []
+  );
+
   const onHostRaceStartClick = () => {
     if (!isHost) return;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -216,6 +231,7 @@ export const useRace = (raceId: string) => {
     raceTimer,
     raceStatus,
     onDocChange: onCurrentPlayerDocumentChange,
+    onCurrentPlayerRaceFinish,
     isHost,
     onHostRaceStartClick,
     onCurrentPlayerUsernameChange

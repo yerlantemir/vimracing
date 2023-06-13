@@ -1,3 +1,4 @@
+import { ExecutedCommand } from '@vimracing/shared';
 import { useAnimate, usePresence } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 
@@ -7,14 +8,6 @@ const ArrowKeyIconMapping = {
   '<Up>': '↑',
   '<Left>': '←',
   '<Right>': '→'
-};
-
-export type ExecutedCommand = {
-  isFailed: boolean;
-  command: string;
-  count?: number;
-  isArrowKey?: boolean;
-  index?: number;
 };
 
 export const Command: React.FC<ExecutedCommand> = ({

@@ -1,10 +1,18 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Command, ExecutedCommand } from './Command';
+import { Command } from './Command';
 import { AnimatePresence } from 'framer-motion';
+import { ExecutedCommand } from '@vimracing/shared';
 
-export const Hotkeys = () => {
+interface IHotkeysProps {
+  onExecutedCommandsChangeCallback: (
+    ExecutedCommands: ExecutedCommand[]
+  ) => void;
+}
+export const Hotkeys: React.FC<IHotkeysProps> = ({
+  onExecutedCommandsChangeCallback
+}) => {
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[]>(
     []
   );
@@ -123,6 +131,16 @@ export const Hotkeys = () => {
     };
   }, [executedCommands]);
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    if (!mounted) {
+      setMounted(true);
+      return;
+    }
+
+    onExecutedCommandsChangeCallback(executedCommands);
+  }, [executedCommands, mounted, onExecutedCommandsChangeCallback]);
+
   const allCommands = currentCommand
     ? [
         ...executedCommands,
@@ -134,7 +152,7 @@ export const Hotkeys = () => {
       ]
     : executedCommands;
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 flex-wrap">
       <AnimatePresence>
         {allCommands.map((command, index) => {
           return <Command key={index} {...command} index={index} />;
