@@ -6,15 +6,17 @@ import { AnimatePresence } from 'framer-motion';
 import { ExecutedCommand } from '@vimracing/shared';
 
 interface IHotkeysProps {
-  onExecutedCommandsChangeCallback: (
+  onExecutedCommandsChangeCallback?: (
     ExecutedCommands: ExecutedCommand[]
   ) => void;
+  executedCommands?: ExecutedCommand[];
 }
 export const Hotkeys: React.FC<IHotkeysProps> = ({
-  onExecutedCommandsChangeCallback
+  onExecutedCommandsChangeCallback,
+  executedCommands: executedCommandsProp
 }) => {
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[]>(
-    []
+    executedCommandsProp ?? []
   );
   const [currentCommand, setCurrentCommand] = useState('');
   const [partialCommandExecuted, setPartialCommandExecuted] = useState(false);
@@ -138,9 +140,12 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
       return;
     }
 
-    onExecutedCommandsChangeCallback(executedCommands);
+    onExecutedCommandsChangeCallback?.(executedCommands);
   }, [executedCommands, mounted, onExecutedCommandsChangeCallback]);
 
+  useEffect(() => {
+    if (executedCommandsProp) setExecutedCommands(executedCommandsProp);
+  }, [executedCommandsProp]);
   const allCommands = currentCommand
     ? [
         ...executedCommands,

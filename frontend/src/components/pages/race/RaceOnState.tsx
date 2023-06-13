@@ -4,6 +4,7 @@ import { Players } from './Players';
 import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
 import { Timer } from '@/components/Timer';
 import { Hotkeys } from './Hotkeys/Hotkeys';
+import { Recap } from './Recap';
 
 interface RaceOnStateProps {
   raceDocs: { start: string[]; target: string[] }[];
@@ -69,8 +70,6 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
     )
       return;
 
-    console.log('A?');
-
     const editor = new Editor({
       raceDoc: raceDocs[documentIndex],
       parent: editorParentElement.current,
@@ -102,6 +101,16 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   const isFinished =
     documentIndex === raceDocs.length - 1 &&
     currentPlayer?.raceData?.completeness === 100;
+  const [recapPlayer, setRecapPlayer] = useState<Player | null>(null);
+
+  if (recapPlayer)
+    return (
+      <Recap
+        raceDocs={raceDocs}
+        recapPlayer={recapPlayer}
+        onExit={() => setRecapPlayer(null)}
+      />
+    );
   return (
     <>
       <div className="flex justify-between">
@@ -121,6 +130,7 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
               currentDocIndex: documentIndex
             }
           }}
+          onRecapClick={(player: Player) => setRecapPlayer(player)}
         />
       )}
 
@@ -132,8 +142,6 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
         onExecutedCommandsChangeCallback={onExecutedCommandsChangeCallback}
         key={documentIndex}
       />
-
-      {isFinished && <div>FINISHED</div>}
     </>
   );
 };

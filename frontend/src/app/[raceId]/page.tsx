@@ -17,7 +17,8 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
     onDocChange,
     isHost,
     onHostRaceStartClick,
-    onCurrentPlayerUsernameChange
+    onCurrentPlayerUsernameChange,
+    onCurrentPlayerRaceFinish
   } = useRace(raceId);
 
   const renderRaceByStatus = () => {
@@ -35,20 +36,19 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
             }
           />
         );
-      case RaceStatus.ON:
+      default:
         return (
           raceDocs && (
             <RaceOnState
               raceDocs={raceDocs}
               onDocChange={onDocChange}
+              onRaceFinish={onCurrentPlayerRaceFinish}
               players={players}
               currentPlayer={currentPlayer}
               raceTimer={raceTimer || 0}
             />
           )
         );
-      case RaceStatus.FINISHED:
-        return <div className="text-gray">finished</div>;
     }
   };
   return (

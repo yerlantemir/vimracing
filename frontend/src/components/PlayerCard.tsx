@@ -10,6 +10,11 @@ type PlayerCardProps = {
   raceDocsCount: number;
   onUsernameChangeCallback?: (newUsername: string) => void;
   player: Player;
+  onRecapClick?: (player: Player) => void;
+  recapProps?: {
+    currentRecapTaskIndex?: number;
+    onTaskClick?: (taskIndex: number) => void;
+  };
 };
 
 const USERNAME_MAX_LENGTH = 15;
@@ -18,7 +23,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   player,
   raceDocsCount,
   raceStatus,
-  onUsernameChangeCallback
+  onUsernameChangeCallback,
+  onRecapClick,
+  recapProps
 }) => {
   const { username: initialUsername, raceData } = player;
 
@@ -80,6 +87,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
   const completeness = raceData?.completeness ?? 0;
   const currentDocIndex = raceData?.currentDocIndex ?? 0;
+  const executedCommands = raceData?.executedCommands ?? [];
 
   useEffect(() => {
     const onOutsideClick = (e: MouseEvent) => {
@@ -116,6 +124,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       className="flex"
       style={{ background: isCurrentUser ? '#4a505a' : '' }}
     >
+      {onRecapClick && executedCommands.length > 0 && (
+        <span onClick={() => onRecapClick(player)}>he</span>
+      )}
       <div
         className="flex py-0 gap-4 items-center text-gray-2"
         style={{ width: '10%' }}
@@ -128,6 +139,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         currentTaskIndex={currentDocIndex}
         currentTaskCompleteness={completeness}
         className="pr-4"
+        recapProps={recapProps}
       />
     </div>
   );
