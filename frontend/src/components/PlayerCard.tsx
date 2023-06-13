@@ -3,6 +3,7 @@
 import { Player, RaceStatus } from '@vimracing/shared';
 import { ProgressBar } from './pages/race/ProgressBar';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { RecapIcon } from './icons';
 
 type PlayerCardProps = {
   isCurrentUser: boolean;
@@ -125,7 +126,12 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       style={{ background: isCurrentUser ? '#4a505a' : '' }}
     >
       {onRecapClick && executedCommands.length > 0 && (
-        <span onClick={() => onRecapClick(player)}>he</span>
+        <span
+          onClick={() => onRecapClick(player)}
+          className="flex items-center mr-1"
+        >
+          <RecapIcon className="text-gray hover:text-gray-2 transition duration-200 cursor-pointer outline-1" />
+        </span>
       )}
       <div
         className="flex py-0 gap-4 items-center text-gray-2"

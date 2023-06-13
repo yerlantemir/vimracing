@@ -5,6 +5,7 @@ import React from 'react';
 import { ContentCard } from '@/components/ContentCard';
 import { PlayerCard } from '@/components/PlayerCard';
 import { Hotkeys } from './Hotkeys/Hotkeys';
+import { ArrowBackIcon } from '@/components/icons';
 
 interface IRecapProps {
   raceDocs: { start: string[]; target: string[] }[];
@@ -31,7 +32,8 @@ export const Recap: React.FC<IRecapProps> = ({
 
     const editor = new Editor({
       raceDoc: raceDocs[currentRecapTaskIndex],
-      parent: editorParentElement.current
+      parent: editorParentElement.current,
+      readOnly: true
     });
     editor.focus();
     return () => {
@@ -42,7 +44,10 @@ export const Recap: React.FC<IRecapProps> = ({
   const { executedCommands } = raceData ?? {};
 
   return (
-    <ContentCard>
+    <>
+      <span onClick={onExit}>
+        <ArrowBackIcon className="h-6 w-6 text-gray-2 cursor-pointer" />
+      </span>
       <PlayerCard
         player={recapPlayer}
         isCurrentUser={false}
@@ -54,6 +59,6 @@ export const Recap: React.FC<IRecapProps> = ({
       />
       {raceDocs && <div ref={editorParentElement} />}
       <Hotkeys executedCommands={executedCommands?.[currentRecapTaskIndex]} />
-    </ContentCard>
+    </>
   );
 };

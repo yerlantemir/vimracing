@@ -23,6 +23,7 @@ import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange?: (doc: string[]) => void;
   raceDoc: { start: string[]; target: string[] };
+  readOnly?: boolean;
 };
 
 class Editor extends EditorView {
@@ -49,7 +50,8 @@ class Editor extends EditorView {
         ...unifiedMergeView({
           mergeControls: false,
           original: Text.of(config?.raceDoc.target ?? [])
-        })
+        }),
+        EditorView.editable.of(!config?.readOnly)
       ]
     });
   }
