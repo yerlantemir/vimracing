@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import Editor from '@/components/Editor';
 import { Player } from '@vimracing/shared';
 import React from 'react';
-import { ContentCard } from '@/components/ContentCard';
 import { PlayerCard } from '@/components/PlayerCard';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { ArrowBackIcon } from '@/components/icons';

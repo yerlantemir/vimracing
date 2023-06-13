@@ -9,7 +9,7 @@ interface PlayersProps {
   raceStatus: RaceStatus;
   raceDocsCount?: number;
   onCurrentPlayerUsernameChangeCallback?: (newUsername: string) => void;
-  onRecapClick: (player: Player) => void;
+  onRecapClick?: (player: Player) => void;
 }
 export const Players: React.FC<PlayersProps> = ({
   players,
