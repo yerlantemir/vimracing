@@ -3,7 +3,6 @@
 import { Player, RaceStatus } from '@vimracing/shared';
 import { ProgressBar } from './pages/race/ProgressBar';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { RecapIcon } from './icons';
 
 type PlayerCardProps = {
   isCurrentUser: boolean;
@@ -11,11 +10,6 @@ type PlayerCardProps = {
   raceDocsCount: number;
   onUsernameChangeCallback?: (newUsername: string) => void;
   player: Player;
-  onRecapClick?: (player: Player) => void;
-  recapProps?: {
-    currentRecapTaskIndex?: number;
-    onTaskClick?: (taskIndex: number) => void;
-  };
 };
 
 const USERNAME_MAX_LENGTH = 15;
@@ -24,9 +18,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   player,
   raceDocsCount,
   raceStatus,
-  onUsernameChangeCallback,
-  onRecapClick,
-  recapProps
+  onUsernameChangeCallback
 }) => {
   const { username: initialUsername, raceData } = player;
 
@@ -88,7 +80,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
   const completeness = raceData?.completeness ?? 0;
   const currentDocIndex = raceData?.currentDocIndex ?? 0;
-  const executedCommands = raceData?.executedCommands ?? [];
 
   useEffect(() => {
     const onOutsideClick = (e: MouseEvent) => {
@@ -125,14 +116,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       className="flex"
       style={{ background: isCurrentUser ? '#4a505a' : '' }}
     >
-      {onRecapClick && executedCommands.length > 0 && (
-        <span
-          onClick={() => onRecapClick(player)}
-          className="flex items-center mr-1"
-        >
-          <RecapIcon className="text-gray hover:text-gray-2 transition duration-200 cursor-pointer outline-1" />
-        </span>
-      )}
       <div
         className="flex py-0 gap-4 items-center text-gray-2"
         style={{ width: '10%' }}
@@ -145,7 +128,6 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
         currentTaskIndex={currentDocIndex}
         currentTaskCompleteness={completeness}
         className="pr-4"
-        recapProps={recapProps}
       />
     </div>
   );

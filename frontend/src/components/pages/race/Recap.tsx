@@ -2,22 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import Editor from '@/components/Editor';
 import { Player } from '@vimracing/shared';
 import React from 'react';
-import { PlayerCard } from '@/components/PlayerCard';
 import { Hotkeys } from './Hotkeys/Hotkeys';
-import { ArrowBackIcon } from '@/components/icons';
+import { ProgressBar } from './ProgressBar';
 
 interface IRecapProps {
   raceDocs: { start: string[]; target: string[] }[];
-  recapPlayer: Player;
-  onExit: () => void;
+  players: Player[];
 }
-export const Recap: React.FC<IRecapProps> = ({
-  raceDocs,
-  recapPlayer,
-  onExit
-}) => {
-  const { raceData } = recapPlayer;
-
+export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
   const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [currentRecapTaskIndex, setCurrentRecapTaskIndex] = useState(0);
 
@@ -40,24 +32,46 @@ export const Recap: React.FC<IRecapProps> = ({
     };
   }, [currentRecapTaskIndex, raceDocs]);
 
-  const { executedCommands } = raceData ?? {};
+  const finishedPlayers = players.filter(
+    (player) =>
+      player.raceData?.executedCommands?.length &&
+      player.raceData?.executedCommands?.length > 0
+  );
 
   return (
     <>
-      <span onClick={onExit}>
-        <ArrowBackIcon className="h-6 w-6 text-gray-2 cursor-pointer" />
-      </span>
-      <PlayerCard
-        player={recapPlayer}
-        isCurrentUser={false}
-        raceDocsCount={raceDocs.length - 1}
-        recapProps={{
-          currentRecapTaskIndex: currentRecapTaskIndex,
-          onTaskClick: (index) => setCurrentRecapTaskIndex(index)
-        }}
-      />
+      <div className="flex items-center gap-2">
+        {Array(raceDocs.length)
+          .fill(0)
+          .map((_, index) => {
+            return (
+              <span
+                className={`p-1 cursor-pointer border-2 transition-all duration-300 ${
+                  index === currentRecapTaskIndex
+                    ? 'border-blue-3 text-blue-3'
+                    : 'border-gray-2 opacity-80 text-gray'
+                }`}
+                key={index}
+                onClick={() => setCurrentRecapTaskIndex(index)}
+              >
+                task {index + 1}
+              </span>
+            );
+          })}
+      </div>
       {raceDocs && <div ref={editorParentElement} />}
-      <Hotkeys executedCommands={executedCommands?.[currentRecapTaskIndex]} />
+      {finishedPlayers.map((player) => {
+        return (
+          <div key={player.id} className="flex items-center gap-4">
+            <span className="text-gray-2 opacity-80">{player.username}</span>
+            <Hotkeys
+              executedCommands={
+                player.raceData?.executedCommands?.[currentRecapTaskIndex] ?? []
+              }
+            />
+          </div>
+        );
+      })}
     </>
   );
 };

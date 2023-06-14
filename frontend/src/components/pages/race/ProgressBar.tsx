@@ -4,18 +4,12 @@ type TaskStatus = 'done' | 'doing' | 'todo';
 
 const TRANSITION_DURATION = 1000;
 
-const Circle = ({
+export const Circle = ({
   taskStatus,
-  isFinished,
-  isRecapView = false,
-  isRecapSelected = false,
-  onClick
+  isFinished
 }: {
   taskStatus: TaskStatus;
   isFinished: boolean;
-  isRecapView?: boolean;
-  isRecapSelected?: boolean;
-  onClick: () => void;
 }) => {
   const bgColor = useMemo(() => {
     if (isFinished) return 'bg-green-3';
@@ -24,17 +18,9 @@ const Circle = ({
     return 'bg-gray-4';
   }, [isFinished, taskStatus]);
 
-  const form = useMemo(() => {
-    if (isRecapView) return 'h-4 w-4';
-    return 'h-3 w-3';
-  }, [isRecapView]);
-
   return (
     <div
-      className={`${form} rounded-full transition ease-in-out ${bgColor} ${
-        isRecapSelected && 'border-2 border-white-1'
-      }`}
-      onClick={onClick}
+      className={`h-3 w-3rounded-full transition ease-in-out ${bgColor}`}
       style={{
         transitionDuration: `${TRANSITION_DURATION}ms`
       }}
@@ -97,18 +83,13 @@ interface IProgressBarProps extends HTMLAttributes<HTMLDivElement> {
   tasksCount: number;
   currentTaskIndex: number;
   currentTaskCompleteness: number;
-  recapProps?: {
-    currentRecapTaskIndex?: number;
-    onTaskClick?: (taskIndex: number) => void;
-  };
 }
 
 export const ProgressBar: React.FC<IProgressBarProps> = ({
   tasksCount,
   currentTaskIndex,
   currentTaskCompleteness,
-  className,
-  recapProps
+  className
 }) => {
   const getTaskStatus = (taskIndex: number): TaskStatus => {
     if (currentTaskCompleteness === 100) return 'done';
@@ -126,8 +107,6 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
   };
 
   const isFinished = currentTaskIndex === tasksCount;
-  const isRecapView = recapProps !== undefined;
-  const currentRecapIndex = recapProps?.currentRecapTaskIndex;
 
   return (
     <div className={`flex items-center flex-grow ${className} z-10`}>
@@ -137,17 +116,7 @@ export const ProgressBar: React.FC<IProgressBarProps> = ({
           const taskStatus = getTaskStatus(index);
           return (
             <Fragment key={index}>
-              <Circle
-                taskStatus={taskStatus}
-                isFinished={isFinished}
-                isRecapView={isRecapView}
-                isRecapSelected={currentRecapIndex === index}
-                onClick={() => {
-                  if (isRecapView) {
-                    recapProps?.onTaskClick?.(index);
-                  }
-                }}
-              />
+              <Circle taskStatus={taskStatus} isFinished={isFinished} />
               {index !== tasksCount - 1 && (
                 <Line
                   taskStatus={taskStatus}

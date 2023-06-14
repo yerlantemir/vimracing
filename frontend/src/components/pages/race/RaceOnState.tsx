@@ -99,18 +99,9 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
   );
 
   const isFinished =
-    documentIndex === raceDocs.length - 1 &&
+    documentIndex === raceDocs.length &&
     currentPlayer?.raceData?.completeness === 100;
-  const [recapPlayer, setRecapPlayer] = useState<Player | null>(null);
 
-  if (recapPlayer)
-    return (
-      <Recap
-        raceDocs={raceDocs}
-        recapPlayer={recapPlayer}
-        onExit={() => setRecapPlayer(null)}
-      />
-    );
   return (
     <>
       <div className="flex justify-between">
@@ -130,18 +121,23 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
               currentDocIndex: documentIndex
             }
           }}
-          onRecapClick={(player: Player) => setRecapPlayer(player)}
         />
       )}
 
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
 
-      {!isFinished && <>{raceDocs && <div ref={editorParentElement} />}</>}
-
-      <Hotkeys
-        onExecutedCommandsChangeCallback={onExecutedCommandsChangeCallback}
-        key={documentIndex}
-      />
+      {!isFinished && raceDocs && (
+        <>
+          <div ref={editorParentElement} />
+          <Hotkeys
+            onExecutedCommandsChangeCallback={onExecutedCommandsChangeCallback}
+            key={documentIndex}
+          />
+        </>
+      )}
+      {isFinished && players && (
+        <Recap players={[...players, currentPlayer]} raceDocs={raceDocs} />
+      )}
     </>
   );
 };

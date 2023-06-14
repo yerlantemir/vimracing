@@ -9,15 +9,13 @@ interface PlayersProps {
   raceStatus: RaceStatus;
   raceDocsCount?: number;
   onCurrentPlayerUsernameChangeCallback?: (newUsername: string) => void;
-  onRecapClick?: (player: Player) => void;
 }
 export const Players: React.FC<PlayersProps> = ({
   players,
   currentPlayer,
   raceStatus,
   raceDocsCount, // to show the progress bar in the waiting state component
-  onCurrentPlayerUsernameChangeCallback,
-  onRecapClick
+  onCurrentPlayerUsernameChangeCallback
 }) => {
   const allPlayers = useMemo(
     () =>
@@ -44,7 +42,6 @@ export const Players: React.FC<PlayersProps> = ({
               raceStatus={raceStatus}
               raceDocsCount={raceDocsCount || 1}
               onUsernameChangeCallback={onCurrentPlayerUsernameChangeCallback}
-              onRecapClick={onRecapClick}
             />
           );
         })}
