@@ -20,7 +20,7 @@ export const Circle = ({
 
   return (
     <div
-      className={`h-3 w-3rounded-full transition ease-in-out ${bgColor}`}
+      className={`h-3 w-3 rounded-full transition ease-in-out ${bgColor}`}
       style={{
         transitionDuration: `${TRANSITION_DURATION}ms`
       }}

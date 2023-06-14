@@ -3,6 +3,9 @@ import { CopyInput } from '@/components/CopyInput';
 import { Player, RaceStatus } from '@vimracing/shared';
 import { Players } from './Players';
 import { Timer } from '@/components/Timer';
+import { useState } from 'react';
+
+const RACE_WAITINIG_TIME_IN_S = 3;
 
 interface WaitingStateProps {
   raceTimer?: number;
@@ -20,6 +23,7 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
   isHost,
   onCurrentPlayerUsernameChangeCallback
 }) => {
+  const [startClicked, setStartClicked] = useState(false);
   return (
     <>
       {raceTimer ? (
@@ -47,11 +51,16 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
         />
       )}
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
-      {isHost && !raceTimer && (
+      {isHost && !startClicked && (
         <>
           {players && players.length > 0 ? (
             <Button
-              onClick={onHostRaceStartClick}
+              onClick={() => {
+                if (!startClicked) {
+                  onHostRaceStartClick();
+                  setStartClicked(true);
+                }
+              }}
               className="text-gray-3"
               style={{ maxWidth: '200px' }}
             >
@@ -64,7 +73,7 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
           )}
         </>
       )}
-      {!isHost && !raceTimer && (
+      {!isHost && raceTimer === RACE_WAITINIG_TIME_IN_S && (
         <p className="text-gray-2">Waiting for host to start</p>
       )}
     </>

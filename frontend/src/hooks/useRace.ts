@@ -49,7 +49,13 @@ export const useRace = (raceId: string) => {
   }, [raceId]);
 
   const onRaceInit = (payload: BackendRaceInitEvent['payload']) => {
-    const { you, players: otherPlayers, raceStatus } = payload;
+    const {
+      you,
+      players: otherPlayers,
+      raceStatus,
+      raceDocs: initialRaceDocs,
+      timerInSeconds
+    } = payload;
     LocalStorageManager.setUser({
       id: you.id,
       username: you.username
@@ -57,6 +63,8 @@ export const useRace = (raceId: string) => {
     setCurrentPlayer(you);
     setPlayers(otherPlayers);
     setRaceStatus(raceStatus);
+    setRaceDocs(initialRaceDocs);
+    setRaceTimer(timerInSeconds);
   };
   const onNewPlayerJoin = useCallback(
     (payload: BackendNewPlayerEvent['payload']) => {

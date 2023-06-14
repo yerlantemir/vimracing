@@ -88,6 +88,11 @@ export interface BackendRaceInitEvent {
     you: Player;
     players: Player[];
     raceStatus: RaceStatus;
+    raceDocs: {
+      start: string[];
+      target: string[];
+    }[];
+    timerInSeconds: number;
   };
 }
 export interface BackendNewPlayerEvent {
