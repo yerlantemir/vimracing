@@ -58,7 +58,9 @@ export class WebSocketServer {
         payload: {
           you: currentPlayer,
           players: race.getPlayers().filter((p) => p.id !== currentPlayer.id),
-          raceStatus: race.getRaceStatus()
+          raceStatus: race.getRaceStatus(),
+          raceDocs: race.getRaceDocs(),
+          timerInSeconds: race.getTimer()
         }
       };
       ws.send(JSON.stringify(initRacePayload));

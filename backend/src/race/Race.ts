@@ -22,6 +22,7 @@ interface RaceEvents {
 export class Race {
   private eventEmitter = new EventEmitter();
   private status: RaceStatus = RaceStatus.WAITING;
+  private timer: number = DEFAULT_WAITING_TIME_IN_S;
   private players: Player[] = [];
   private raceDocs: {
     start: string[];
@@ -38,14 +39,18 @@ export class Race {
   }
 
   start() {
-    let timer = DEFAULT_WAITING_TIME_IN_S;
+    this.timer = DEFAULT_WAITING_TIME_IN_S;
+
     const currentInterval = setInterval(() => {
-      if (timer === 1) {
+      if (this.timer === 1) {
         this.onRaceOn();
         clearInterval(currentInterval);
       } else {
-        timer--;
-        this.emit('timerUpdated', { raceStatus: this.status, timer });
+        this.timer--;
+        this.emit('timerUpdated', {
+          raceStatus: this.status,
+          timer: this.timer
+        });
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
@@ -53,14 +58,17 @@ export class Race {
     this.status = RaceStatus.ON;
     this.emit('raceStarted');
 
-    let timer = DEFAULT_RACE_TIME_IN_S;
+    this.timer = DEFAULT_RACE_TIME_IN_S;
     const interval = setInterval(() => {
-      if (timer === 1) {
+      if (this.timer === 1) {
         this.onRaceEnd();
         clearInterval(interval);
       } else {
-        this.emit('timerUpdated', { raceStatus: this.status, timer });
-        timer--;
+        this.emit('timerUpdated', {
+          raceStatus: this.status,
+          timer: this.timer
+        });
+        this.timer--;
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
@@ -108,6 +116,9 @@ export class Race {
   }
   public getPlayer(id: string) {
     return this.players.find((p) => p.id === id);
+  }
+  public getTimer() {
+    return this.timer;
   }
   public getDocCompleteness(doc: string[], docIndex: number): number {
     const targetDoc = this.raceDocs[docIndex].target;
