@@ -40,6 +40,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
 
   return (
     <>
+      <h5 className="text-gray-2">Race recap:</h5>
       <div className="flex items-center gap-2">
         {Array(raceDocs.length)
           .fill(0)
@@ -60,6 +61,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
           })}
       </div>
       {raceDocs && <div ref={editorParentElement} />}
+
       {finishedPlayers.map((player) => {
         return (
           <div key={player.id} className="flex items-center gap-4">

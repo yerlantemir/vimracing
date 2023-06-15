@@ -2,26 +2,28 @@ import Editor, { isTextEqual } from '@/components/Editor';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
 import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
-import { Timer } from '@/components/Timer';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { Recap } from './Recap';
+import { Timer } from '@/components/Timer';
 
-interface RaceOnStateProps {
+interface RaceStateProps {
   raceDocs: { start: string[]; target: string[] }[];
   onDocChange: (newDoc: string[], documentIndex: number) => void;
   onRaceFinish: (executedCommands: ExecutedCommand[][]) => void;
   players?: Player[];
   currentPlayer?: Player;
   raceTimer: number;
+  raceStatus: RaceStatus;
 }
 
-export const RaceOnState: React.FC<RaceOnStateProps> = ({
+export const RaceState: React.FC<RaceStateProps> = ({
   raceDocs,
   onDocChange,
   players,
   currentPlayer,
   onRaceFinish,
-  raceTimer
+  raceTimer,
+  raceStatus
 }) => {
   const [raceExecutedCommands, setRaceExecutedCommands] = useState<
     ExecutedCommand[][]
@@ -102,12 +104,20 @@ export const RaceOnState: React.FC<RaceOnStateProps> = ({
     documentIndex === raceDocs.length &&
     currentPlayer?.raceData?.completeness === 100;
 
-  return (
-    <>
-      <div className="flex justify-between">
+  const renderHeader = () => {
+    if (raceStatus === RaceStatus.FINISHED || isFinished) {
+      return <h5 className="text-gray-2">You finished nth!</h5>;
+    }
+    return (
+      <>
         <h5 className="text-gray-2">The race is on!</h5>
         <Timer time={raceTimer} />
-      </div>
+      </>
+    );
+  };
+  return (
+    <>
+      <div className="flex justify-between">{renderHeader()}</div>
       <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {players && currentPlayer && (
         <Players

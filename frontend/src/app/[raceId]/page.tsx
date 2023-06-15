@@ -1,7 +1,7 @@
 'use client';
 
 import { ContentCard } from '@/components/ContentCard';
-import { RaceOnState } from '@/components/pages/race/RaceOnState';
+import { RaceState } from '@/components/pages/race/RaceState';
 import { WaitingState } from '@/components/pages/race/WaintingState';
 import { useRace } from '@/hooks/useRace';
 import { RaceStatus } from '@vimracing/shared';
@@ -39,13 +39,14 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
       default:
         return (
           raceDocs && (
-            <RaceOnState
+            <RaceState
               raceDocs={raceDocs}
               onDocChange={onDocChange}
               onRaceFinish={onCurrentPlayerRaceFinish}
               players={players}
               currentPlayer={currentPlayer}
               raceTimer={raceTimer || 0}
+              raceStatus={raceStatus as RaceStatus}
             />
           )
         );
