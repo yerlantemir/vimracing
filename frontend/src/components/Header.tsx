@@ -28,7 +28,9 @@ export const Header = () => {
 
       <div className="flex items-center gap-4 text-gray">
         <Sun className={iconClassNames} tabIndex={0} />{' '}
-        <Github className={iconClassNames} tabIndex={0} />
+        <a href="https://github.com/yerlantemir/vimracing" target="_blank">
+          <Github className={iconClassNames} tabIndex={0} />
+        </a>
       </div>
     </div>
   );
