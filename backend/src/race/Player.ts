@@ -20,7 +20,8 @@ export class Player implements PlayerType {
       completeness: 0,
       currentDocIndex: 0,
       docs: [],
-      currentPlace: 0
+      currentPlace: 0,
+      isFinished: false
     };
   }
 

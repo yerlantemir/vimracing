@@ -60,7 +60,7 @@ export class Race {
 
     this.timer = DEFAULT_RACE_TIME_IN_S;
     const interval = setInterval(() => {
-      if (this.timer === 1) {
+      if (this.timer === 1 || this.isRaceFinished()) {
         this.onRaceEnd();
         clearInterval(interval);
       } else {
@@ -71,6 +71,9 @@ export class Race {
         this.timer--;
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
+  }
+  private isRaceFinished() {
+    return this.players.every((player) => player.raceData?.isFinished);
   }
   onRaceEnd() {
     this.status = RaceStatus.FINISHED;
