@@ -7,7 +7,7 @@ export class Player implements PlayerType {
     completeness?: number;
     currentDocIndex?: number;
     docs?: string[][];
-    currentPlace?: number;
+    place?: number;
     executedCommands?: ExecutedCommand[][];
     isFinished?: boolean;
   };
@@ -20,7 +20,6 @@ export class Player implements PlayerType {
       completeness: 0,
       currentDocIndex: 0,
       docs: [],
-      currentPlace: 0,
       isFinished: false
     };
   }
@@ -47,21 +46,21 @@ export class Player implements PlayerType {
     }
   }
 
-  finishRace(executedCommands: ExecutedCommand[][]) {
+  finishRace(executedCommands: ExecutedCommand[][], place: number) {
     if (!this._canFinishRace()) return false;
 
     if (this.raceData) {
       this.raceData = {
         ...this.raceData,
         executedCommands,
-        isFinished: true
+        isFinished: true,
+        place
       };
       return true;
     }
   }
 
   _canFinishRace(): boolean {
-    console.log(this.raceData);
     if (!this.raceData || !this.raceData.docs) return false;
 
     const { currentDocIndex, docs, completeness } = this.raceData;

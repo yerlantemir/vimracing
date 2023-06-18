@@ -4,8 +4,8 @@ import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
 import { generateRaceDocs } from './raceDocsGenerator';
 
-const DEFAULT_WAITING_TIME_IN_S = 3;
-const DEFAULT_RACE_TIME_IN_S = 60;
+const DEFAULT_WAITING_TIME_IN_S = 1;
+const DEFAULT_RACE_TIME_IN_S = 10;
 const RACE_TIMER_UPDATE_INTERVAL_IN_MS = 1000;
 
 interface RaceEvents {
@@ -54,6 +54,7 @@ export class Race {
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
+
   onRaceOn() {
     this.status = RaceStatus.ON;
     this.emit('raceStarted');
@@ -72,11 +73,12 @@ export class Race {
       }
     }, RACE_TIMER_UPDATE_INTERVAL_IN_MS);
   }
-  private isRaceFinished() {
-    return this.players.every((player) => player.raceData?.isFinished);
-  }
+
   onRaceEnd() {
     this.status = RaceStatus.FINISHED;
+
+    this.setPlayersPlace();
+    // calculate places
     this.emit('raceFinished');
   }
 
@@ -96,6 +98,7 @@ export class Race {
 
     this.emit('playerDataChanged', player);
   }
+
   public finishPlayerRace(
     playerId: string,
     executedCommands: ExecutedCommand[][]
@@ -103,10 +106,14 @@ export class Race {
     if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
-    const raceFinished = player.finishRace(executedCommands);
+    const raceFinished = player.finishRace(
+      executedCommands,
+      this.getFinishedPlayersCount() + 1
+    );
 
     if (raceFinished) this.emit('playerDataChanged', player);
   }
+
   public changeUsername(playerId: string, newUsername: string) {
     if (this.status !== RaceStatus.WAITING) return;
     const player = this.getPlayer(playerId);
@@ -114,15 +121,19 @@ export class Race {
     player.updateUsername(newUsername);
     this.emit('playerDataChanged', player);
   }
+
   public getRaceDocs() {
     return this.raceDocs;
   }
+
   public getPlayer(id: string) {
     return this.players.find((p) => p.id === id);
   }
+
   public getTimer() {
     return this.timer;
   }
+
   public getDocCompleteness(doc: string[], docIndex: number): number {
     const targetDoc = this.raceDocs[docIndex].target;
     let completeness = 0;
@@ -132,10 +143,45 @@ export class Race {
     const completenessPercentage = (completeness / targetDoc.length) * 100;
     return Math.round(completenessPercentage);
   }
+
   public getRaceStatus() {
     return this.status;
   }
 
+  private isRaceFinished() {
+    return this.players.every((player) => player.raceData?.isFinished);
+  }
+
+  private getFinishedPlayersCount() {
+    return this.players.filter((player) => player.raceData?.isFinished).length;
+  }
+
+  private setPlayersPlace() {
+    const notFinishedPlayers = this.players.filter(
+      (player) => !player.raceData?.isFinished
+    );
+    notFinishedPlayers.sort((a, b) => {
+      if (!a.raceData || !b.raceData) return 0;
+      if (a.raceData.currentDocIndex === b.raceData.currentDocIndex) {
+        return (b.raceData.completeness ?? 0) - (a.raceData.completeness ?? 0);
+      }
+      return (
+        (b.raceData.currentDocIndex ?? 0) - (a.raceData.currentDocIndex ?? 0)
+      );
+    });
+
+    const startPlace = this.players.length - notFinishedPlayers.length + 1;
+    const finishedPlayers = this.players.map((player) => {
+      if (player.raceData?.place) return player;
+      const place =
+        notFinishedPlayers.findIndex((p) => p.id === player.id) + startPlace;
+      return {
+        ...player,
+        raceData: { ...player.raceData, place, isFinished: true }
+      } as Player;
+    });
+    this.players = finishedPlayers;
+  }
   on<Event extends keyof RaceEvents>(
     event: Event,
     listener: RaceEvents[Event]

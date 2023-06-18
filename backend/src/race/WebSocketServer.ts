@@ -168,7 +168,8 @@ export class WebSocketServer {
             raceData: {
               completeness: newPlayer.raceData?.completeness,
               currentDocIndex: newPlayer.raceData?.currentDocIndex,
-              executedCommands: newPlayer.raceData?.executedCommands
+              executedCommands: newPlayer.raceData?.executedCommands,
+              place: newPlayer.raceData?.place
             }
           }
         };
@@ -178,11 +179,17 @@ export class WebSocketServer {
   }
   onRaceFinished(race: Race) {
     this.raceIdWebsocketConnectionsMapping[race.id].forEach(
-      ({ connection }) => {
+      ({ connection, playerId }) => {
+        const currentPlayer = race.getPlayer(playerId);
+        if (!currentPlayer) {
+          console.error('Player not found');
+          return;
+        }
         const payload: BackendRaceFinishEvent = {
           event: BackendEventType.RACE_FINISH,
           payload: {
-            players: race.getPlayers()
+            players: race.getPlayers().filter((p) => p.id !== playerId),
+            you: currentPlayer
           }
         };
         connection.send(JSON.stringify(payload));
