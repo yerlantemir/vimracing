@@ -28,7 +28,7 @@ export type Player = {
     completeness?: number;
     currentDocIndex?: number;
     docs?: string[][];
-    currentPlace?: number;
+    place?: number;
     executedCommands?: ExecutedCommand[][];
     isFinished?: boolean;
   };
@@ -125,5 +125,6 @@ export interface BackendRaceFinishEvent {
   event: BackendEventType.RACE_FINISH;
   payload: {
     players: Player[];
+    you: Player;
   };
 }

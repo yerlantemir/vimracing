@@ -5,6 +5,7 @@ import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { Recap } from './Recap';
 import { Timer } from '@/components/Timer';
+import { getPostfixedPlace } from '@/utils/postfix';
 
 interface RaceStateProps {
   raceDocs: { start: string[]; target: string[] }[];
@@ -105,8 +106,15 @@ export const RaceState: React.FC<RaceStateProps> = ({
     currentPlayer?.raceData?.completeness === 100;
 
   const renderHeader = () => {
-    if (raceStatus === RaceStatus.FINISHED || isFinished) {
-      return <h5 className="text-gray-2">You finished nth!</h5>;
+    if (
+      (raceStatus === RaceStatus.FINISHED || isFinished) &&
+      currentPlayer?.raceData?.place
+    ) {
+      return (
+        <h5 className="text-gray-2">
+          You finished {getPostfixedPlace(currentPlayer.raceData.place)}
+        </h5>
+      );
     }
     return (
       <>

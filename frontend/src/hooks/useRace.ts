@@ -60,12 +60,14 @@ export const useRace = (raceId: string) => {
       id: you.id,
       username: you.username
     });
+
     setCurrentPlayer(you);
     setPlayers(otherPlayers);
     setRaceStatus(raceStatus);
     setRaceDocs(initialRaceDocs);
     setRaceTimer(timerInSeconds);
   };
+
   const onNewPlayerJoin = useCallback(
     (payload: BackendNewPlayerEvent['payload']) => {
       const { newPlayer } = payload;
@@ -142,7 +144,12 @@ export const useRace = (raceId: string) => {
     [currentPlayer?.id]
   );
 
-  const onRaceFinish = () => {
+  const onRaceFinish = ({
+    players,
+    you
+  }: BackendRaceFinishEvent['payload']) => {
+    setPlayers(players);
+    setCurrentPlayer(you);
     setRaceStatus(RaceStatus.FINISHED);
   };
 
@@ -169,7 +176,7 @@ export const useRace = (raceId: string) => {
           onRacePlayerDataChange(payload);
           break;
         case BackendEventType.RACE_FINISH:
-          onRaceFinish();
+          onRaceFinish(payload);
           break;
       }
     },
