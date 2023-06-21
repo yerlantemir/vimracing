@@ -3,7 +3,6 @@ import Editor from '@/components/Editor';
 import { Player } from '@vimracing/shared';
 import React from 'react';
 import { Hotkeys } from './Hotkeys/Hotkeys';
-import { ProgressBar } from './ProgressBar';
 
 interface IRecapProps {
   raceDocs: { start: string[]; target: string[] }[];

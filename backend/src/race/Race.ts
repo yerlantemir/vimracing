@@ -4,8 +4,8 @@ import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
 import { generateRaceDocs } from './raceDocsGenerator';
 
-const DEFAULT_WAITING_TIME_IN_S = 1;
-const DEFAULT_RACE_TIME_IN_S = 10;
+const DEFAULT_WAITING_TIME_IN_S = 3;
+const DEFAULT_RACE_TIME_IN_S = 60;
 const RACE_TIMER_UPDATE_INTERVAL_IN_MS = 1000;
 
 interface RaceEvents {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Command } from './Command';
 import { AnimatePresence } from 'framer-motion';
 import { ExecutedCommand } from '@vimracing/shared';
@@ -109,28 +109,23 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
     partialCommandExecuted
   ]);
 
-  useLayoutEffect(() => {
-    const timeout = setTimeout(() => {
-      const lastCommand = executedCommands[executedCommands.length - 1];
-      const lastLastCommand = executedCommands[executedCommands.length - 2];
+  useEffect(() => {
+    const lastCommand = executedCommands[executedCommands.length - 1];
+    const lastLastCommand = executedCommands[executedCommands.length - 2];
 
-      if (
-        lastCommand &&
-        lastLastCommand &&
-        lastCommand.command === lastLastCommand.command
-      ) {
-        setExecutedCommands([
-          ...executedCommands.slice(0, executedCommands.length - 2),
-          {
-            ...lastLastCommand,
-            count: (lastLastCommand?.count ?? 0) + (lastCommand?.count ?? 0)
-          }
-        ]);
-      }
-    }, 300);
-    return () => {
-      clearTimeout(timeout);
-    };
+    if (
+      lastCommand &&
+      lastLastCommand &&
+      lastCommand.command === lastLastCommand.command
+    ) {
+      setExecutedCommands([
+        ...executedCommands.slice(0, executedCommands.length - 2),
+        {
+          ...lastLastCommand,
+          count: (lastLastCommand?.count ?? 0) + (lastCommand?.count ?? 0)
+        }
+      ]);
+    }
   }, [executedCommands]);
 
   const [mounted, setMounted] = useState(false);
