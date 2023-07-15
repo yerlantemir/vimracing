@@ -34,7 +34,6 @@ class Editor extends EditorView {
       extensions: [
         vim(),
         history(),
-        lineNumbers(),
         javascript(),
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
         highlightSpecialChars(),

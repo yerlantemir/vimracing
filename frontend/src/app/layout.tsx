@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-dark">
+      <body className="bg-background">
         <div
           className="grow relative"
           style={{

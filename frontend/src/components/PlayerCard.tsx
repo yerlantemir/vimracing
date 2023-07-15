@@ -57,7 +57,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       return (
         <input
           type="text"
-          className="border-none outline-none bg-transparent text-gray-2 italic"
+          className="border-none outline-none bg-transparent text-text italic"
           style={{
             width: '80%'
           }}
@@ -70,7 +70,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
     }
     return (
       <span
-        className="opacity-80 cursor-pointer"
+        className="opacity-80 cursor-pointer text-primary"
         onDoubleClick={onUsernameDblClick}
       >
         {username}
@@ -112,12 +112,9 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   }, [isEditingUsername]);
 
   return (
-    <div
-      className="flex"
-      style={{ background: isCurrentUser ? '#4a505a' : '' }}
-    >
+    <div className="flex">
       <div
-        className="flex py-0 gap-4 items-center text-gray-2"
+        className="flex py-0 gap-4 items-center text-text"
         style={{ width: '10%' }}
       >
         {renderUsername()}

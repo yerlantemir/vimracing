@@ -111,14 +111,14 @@ export const RaceState: React.FC<RaceStateProps> = ({
       currentPlayer?.raceData?.place
     ) {
       return (
-        <h5 className="text-gray-2">
+        <h5 className="text-text">
           You finished {getPostfixedPlace(currentPlayer.raceData.place)}
         </h5>
       );
     }
     return (
       <>
-        <h5 className="text-gray-2">The race is on!</h5>
+        <h5 className="text-text">The race is on!</h5>
         <Timer time={raceTimer} />
       </>
     );

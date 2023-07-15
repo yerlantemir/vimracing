@@ -12,13 +12,13 @@ export const Header = () => {
   };
 
   const iconClassNames =
-    'text-gray hover:text-gray-2 transition duration-200 cursor-pointer outline-1';
+    'text-gray hover:text-text transition duration-200 cursor-pointer outline-1 h-5 w-5';
 
   return (
     <div className="flex justify-between items-center h-20">
-      <h1 className="text-2xl">
+      <h1 className="text-xl">
         <Link
-          className="no-underline text-gray"
+          className="no-underline text-text"
           href="/"
           onClick={onHeaderClick}
         >
@@ -26,7 +26,7 @@ export const Header = () => {
         </Link>
       </h1>
 
-      <div className="flex items-center gap-4 text-gray">
+      <div className="flex items-center gap-4 text-text">
         <Sun className={iconClassNames} tabIndex={0} />{' '}
         <a href="https://github.com/yerlantemir/vimracing" target="_blank">
           <Github className={iconClassNames} tabIndex={0} />

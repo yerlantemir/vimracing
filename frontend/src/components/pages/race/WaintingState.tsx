@@ -27,15 +27,13 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
   return (
     <>
       {raceTimer ? (
-        <div className="flex justify-between">
-          <h5 className="text-gray-2">The race is about to start!</h5>
+        <div className="flex gap-4">
+          <h5 className="text-text text-sm">The race is about to start!</h5>
           <Timer time={raceTimer} />
         </div>
       ) : (
         <>
-          <h5 className="text-gray-2">
-            Share the link below with your friends
-          </h5>
+          <h5 className="text-text">Share the link below with your friends</h5>
           <CopyInput link={window.location.href} />
         </>
       )}
@@ -61,20 +59,22 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
                   setStartClicked(true);
                 }
               }}
-              className="text-gray-3"
-              style={{ maxWidth: '200px' }}
+              className="text-text"
+              style={{ maxWidth: '80px' }}
             >
-              Start the race!
+              Start!
             </Button>
           ) : (
             <>
-              <p className="text-gray-2">Waiting for other players to join</p>
+              <p className="text-text text-xs">
+                Waiting for other players to join
+              </p>
             </>
           )}
         </>
       )}
       {!isHost && raceTimer === RACE_WAITINIG_TIME_IN_S && (
-        <p className="text-gray-2">Waiting for host to start</p>
+        <p className="text-text">Waiting for host to start</p>
       )}
     </>
   );

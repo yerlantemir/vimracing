@@ -8,7 +8,7 @@ export const Button: React.FC<HTMLAttributes<HTMLButtonElement>> = ({
   return (
     <button
       {...rest}
-      className={`py-2 text-gray bg-blue-1 px-4 rounded cursor-pointer transition duration-200 ease-in hover:bg-blue-3 ${className}`}
+      className={`p-2 text-xs text-text rounded-lg cursor-pointer transition duration-200 ease-in border border-text hover:border-primary ${className}`}
     >
       {children}
     </button>

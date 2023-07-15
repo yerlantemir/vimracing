@@ -36,7 +36,6 @@ const TestPage = () => {
         <div className="flex flex-col gap-4">
           <div ref={editorParentElement} />
 
-          <div style={{ height: '0.3px' }} className="bg-gray w-full" />
           <Hotkeys />
         </div>
       </ContentCard>

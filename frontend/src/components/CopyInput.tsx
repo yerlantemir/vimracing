@@ -30,7 +30,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
   };
 
   return (
-    <div className="flex justify-between py-1 px-3 pr-0 items-center rounded-xl gap-4 h-10 bg-gray-2">
+    <div className="flex justify-between py-1 px-3 pr-0 items-center rounded-xl gap-4 h-10">
       <input
         className="border-none outline-none w-full bg-transparent py-2 px-1"
         value={link}
@@ -39,9 +39,7 @@ export const CopyInput: React.FC<CopyInputProps> = ({ link = '' }) => {
         readOnly
       />
       <button
-        className={`border-none rounded py-2 px-4 cursor-pointer w-24 transition duration-300 ease-linear text-gray-3 ${
-          copied ? 'bg-green-1' : 'bg-blue-2 hover:bg-blue-3'
-        }`}
+        className={`border-none rounded py-2 px-4 cursor-pointer w-24 transition duration-300 ease-linear text-text`}
         onClick={onCopyClick}
       >
         {copied ? 'Copied!' : 'Copy'}

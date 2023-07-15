@@ -39,17 +39,16 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
 
   return (
     <>
-      <h5 className="text-gray-2">Race recap:</h5>
       <div className="flex items-center gap-2">
         {Array(raceDocs.length)
           .fill(0)
           .map((_, index) => {
             return (
               <span
-                className={`p-1 cursor-pointer border-2 transition-all duration-300 ${
+                className={`p-2 text-sm cursor-pointer border rounded-md transition-all duration-300 ${
                   index === currentRecapTaskIndex
-                    ? 'border-blue-3 text-blue-3'
-                    : 'border-gray-2 opacity-80 text-gray'
+                    ? 'text-text border border-primary'
+                    : 'opacity-80 text-text'
                 }`}
                 key={index}
                 onClick={() => setCurrentRecapTaskIndex(index)}
@@ -64,7 +63,9 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
       {finishedPlayers.map((player) => {
         return (
           <div key={player.id} className="flex items-center gap-4">
-            <span className="text-gray-2 opacity-80">{player.username}</span>
+            <span className="text-text text-sm opacity-80">
+              {player.username}
+            </span>
             <Hotkeys
               executedCommands={
                 player.raceData?.executedCommands?.[currentRecapTaskIndex] ?? []

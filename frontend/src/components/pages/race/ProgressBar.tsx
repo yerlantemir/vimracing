@@ -12,10 +12,10 @@ export const Circle = ({
   isFinished: boolean;
 }) => {
   const bgColor = useMemo(() => {
-    if (isFinished) return 'bg-green-3';
-    if (taskStatus === 'done') return 'bg-green-2';
-    if (taskStatus === 'doing') return 'bg-orange';
-    return 'bg-gray-4';
+    if (isFinished) return 'bg-text';
+    if (taskStatus === 'done') return 'bg-text';
+    if (taskStatus === 'doing') return 'bg-text';
+    return 'bg-secondary';
   }, [isFinished, taskStatus]);
 
   return (
@@ -30,7 +30,6 @@ export const Circle = ({
 
 export const Line = ({
   taskStatus,
-  currentTaskCompleteness,
   isFinished
 }: {
   taskStatus: TaskStatus;
@@ -39,9 +38,9 @@ export const Line = ({
 }) => {
   const sharedContainerClasses = 'flex flex-grow transition ease-in-out';
   const containerBgClass = useMemo(() => {
-    if (isFinished) return 'bg-green-3';
-    if (taskStatus === 'done') return 'bg-green-2';
-    if (taskStatus === 'todo') return 'bg-gray-4';
+    if (isFinished) return 'bg-text';
+    if (taskStatus === 'done') return 'bg-text';
+    if (taskStatus === 'todo') return 'bg-secondary';
     return '';
   }, [isFinished, taskStatus]);
 
@@ -59,17 +58,9 @@ export const Line = ({
         }}
       >
         <div
-          className="bg-orange flex-grow"
+          className="bg-secondary flex-grow "
           style={{
-            width: `${currentTaskCompleteness}%`,
-            height: 1,
-            transition: 'width 0.2s'
-          }}
-        />
-        <div
-          className="bg-gray-4 flex-grow "
-          style={{
-            width: `${100 - currentTaskCompleteness}%`,
+            width: '100%',
             height: 1,
             transition: 'width 0.2s'
           }}

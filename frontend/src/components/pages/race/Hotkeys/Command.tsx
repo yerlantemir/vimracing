@@ -40,7 +40,6 @@ export const Command: React.FC<ExecutedCommand> = ({
         scope.current,
         {
           scale: [1.5, 1],
-          borderColor: ['#2ecc71', '#61afef'],
           borderWidth: ['2px', '1px']
         },
         {
@@ -59,8 +58,7 @@ export const Command: React.FC<ExecutedCommand> = ({
       animate(
         countElementRef.current,
         {
-          scale: [1, 1.5, 1],
-          color: ['#E67E22', '#abb2bf']
+          scale: [1, 1.5, 1]
         },
         {
           times: [0.9, 1],
@@ -88,8 +86,8 @@ export const Command: React.FC<ExecutedCommand> = ({
     <div
       key={index}
       ref={scope}
-      className={`py-2 px-3 bg-gray-5 text-gray border relative ${
-        isFailed ? 'border-red-1' : 'border-blue-2'
+      className={`py-2 px-3 text-sm text-text border border-text relative ${
+        isArrowKey ? 'opacity-60' : ''
       }`}
     >
       <span>
