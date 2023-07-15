@@ -126,7 +126,6 @@ export const RaceState: React.FC<RaceStateProps> = ({
   return (
     <>
       <div className="flex justify-between">{renderHeader()}</div>
-      <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {players && currentPlayer && (
         <Players
           raceDocsCount={raceDocs.length}
@@ -141,8 +140,6 @@ export const RaceState: React.FC<RaceStateProps> = ({
           }}
         />
       )}
-
-      <div style={{ height: '0.3px' }} className="bg-gray w-full" />
 
       {!isFinished && raceDocs && (
         <>

@@ -54,7 +54,9 @@ export default function RacePage({ params }: { params: { raceId: string } }) {
   };
   return (
     <ContentCard>
-      <div className="flex flex-col gap-4">{renderRaceByStatus()}</div>
+      <div className="flex flex-col gap-4" style={{ marginTop: '6rem' }}>
+        {renderRaceByStatus()}
+      </div>
     </ContentCard>
   );
 }

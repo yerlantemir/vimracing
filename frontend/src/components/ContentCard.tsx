@@ -6,7 +6,7 @@ export const ContentCard: React.FC<HTMLAttributes<HTMLDivElement>> = ({
   ...rest
 }) => {
   return (
-    <div {...rest} className={`bg-transparent p-4 rounded-md ${className}`}>
+    <div {...rest} className={`bg-transparent rounded-md ${className}`}>
       {children}
     </div>
   );

@@ -14,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-background">
+      <body className="bg-background text-text">
         <div
           className="grow relative"
           style={{
@@ -22,7 +22,7 @@ export default function RootLayout({
           }}
         >
           <Header />
-          <div style={{ paddingTop: '6rem' }}>{children}</div>
+          {children}
           <Footer />
         </div>
       </body>

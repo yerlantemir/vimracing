@@ -37,7 +37,6 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
           <CopyInput link={window.location.href} />
         </>
       )}
-      <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {currentPlayer && players && (
         <Players
           currentPlayer={currentPlayer}
@@ -48,7 +47,6 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
           }
         />
       )}
-      <div style={{ height: '0.3px' }} className="bg-gray w-full" />
       {isHost && !startClicked && (
         <>
           {players && players.length > 0 ? (
