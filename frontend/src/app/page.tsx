@@ -5,15 +5,18 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Editor from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
+import { useTraining } from '@/hooks/useTraining';
 
 const supportedLangs = ['js', 'python'];
 export default function Home() {
   const router = useRouter();
-  const [selectedLang, setSelectedLang] = useState('js');
+  const [selectedLang, setSelectedLang] = useState<'js' | 'python'>('js');
   const editorParentElement = useRef<HTMLDivElement | null>(null);
+  const { raceData } = useTraining({ selectedLang });
+  const [documentIndex, setDocumentIndex] = useState<number>(0);
 
   const onCreateRaceClick = async () => {
     const response = await createRace();
@@ -27,25 +30,37 @@ export default function Home() {
     router.push(raceId);
   };
 
+  const onDocChange = useCallback(
+    (newDoc: string[]) => {
+      if (
+        raceData &&
+        newDoc.join('') === raceData[documentIndex].target.join('')
+      ) {
+        setDocumentIndex((prev) => prev + 1);
+      }
+    },
+    [documentIndex, raceData]
+  );
+
   useEffect(() => {
     if (
       !editorParentElement.current ||
+      !raceData ||
+      !raceData[documentIndex] ||
       editorParentElement.current.childNodes.length !== 0
     )
       return;
 
     const editor = new Editor({
-      raceDoc: {
-        start: ['console.log("hell worldd")'],
-        target: ['console.log("hello world")']
-      },
-      parent: editorParentElement.current
+      raceDoc: raceData[documentIndex],
+      parent: editorParentElement.current,
+      onChange: onDocChange
     });
     editor.focus();
     return () => {
       editor?.destroy();
     };
-  }, []);
+  }, [documentIndex, onDocChange, raceData]);
 
   return (
     <>
@@ -69,7 +84,7 @@ export default function Home() {
       <ContentCard style={{ paddingTop: '6rem' }}>
         <div className="flex flex-col gap-4">
           <div ref={editorParentElement} />
-          <Hotkeys />
+          <Hotkeys key={documentIndex} />
         </div>
       </ContentCard>
     </>

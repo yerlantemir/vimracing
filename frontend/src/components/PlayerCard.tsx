@@ -57,7 +57,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
       return (
         <input
           type="text"
-          className="border-none outline-none bg-transparent text-text italic"
+          className="border-none outline-none bg-transparent text-primary italic"
           style={{
             width: '80%'
           }}
@@ -114,7 +114,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
   return (
     <div className="flex">
       <div
-        className="flex py-0 gap-4 items-center text-text"
+        className="flex py-0 gap-4 items-center text-text text-sm"
         style={{ width: '10%' }}
       >
         {renderUsername()}
