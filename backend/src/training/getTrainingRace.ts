@@ -2,7 +2,7 @@ import { Router } from 'express';
 import path from 'path';
 import fs from 'fs';
 
-const racesDataPath = path.resolve(__dirname, '../racesData');
+const racesDataPath = path.resolve(__dirname, '../../racesData');
 const router = Router();
 
 router.get('/', (req, res) => {
