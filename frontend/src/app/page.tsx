@@ -10,7 +10,8 @@ import Editor from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
 
-const supportedLangs = ['js', 'python'];
+type SupportedLangs = 'js' | 'python';
+const supportedLangs: SupportedLangs[] = ['js', 'python'];
 export default function Home() {
   const router = useRouter();
   const [selectedLang, setSelectedLang] = useState<'js' | 'python'>('js');
