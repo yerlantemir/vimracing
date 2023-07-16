@@ -2,23 +2,40 @@ import { Octokit } from 'octokit';
 import fs from 'fs';
 import tar from 'tar';
 import glob from 'glob';
+import path from 'path';
 
-const GITHUB_TOKEN = 'TOKEN';
-const REPO_OWNER = 'metarhia';
-const REPO_NAME = 'impress';
-const MAX_ERRORS_COUNT = 4;
-const MIN_ERRORS_COUNT = 1;
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-// TODO: RENAME
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const args = process.argv.slice(2);
+
+const GITHUB_TOKEN = args[0];
+const REPO_LANG = args[1] || 'js';
+const REPO_OWNER = args[2] || 'metarhia';
+const REPO_NAME = args[3] || 'impress';
+const MAX_ERRORS_COUNT = args[4] || 4;
+const MIN_ERRORS_COUNT = args[5] || 1;
+
 // 5 - one line, 3 - two line, 2 - three line snippets
-const LINES_SYMMETRY = [5, 3, 2];
+const ONE_LINER_COUNT = 5;
+const TWO_LINER_COUNT = 3;
+const THREE_LINER_COUNT = 3;
 
-const FILENAME = './bin/js.tar';
-const TARGET_DIRECTORY = './bin/js_files'; // Target directory to save js files
+const FILENAME = path.join(__dirname, './bin/js.tar');
 
 const octokit = new Octokit({
   auth: GITHUB_TOKEN
 });
+
+const popRandomElement = (array) => {
+  const randomIndex = Math.floor(Math.random() * array.length);
+  const randomElement = array[randomIndex];
+  array.splice(randomIndex, 1);
+  return randomElement;
+};
 
 const introduceSyntaxErrors = (code) => {
   const operations = ['add', 'delete', 'replace'];
@@ -77,14 +94,20 @@ const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
     }
   }
 
-  processLines(1, 5);
-  processLines(2, 3);
-  processLines(3, 2);
+  processLines(1, ONE_LINER_COUNT);
+  processLines(2, TWO_LINER_COUNT);
+  processLines(3, THREE_LINER_COUNT);
 
   return results;
 };
 
 (async function () {
+  if (!fs.existsSync(path.join(__dirname, './bin')))
+    fs.mkdirSync(path.join(__dirname, './bin'));
+  if (!fs.existsSync(`./src/racesData`)) fs.mkdirSync(`./src/racesData`);
+  if (!fs.existsSync(`./src/racesData/${REPO_LANG}`))
+    fs.mkdirSync(`./src/racesData/${REPO_LANG}`);
+
   try {
     const { data } = await octokit.rest.repos.downloadTarballArchive({
       owner: REPO_OWNER,
@@ -95,35 +118,66 @@ const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
     fs.writeFileSync(FILENAME, Buffer.from(data));
 
     // Unzip the tar file
-    await tar.x({ file: FILENAME, C: './' });
+    await tar.x({ file: FILENAME, C: path.join(__dirname, './bin') });
 
     // Find and copy all JS files to the target directory
-    glob(`./${REPO_OWNER}*/**/*.js`, (err, files) => {
-      if (err) {
-        console.log(err, 'ERROR');
-        return;
+    glob(
+      path.join(__dirname, `./bin/${REPO_OWNER}*/**/*.${REPO_LANG}`),
+      (err, files) => {
+        if (err) {
+          console.log(err, 'ERROR');
+          return;
+        }
+
+        const results = { 1: [], 2: [], 3: [] };
+        files.forEach((file) => {
+          const fileBuffer = fs.readFileSync(file);
+          const fileString = fileBuffer
+            .toString()
+            .split('\n')
+            .filter((a) => a !== '')
+            .map((a) => a.trim());
+
+          collectSnippetsFromFileLinesList(fileString, results);
+        });
+
+        let docIndex = 0;
+        while (
+          results[1].length >= ONE_LINER_COUNT &&
+          results[2].length >= TWO_LINER_COUNT &&
+          results[3].length >= THREE_LINER_COUNT
+        ) {
+          let currentRaceDoc = [];
+          for (let i = 0; i < ONE_LINER_COUNT; i++) {
+            const poppedItem = popRandomElement(results[1]);
+            if (!poppedItem) return;
+            currentRaceDoc.push(poppedItem);
+          }
+          for (let i = 0; i < TWO_LINER_COUNT; i++) {
+            const poppedItem = popRandomElement(results[2]);
+
+            if (!poppedItem) return;
+            currentRaceDoc.push(poppedItem);
+          }
+          for (let i = 0; i < THREE_LINER_COUNT; i++) {
+            const poppedItem = popRandomElement(results[3]);
+            if (!poppedItem) return;
+            currentRaceDoc.push(poppedItem);
+          }
+
+          fs.writeFileSync(
+            `./src/racesData/${REPO_LANG}/${docIndex}.json`,
+            JSON.stringify(currentRaceDoc, null, 2)
+          );
+
+          docIndex++;
+        }
+
+        fs.rmdirSync(path.join(__dirname, 'bin'), { recursive: true });
       }
-
-      const results = { 1: [], 2: [], 3: [] };
-      files.forEach((file) => {
-        const fileBuffer = fs.readFileSync(file);
-        const fileString = fileBuffer
-          .toString()
-          .split('\n')
-          .filter((a) => a !== '')
-          .map((a) => a.trim());
-
-        collectSnippetsFromFileLinesList(fileString, results);
-      });
-
-      fs.writeFile('results.json', JSON.stringify(results, null, 2), (err) => {
-        if (err) throw err;
-        console.log('Data written to file');
-      });
-
-      console.log('JS files are copied to ' + TARGET_DIRECTORY);
-    });
+    );
   } catch (err) {
+    fs.rmdirSync(path.join(__dirname, 'bin'), { recursive: true });
     console.log(err, 'ERROR');
   }
 })();
