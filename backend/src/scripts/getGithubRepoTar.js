@@ -16,9 +16,8 @@ const GITHUB_TOKEN = args[0];
 const REPO_LANG = args[1] || 'js';
 const REPO_OWNER = args[2] || 'metarhia';
 const REPO_NAME = args[3] || 'impress';
-const MAX_ERRORS_COUNT = args[4] || 4;
-const MIN_ERRORS_COUNT = args[5] || 1;
 
+const MIN_SYMBOLS_COUNT = 20;
 // 5 - one line, 3 - two line, 2 - three line snippets
 const ONE_LINER_COUNT = 5;
 const TWO_LINER_COUNT = 3;
@@ -37,17 +36,20 @@ const popRandomElement = (array) => {
   return randomElement;
 };
 
-const introduceSyntaxErrors = (code) => {
+const introduceSyntaxErrors = (code, mistakesCount) => {
   const operations = ['add', 'delete', 'replace'];
   let newCode = code.split('');
-  const numErrors =
-    Math.floor(Math.random() * MAX_ERRORS_COUNT) + MIN_ERRORS_COUNT; // Random number of errors
+  const numErrors = mistakesCount;
   const possibleChars =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_{}[]();,./*-+';
 
   for (let i = 0; i < numErrors; i++) {
     const operation = operations[Math.floor(Math.random() * operations.length)]; // Random operation
     const index = Math.floor(Math.random() * newCode.length); // Random index
+
+    if (newCode[index] === '\n') {
+      continue; // Skip the operation if the character is '\n'
+    }
 
     switch (operation) {
       case 'add':
@@ -75,22 +77,20 @@ const introduceSyntaxErrors = (code) => {
 const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
   let currentLineIndex = 0;
   // one liner
-  function processLines(lineCount, snippetCount) {
+  function processLines(mistakesCount, snippetCount) {
     for (let i = 0; i < snippetCount; i++) {
       let lines = [];
-      for (let j = 0; j < lineCount; j++) {
-        if (currentLineIndex + j >= fileLinesList.length) {
-          return; // If out of bounds, return from the function, ending both loops
-        }
-        lines.push(fileLinesList[currentLineIndex + j]);
+      if (currentLineIndex >= fileLinesList.length) {
+        return; // If out of bounds, return from the function, ending both loops
       }
+      lines.push(fileLinesList[currentLineIndex]);
 
-      results[lineCount].push({
-        target: lines.join('\n'),
-        start: lines.map(introduceSyntaxErrors).join('\n')
+      results[mistakesCount].push({
+        target: lines.map((a) => a),
+        start: lines.map((a) => introduceSyntaxErrors(a, mistakesCount))
       });
 
-      currentLineIndex += lineCount;
+      currentLineIndex++;
     }
   }
 
@@ -135,7 +135,7 @@ const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
           const fileString = fileBuffer
             .toString()
             .split('\n')
-            .filter((a) => a !== '')
+            .filter((a) => a !== '' && a.length > MIN_SYMBOLS_COUNT)
             .map((a) => a.trim());
 
           collectSnippetsFromFileLinesList(fileString, results);
