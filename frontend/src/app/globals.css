@@ -1,11 +1,28 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+/* text: '',
+primary: '',
+secondary: '',
+background: '' */
 
+@layer base {
+  html[data-theme='dark'] {
+    --color-text: #abb2bf;
+    --color-primary: #e67e22;
+    --color-secondary: #293141;
+    --color-background: #282c34;
+  }
+
+  html[data-theme='light'] {
+    --color-text: #abb2bf;
+    --color-primary: #e67e22;
+    --color-secondary: #293141;
+    --color-background: #282c34;
+  }
+}
 :root {
   font-family: 'Roboto Mono', monospace;
-  --gray: '#abb2bf';
-  --dark: '#282c34';
 }
 .cm-editor .cm-content {
   font-family: 'Roboto Mono', monospace;

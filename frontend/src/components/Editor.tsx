@@ -1,6 +1,5 @@
 import {
   keymap,
-  lineNumbers,
   highlightSpecialChars,
   drawSelection,
   dropCursor,
