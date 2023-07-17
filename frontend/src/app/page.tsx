@@ -5,20 +5,31 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Editor from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
-import { SupportedLanguages } from '@vimracing/shared';
+import { ExecutedCommand, SupportedLanguages } from '@vimracing/shared';
+import { TrainingRecap } from '@/components/pages/race/Recap';
+import { RefreshIcon } from '@/components/icons';
+
+type RaceData = { start: []; target: [] }[];
 
 export default function Home() {
   const router = useRouter();
+  const [recapRaceData, setRecapRaceData] = useState<RaceData | null>(null);
+  const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
+    []
+  );
   const [selectedLang, setSelectedLang] = useState<SupportedLanguages>(
     SupportedLanguages.js
   );
   const [documentIndex, setDocumentIndex] = useState<number>(0);
   const editorParentElement = useRef<HTMLDivElement | null>(null);
-  const { raceData, fillRaceData } = useTraining({ selectedLang });
+  const { raceData } = useTraining({
+    selectedLang,
+    isShowingRecap: !!recapRaceData
+  });
 
   const onCreateRaceClick = async () => {
     const response = await createRace();
@@ -48,15 +59,17 @@ export default function Home() {
     if (
       !editorParentElement.current ||
       !raceData ||
-      editorParentElement.current.childNodes.length !== 0
+      editorParentElement.current.childNodes.length !== 0 ||
+      recapRaceData
     )
       return;
 
     if (!raceData[documentIndex]) {
+      setRecapRaceData(raceData);
       setDocumentIndex(0);
-      fillRaceData();
       return;
     }
+
     const editor = new Editor({
       raceDoc: raceData[documentIndex],
       parent: editorParentElement.current,
@@ -67,7 +80,29 @@ export default function Home() {
     return () => {
       editor?.destroy();
     };
-  }, [documentIndex, fillRaceData, onDocChange, raceData]);
+  }, [documentIndex, onDocChange, raceData, recapRaceData]);
+
+  const onExecutedCommandsChangeCallback = useCallback(
+    (executedCommands: ExecutedCommand[]) => {
+      setExecutedCommands((prev) => {
+        if (documentIndex === prev.length - 1) {
+          return prev.map((commands, index) => {
+            if (index === documentIndex) {
+              return executedCommands;
+            }
+            return commands;
+          });
+        }
+        return [...prev, executedCommands];
+      });
+    },
+    [documentIndex]
+  );
+
+  const onRefreshClick = () => {
+    setRecapRaceData(null);
+    setExecutedCommands([]);
+  };
 
   return (
     <>
@@ -80,18 +115,48 @@ export default function Home() {
             key={a}
             className={`${
               a === selectedLang ? 'text-primary' : ''
-            } cursor-pointer transition duration-300`}
+            } cursor-pointer transition duration-300 hover:text-primary hover:opacity-80`}
             onClick={() => setSelectedLang(a as SupportedLanguages)}
           >
             {a}
           </p>
         ))}
-        |<Button onClick={onCreateRaceClick}>compete</Button>
+        |
+        {!!recapRaceData && (
+          <>
+            <span
+              className="cursor-pointer hover:text-primary transition duration-300"
+              onClick={onRefreshClick}
+            >
+              <RefreshIcon />
+            </span>{' '}
+            |
+          </>
+        )}
+        <Button onClick={onCreateRaceClick}>compete</Button>
       </div>
       <ContentCard style={{ paddingTop: '6rem' }}>
         <div className="flex flex-col gap-4">
-          <div ref={editorParentElement} />
-          <Hotkeys key={documentIndex} />
+          {recapRaceData ? (
+            <TrainingRecap
+              raceDocs={recapRaceData}
+              executedCommands={executedCommands}
+            />
+          ) : (
+            <>
+              <span className="text-xs">
+                <span className="text-primary">{documentIndex + 1}</span>/
+                {raceData?.length}
+              </span>
+              <div ref={editorParentElement} />
+              <Hotkeys
+                key={documentIndex}
+                onExecutedCommandsChangeCallback={
+                  onExecutedCommandsChangeCallback
+                }
+              />
+            </>
+          )}
         </div>
       </ContentCard>
     </>

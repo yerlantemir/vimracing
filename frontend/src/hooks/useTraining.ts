@@ -5,10 +5,12 @@ import { getTrainingRace } from '@/api/getTrainingRace';
 type RaceData = { start: []; target: [] }[];
 
 export const useTraining = ({
-  selectedLang
+  selectedLang,
+  isShowingRecap
 }: {
   selectedLang: SupportedLanguages;
-}): { raceData: RaceData | null; fillRaceData: () => void } => {
+  isShowingRecap: boolean;
+}): { raceData: RaceData | null } => {
   const [internalSelectedLang, setInternalSelectedLang] =
     useState<SupportedLanguages>(selectedLang);
   const [cache, setCache] = useState<
@@ -38,28 +40,34 @@ export const useTraining = ({
     );
   }, [cache]);
 
-  const fillRaceData = useCallback(() => {
+  const fillRaceData = useCallback((lang: SupportedLanguages) => {
     setCache((prev) => {
       if (!prev) return prev;
 
-      const newRaceData = prev[selectedLang];
+      const newRaceData = prev[lang];
 
       if (!newRaceData) return prev;
+
       setCurrentRaceData(newRaceData);
 
       return {
         ...prev,
-        [selectedLang]: null
+        [lang]: null
       };
     });
-  }, [selectedLang]);
-  console.log(selectedLang);
+  }, []);
 
   useEffect(() => {
-    if (!currentRaceData && cache) fillRaceData();
+    // fill for the first time
+    if (!currentRaceData && cache) {
+      fillRaceData(internalSelectedLang);
+      return;
+    }
+    // fill when language changes
     if (internalSelectedLang !== selectedLang) {
       setInternalSelectedLang(selectedLang);
-      fillRaceData();
+      fillRaceData(selectedLang);
+      return;
     }
   }, [
     cache,
@@ -69,5 +77,13 @@ export const useTraining = ({
     selectedLang
   ]);
 
-  return { raceData: currentRaceData, fillRaceData };
+  useEffect(() => {
+    if (isShowingRecap) {
+      fillRaceData(internalSelectedLang);
+    }
+  }, [fillRaceData, internalSelectedLang, isShowingRecap]);
+
+  return {
+    raceData: currentRaceData
+  };
 };
