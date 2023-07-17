@@ -8,6 +8,7 @@ import {
   EditorView
 } from '@codemirror/view';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { basicLight } from 'cm6-theme-basic-light';
 import { Text } from '@codemirror/state';
 import {
   defaultKeymap,
@@ -18,11 +19,13 @@ import {
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
 import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
+import { Theme } from './context/ThemeContext';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange?: (doc: string[]) => void;
   raceDoc: { start: string[]; target: string[] };
   readOnly?: boolean;
+  theme: Theme;
 };
 
 class Editor extends EditorView {
@@ -39,7 +42,7 @@ class Editor extends EditorView {
         dropCursor(),
         rectangularSelection(),
         drawSelection(),
-        oneDark,
+        config?.theme === 'light' ? basicLight : oneDark,
         EditorView.updateListener.of((v: ViewUpdate) => {
           if (v.docChanged) {
             config?.onChange?.(v.state.doc.toJSON());

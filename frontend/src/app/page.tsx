@@ -5,7 +5,7 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import Editor from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
@@ -13,11 +13,13 @@ import { ExecutedCommand, SupportedLanguages } from '@vimracing/shared';
 import { TrainingRecap } from '@/components/pages/race/Recap';
 import { RefreshIcon } from '@/components/icons';
 import { LoadingIcon } from '@/components/Loading';
+import { ThemeContext } from '@/components/context/ThemeContext';
 
 type RaceData = { start: []; target: [] }[];
 
 export default function Home() {
   const router = useRouter();
+  const { mode } = useContext(ThemeContext);
   const [recapRaceData, setRecapRaceData] = useState<RaceData | null>(null);
   const [createRaceLoading, setCreateRaceLoading] = useState(false);
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
@@ -80,14 +82,15 @@ export default function Home() {
     const editor = new Editor({
       raceDoc: raceData[documentIndex],
       parent: editorParentElement.current,
-      onChange: onDocChange
+      onChange: onDocChange,
+      theme: mode
     });
     editor.focus();
 
     return () => {
       editor?.destroy();
     };
-  }, [documentIndex, onDocChange, raceData, recapRaceData]);
+  }, [documentIndex, mode, onDocChange, raceData, recapRaceData]);
 
   const onExecutedCommandsChangeCallback = useCallback(
     (executedCommands: ExecutedCommand[]) => {

@@ -4,7 +4,13 @@ import Link from 'next/link';
 import { Github, Sun } from './icons';
 import { useRouter } from 'next/navigation';
 
-export const Header = () => {
+export const Header = ({
+  currentTheme,
+  onThemeChange
+}: {
+  onThemeChange: (newTheme: 'dark' | 'light') => void;
+  currentTheme: 'dark' | 'light';
+}) => {
   const router = useRouter();
   const onHeaderClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
@@ -27,7 +33,19 @@ export const Header = () => {
       </h1>
 
       <div className="flex items-center gap-4 text-text">
-        <Sun className={iconClassNames} tabIndex={0} />{' '}
+        {currentTheme === 'dark' ? (
+          <Sun
+            className={iconClassNames}
+            tabIndex={0}
+            onClick={() => onThemeChange('light')}
+          />
+        ) : (
+          <Sun
+            className={iconClassNames}
+            tabIndex={0}
+            onClick={() => onThemeChange('dark')}
+          />
+        )}
         <a href="https://github.com/yerlantemir/vimracing" target="_blank">
           <Github className={iconClassNames} tabIndex={0} />
         </a>

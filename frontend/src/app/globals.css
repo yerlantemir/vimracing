@@ -21,11 +21,11 @@ background: '' */
   html[data-theme='light'] {
     --color-text: #5e81ac;
     --color-primary: #d08770;
-    --color-secondary: #ede8e8;
-    --color-background: #ffffff;
-    --color-insert: '#2c663a';
-    --color-delete: '#8b0000';
-    --color-delete-background: '#663a3a';
+    --color-secondary: #e8e3e3;
+    --color-background: #efefef;
+    --color-insert: #a9d08d;
+    --color-delete: #535353;
+    --color-delete-background: #f8cecc;
   }
 }
 :root {
