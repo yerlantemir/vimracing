@@ -12,6 +12,10 @@ background: '' */
     --color-primary: #e67e22;
     --color-secondary: #293141;
     --color-background: #282c34;
+    --color-insert: #2c663a;
+    --color-delete: #8b0000;
+    --color-delete-background: #663a3a;
+    --color-deleted-chunk: rgba(160, 128, 100, 0.08);
   }
 
   html[data-theme='light'] {
@@ -19,6 +23,9 @@ background: '' */
     --color-primary: #d08770;
     --color-secondary: #ede8e8;
     --color-background: #ffffff;
+    --color-insert: '#2c663a';
+    --color-delete: '#8b0000';
+    --color-delete-background: '#663a3a';
   }
 }
 :root {
