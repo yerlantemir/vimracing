@@ -5,7 +5,7 @@ import { Players } from './Players';
 import { Timer } from '@/components/Timer';
 import { useState } from 'react';
 
-const RACE_WAITINIG_TIME_IN_S = 3;
+const RACE_WAITING_TIME_IN_S = 3;
 
 interface WaitingStateProps {
   raceTimer?: number;
@@ -65,13 +65,13 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
           ) : (
             <>
               <p className="text-text text-xs">
-                Waiting for other players to join
+                Share the link with your friends
               </p>
             </>
           )}
         </>
       )}
-      {!isHost && raceTimer === RACE_WAITINIG_TIME_IN_S && (
+      {!isHost && raceTimer === RACE_WAITING_TIME_IN_S && (
         <p className="text-text">Waiting for host to start</p>
       )}
     </>
