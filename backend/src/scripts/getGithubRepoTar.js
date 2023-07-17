@@ -17,6 +17,7 @@ const REPO_LANG = args[1] || 'js';
 const REPO_OWNER = args[2] || 'metarhia';
 const REPO_NAME = args[3] || 'impress';
 
+const MAX_DOCUMENTS_COUNT = 50;
 const MIN_SYMBOLS_COUNT = 20;
 // 5 - one line, 3 - two line, 2 - three line snippets
 const ONE_LINER_COUNT = 5;
@@ -120,7 +121,6 @@ const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
     // Unzip the tar file
     await tar.x({ file: FILENAME, C: path.join(__dirname, './bin') });
 
-    // Find and copy all JS files to the target directory
     glob(
       path.join(__dirname, `./bin/${REPO_OWNER}*/**/*.${REPO_LANG}`),
       (err, files) => {
@@ -145,7 +145,8 @@ const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
         while (
           results[1].length >= ONE_LINER_COUNT &&
           results[2].length >= TWO_LINER_COUNT &&
-          results[3].length >= THREE_LINER_COUNT
+          results[3].length >= THREE_LINER_COUNT &&
+          docIndex < MAX_DOCUMENTS_COUNT
         ) {
           let currentRaceDoc = [];
           for (let i = 0; i < ONE_LINER_COUNT; i++) {
