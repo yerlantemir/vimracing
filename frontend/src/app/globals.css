@@ -15,10 +15,10 @@ background: '' */
   }
 
   html[data-theme='light'] {
-    --color-text: #abb2bf;
-    --color-primary: #e67e22;
-    --color-secondary: #293141;
-    --color-background: #282c34;
+    --color-text: #5e81ac;
+    --color-primary: #d08770;
+    --color-secondary: #ede8e8;
+    --color-background: #ffffff;
   }
 }
 :root {
