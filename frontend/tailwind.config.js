@@ -9,13 +9,13 @@ module.exports = {
       colors: {
         transparent: 'transparent',
 
-        text: '#abb2bf',
+        text: 'var(--color-text)',
 
-        primary: '#e67e22',
+        primary: 'var(--color-primary)',
 
-        secondary: '#293141',
+        secondary: 'var(--color-secondary)',
 
-        background: '#282c34'
+        background: 'var(--color-background)'
       }
     }
   },

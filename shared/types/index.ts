@@ -128,3 +128,8 @@ export interface BackendRaceFinishEvent {
     you: Player;
   };
 }
+
+export enum SupportedLanguages {
+  js = 'js',
+  py = 'py'
+}

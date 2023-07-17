@@ -5,19 +5,20 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Editor from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
+import { SupportedLanguages } from '@vimracing/shared';
 
-type SupportedLangs = 'js' | 'python';
-const supportedLangs: SupportedLangs[] = ['js', 'python'];
 export default function Home() {
   const router = useRouter();
-  const [selectedLang, setSelectedLang] = useState<'js' | 'python'>('js');
-  const editorParentElement = useRef<HTMLDivElement | null>(null);
-  const { raceData } = useTraining({ selectedLang });
+  const [selectedLang, setSelectedLang] = useState<SupportedLanguages>(
+    SupportedLanguages.js
+  );
   const [documentIndex, setDocumentIndex] = useState<number>(0);
+  const editorParentElement = useRef<HTMLDivElement | null>(null);
+  const { raceData, fillRaceData } = useTraining({ selectedLang });
 
   const onCreateRaceClick = async () => {
     const response = await createRace();
@@ -47,21 +48,26 @@ export default function Home() {
     if (
       !editorParentElement.current ||
       !raceData ||
-      !raceData[documentIndex] ||
       editorParentElement.current.childNodes.length !== 0
     )
       return;
 
+    if (!raceData[documentIndex]) {
+      setDocumentIndex(0);
+      fillRaceData();
+      return;
+    }
     const editor = new Editor({
       raceDoc: raceData[documentIndex],
       parent: editorParentElement.current,
       onChange: onDocChange
     });
     editor.focus();
+
     return () => {
       editor?.destroy();
     };
-  }, [documentIndex, onDocChange, raceData]);
+  }, [documentIndex, fillRaceData, onDocChange, raceData]);
 
   return (
     <>
@@ -69,13 +75,13 @@ export default function Home() {
         className="bg-secondary py-1 px-3 gap-6 flex rounded-xl items-center text-xs m-auto"
         style={{ width: 'fit-content' }}
       >
-        {supportedLangs.map((a) => (
+        {Object.keys(SupportedLanguages).map((a) => (
           <p
             key={a}
             className={`${
               a === selectedLang ? 'text-primary' : ''
             } cursor-pointer transition duration-300`}
-            onClick={() => setSelectedLang(a)}
+            onClick={() => setSelectedLang(a as SupportedLanguages)}
           >
             {a}
           </p>
