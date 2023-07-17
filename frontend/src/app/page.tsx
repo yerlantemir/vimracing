@@ -12,12 +12,14 @@ import { useTraining } from '@/hooks/useTraining';
 import { ExecutedCommand, SupportedLanguages } from '@vimracing/shared';
 import { TrainingRecap } from '@/components/pages/race/Recap';
 import { RefreshIcon } from '@/components/icons';
+import { LoadingIcon } from '@/components/Loading';
 
 type RaceData = { start: []; target: [] }[];
 
 export default function Home() {
   const router = useRouter();
   const [recapRaceData, setRecapRaceData] = useState<RaceData | null>(null);
+  const [createRaceLoading, setCreateRaceLoading] = useState(false);
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
     []
   );
@@ -32,15 +34,20 @@ export default function Home() {
   });
 
   const onCreateRaceClick = async () => {
-    const response = await createRace();
-    if (!response) return;
+    try {
+      setCreateRaceLoading(true);
+      const response = await createRace();
+      if (!response) return;
 
-    const { hostToken, raceId } = response;
-    LocalStorageManager.setHostToken({
-      raceId,
-      hostToken
-    });
-    router.push(raceId);
+      const { hostToken, raceId } = response;
+      LocalStorageManager.setHostToken({
+        raceId,
+        hostToken
+      });
+      router.push(raceId);
+    } catch {
+      setCreateRaceLoading(false);
+    }
   };
 
   const onDocChange = useCallback(
@@ -108,7 +115,7 @@ export default function Home() {
     <>
       <div
         className="bg-secondary py-1 px-3 gap-6 flex rounded-xl items-center text-xs m-auto"
-        style={{ width: 'fit-content' }}
+        style={{ width: 'fit-content', height: '36px' }}
       >
         {Object.keys(SupportedLanguages).map((a) => (
           <p
@@ -116,7 +123,10 @@ export default function Home() {
             className={`${
               a === selectedLang ? 'text-primary' : ''
             } cursor-pointer transition duration-300 hover:text-primary hover:opacity-80`}
-            onClick={() => setSelectedLang(a as SupportedLanguages)}
+            onClick={() => {
+              if (a === selectedLang || createRaceLoading) return;
+              setSelectedLang(a as SupportedLanguages);
+            }}
           >
             {a}
           </p>
@@ -133,7 +143,11 @@ export default function Home() {
             |
           </>
         )}
-        <Button onClick={onCreateRaceClick}>compete</Button>
+        {createRaceLoading ? (
+          <LoadingIcon />
+        ) : (
+          <Button onClick={onCreateRaceClick}>compete</Button>
+        )}
       </div>
       <ContentCard style={{ paddingTop: '6rem' }}>
         <div className="flex flex-col gap-4">
@@ -144,10 +158,12 @@ export default function Home() {
             />
           ) : (
             <>
-              <span className="text-xs">
-                <span className="text-primary">{documentIndex + 1}</span>/
-                {raceData?.length}
-              </span>
+              {raceData && (
+                <span className="text-xs">
+                  <span className="text-primary">{documentIndex + 1}</span>/
+                  {raceData.length}
+                </span>
+              )}
               <div ref={editorParentElement} />
               <Hotkeys
                 key={documentIndex}
