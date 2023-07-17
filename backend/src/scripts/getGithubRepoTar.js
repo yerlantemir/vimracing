@@ -22,7 +22,7 @@ const MIN_SYMBOLS_COUNT = 20;
 // 5 - one line, 3 - two line, 2 - three line snippets
 const ONE_LINER_COUNT = 5;
 const TWO_LINER_COUNT = 3;
-const THREE_LINER_COUNT = 3;
+const THREE_LINER_COUNT = 2;
 
 const FILENAME = path.join(__dirname, './bin/js.tar');
 
