@@ -19,7 +19,8 @@ import {
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
 import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
-import { Theme } from './context/ThemeContext';
+import { Theme, ThemeContext } from './context/ThemeContext';
+import { useContext, useEffect, useRef } from 'react';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange?: (doc: string[]) => void;
@@ -28,7 +29,7 @@ type EditorConfig = Partial<DirectMergeConfig> & {
   theme: Theme;
 };
 
-class Editor extends EditorView {
+class EditorObj extends EditorView {
   constructor(config?: EditorConfig) {
     super({
       doc: Text.of(config?.raceDoc.start ?? []),
@@ -57,8 +58,38 @@ class Editor extends EditorView {
     });
   }
 }
-export default Editor;
 
 export const isTextEqual = (a: string[], b: string[]) => {
   return Text.of(a).eq(Text.of(b));
+};
+
+export const Editor: React.FC<Omit<EditorConfig, 'parent' | 'theme'>> = ({
+  onChange,
+  raceDoc,
+  readOnly
+}) => {
+  const editorParentElement = useRef<HTMLDivElement | null>(null);
+
+  const { theme } = useContext(ThemeContext);
+  useEffect(() => {
+    if (
+      !editorParentElement.current ||
+      editorParentElement.current.childNodes.length !== 0
+    )
+      return;
+    const editor = new EditorObj({
+      raceDoc,
+      parent: editorParentElement.current,
+      onChange,
+      theme,
+      readOnly
+    });
+    editor.focus();
+
+    return () => {
+      editor.destroy();
+    };
+  }, [onChange, raceDoc, readOnly, theme]);
+
+  return <div ref={editorParentElement} />;
 };

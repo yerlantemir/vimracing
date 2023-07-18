@@ -10,7 +10,7 @@ export const Layout = ({ children }: HTMLAttributes<HTMLElement>) => {
 
   return (
     <html lang="en" data-theme={theme}>
-      <ThemeContext.Provider value={{ mode: theme }}>
+      <ThemeContext.Provider value={{ theme }}>
         <body className="bg-background text-text">
           <div
             className="grow relative"

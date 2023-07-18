@@ -1,4 +1,4 @@
-import Editor, { isTextEqual } from '@/components/Editor';
+import { Editor, isTextEqual } from '@/components/Editor';
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { Players } from './Players';
 import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
@@ -29,7 +29,6 @@ export const RaceState: React.FC<RaceStateProps> = ({
   const [raceExecutedCommands, setRaceExecutedCommands] = useState<
     ExecutedCommand[][]
   >(currentPlayer?.raceData?.executedCommands ?? []);
-  const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [documentIndex, setDocumentIndex] = useState(
     currentPlayer?.raceData?.currentDocIndex ?? 0
   );
@@ -63,26 +62,6 @@ export const RaceState: React.FC<RaceStateProps> = ({
     },
     [documentIndex, onDocChange, onRaceFinish, raceDocs]
   );
-
-  useEffect(() => {
-    if (
-      !editorParentElement.current ||
-      !raceDocs ||
-      editorParentElement.current.childNodes.length !== 0 ||
-      !raceDocs[documentIndex]
-    )
-      return;
-
-    const editor = new Editor({
-      raceDoc: raceDocs[documentIndex],
-      parent: editorParentElement.current,
-      onChange: onCurrentDocumentChange
-    });
-    editor.focus();
-    return () => {
-      editor?.destroy();
-    };
-  }, [documentIndex, onCurrentDocumentChange, onDocChange, raceDocs]);
 
   const onExecutedCommandsChangeCallback = useCallback(
     (executedCommands: ExecutedCommand[]) => {
@@ -143,7 +122,12 @@ export const RaceState: React.FC<RaceStateProps> = ({
 
       {!isFinished && raceDocs && (
         <>
-          <div ref={editorParentElement} />
+          {raceDocs && raceDocs[documentIndex] && (
+            <Editor
+              raceDoc={raceDocs[documentIndex]}
+              onChange={onCurrentDocumentChange}
+            />
+          )}
           <Hotkeys
             onExecutedCommandsChangeCallback={onExecutedCommandsChangeCallback}
             key={documentIndex}

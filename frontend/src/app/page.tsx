@@ -5,21 +5,19 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import Editor from '@/components/Editor';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Editor } from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
 import { ExecutedCommand, SupportedLanguages } from '@vimracing/shared';
 import { TrainingRecap } from '@/components/pages/race/Recap';
 import { RefreshIcon } from '@/components/icons';
 import { LoadingIcon } from '@/components/Loading';
-import { ThemeContext } from '@/components/context/ThemeContext';
 
 type RaceData = { start: []; target: [] }[];
 
 export default function Home() {
   const router = useRouter();
-  const { mode } = useContext(ThemeContext);
   const [recapRaceData, setRecapRaceData] = useState<RaceData | null>(null);
   const [createRaceLoading, setCreateRaceLoading] = useState(false);
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
@@ -65,32 +63,12 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (
-      !editorParentElement.current ||
-      !raceData ||
-      editorParentElement.current.childNodes.length !== 0 ||
-      recapRaceData
-    )
-      return;
-
-    if (!raceData[documentIndex]) {
+    if (!raceData?.[documentIndex]) {
       setRecapRaceData(raceData);
       setDocumentIndex(0);
       return;
     }
-
-    const editor = new Editor({
-      raceDoc: raceData[documentIndex],
-      parent: editorParentElement.current,
-      onChange: onDocChange,
-      theme: mode
-    });
-    editor.focus();
-
-    return () => {
-      editor?.destroy();
-    };
-  }, [documentIndex, mode, onDocChange, raceData, recapRaceData]);
+  }, [documentIndex, raceData]);
 
   const onExecutedCommandsChangeCallback = useCallback(
     (executedCommands: ExecutedCommand[]) => {
@@ -167,7 +145,12 @@ export default function Home() {
                   {raceData.length}
                 </span>
               )}
-              <div ref={editorParentElement} />
+              {raceData && raceData[documentIndex] && (
+                <Editor
+                  raceDoc={raceData[documentIndex]}
+                  onChange={onDocChange}
+                />
+              )}
               <Hotkeys
                 key={documentIndex}
                 onExecutedCommandsChangeCallback={

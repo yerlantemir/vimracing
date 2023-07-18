@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import Editor from '@/components/Editor';
+import { Editor } from '@/components/Editor';
 import { ExecutedCommand, Player } from '@vimracing/shared';
 import React from 'react';
 import { Hotkeys } from './Hotkeys/Hotkeys';
@@ -28,7 +28,7 @@ const TasksList = ({
               className={`p-2 text-sm cursor-pointer border rounded-md transition-all duration-300 ${
                 index === currentRecapTaskIndex
                   ? 'text-text border border-primary'
-                  : 'opacity-80 text-text'
+                  : 'opacity-80 text-text border-text'
               }`}
               key={index}
               onClick={() => onTaskClick(index)}
@@ -41,27 +41,7 @@ const TasksList = ({
   );
 };
 export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
-  const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [currentRecapTaskIndex, setCurrentRecapTaskIndex] = useState(0);
-
-  useEffect(() => {
-    if (
-      !editorParentElement.current ||
-      !raceDocs ||
-      editorParentElement.current.childNodes.length !== 0
-    )
-      return;
-
-    const editor = new Editor({
-      raceDoc: raceDocs[currentRecapTaskIndex],
-      parent: editorParentElement.current,
-      readOnly: true
-    });
-    editor.focus();
-    return () => {
-      editor?.destroy();
-    };
-  }, [currentRecapTaskIndex, raceDocs]);
 
   const finishedPlayers = players.filter(
     (player) =>
@@ -76,7 +56,9 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
         currentRecapTaskIndex={currentRecapTaskIndex}
         onTaskClick={setCurrentRecapTaskIndex}
       />
-      {raceDocs && <div ref={editorParentElement} />}
+      {raceDocs && raceDocs[currentRecapTaskIndex] && (
+        <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
+      )}
 
       {finishedPlayers.map((player) => {
         return (
@@ -105,27 +87,7 @@ export const TrainingRecap: React.FC<ITrainingRecapProps> = ({
   raceDocs,
   executedCommands
 }) => {
-  const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [currentRecapTaskIndex, setCurrentRecapTaskIndex] = useState(0);
-
-  useEffect(() => {
-    if (
-      !editorParentElement.current ||
-      !raceDocs ||
-      editorParentElement.current.childNodes.length !== 0
-    )
-      return;
-
-    const editor = new Editor({
-      raceDoc: raceDocs[currentRecapTaskIndex],
-      parent: editorParentElement.current,
-      readOnly: true
-    });
-    editor.focus();
-    return () => {
-      editor?.destroy();
-    };
-  }, [currentRecapTaskIndex, raceDocs]);
 
   return (
     <>
@@ -134,7 +96,9 @@ export const TrainingRecap: React.FC<ITrainingRecapProps> = ({
         currentRecapTaskIndex={currentRecapTaskIndex}
         onTaskClick={setCurrentRecapTaskIndex}
       />
-      {raceDocs && <div ref={editorParentElement} />}
+      {raceDocs && raceDocs[currentRecapTaskIndex] && (
+        <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
+      )}
 
       <Hotkeys executedCommands={executedCommands[currentRecapTaskIndex]} />
     </>
