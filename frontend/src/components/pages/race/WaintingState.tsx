@@ -72,7 +72,7 @@ export const WaitingState: React.FC<WaitingStateProps> = ({
         </>
       )}
       {!isHost && raceTimer === RACE_WAITING_TIME_IN_S && (
-        <p className="text-text">Waiting for host to start</p>
+        <p className="text-text text-xs">Waiting for host to start</p>
       )}
     </>
   );

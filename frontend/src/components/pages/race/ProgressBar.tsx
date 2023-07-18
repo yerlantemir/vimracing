@@ -30,7 +30,8 @@ export const Circle = ({
 
 export const Line = ({
   taskStatus,
-  isFinished
+  isFinished,
+  currentTaskCompleteness
 }: {
   taskStatus: TaskStatus;
   currentTaskCompleteness: number;
@@ -58,9 +59,17 @@ export const Line = ({
         }}
       >
         <div
+          className="bg-text flex-grow"
+          style={{
+            width: `${currentTaskCompleteness}%`,
+            height: 1,
+            transition: 'width 0.2s'
+          }}
+        />
+        <div
           className="bg-secondary flex-grow "
           style={{
-            width: '100%',
+            width: `${100 - currentTaskCompleteness}%`,
             height: 1,
             transition: 'width 0.2s'
           }}
