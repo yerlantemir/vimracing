@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, Sun } from './icons';
+import { GithubIcon, SunIcon } from './icons';
 import { useRouter } from 'next/navigation';
+import { MoonIcon } from './icons/MoonIcon';
 
 export const Header = ({
   currentTheme,
@@ -34,20 +35,20 @@ export const Header = ({
 
       <div className="flex items-center gap-4 text-text">
         {currentTheme === 'dark' ? (
-          <Sun
+          <SunIcon
             className={iconClassNames}
             tabIndex={0}
             onClick={() => onThemeChange('light')}
           />
         ) : (
-          <Sun
+          <MoonIcon
             className={iconClassNames}
             tabIndex={0}
             onClick={() => onThemeChange('dark')}
           />
         )}
         <a href="https://github.com/yerlantemir/vimracing" target="_blank">
-          <Github className={iconClassNames} tabIndex={0} />
+          <GithubIcon className={iconClassNames} tabIndex={0} />
         </a>
       </div>
     </div>

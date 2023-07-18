@@ -1,6 +1,6 @@
 import { SVGProps } from 'react';
 
-export const Sun = (props: SVGProps<SVGSVGElement>) => {
+export const SunIcon = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
       width="32"

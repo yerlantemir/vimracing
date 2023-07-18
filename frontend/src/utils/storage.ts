@@ -1,7 +1,11 @@
 'use client';
+
+import { Theme } from '@/types/Theme';
+
 export enum CacheStorageKey {
   User = 'user',
-  HostToken = 'hostToken'
+  HostToken = 'hostToken',
+  Theme = 'theme'
 }
 
 export class LocalStorageManager {
@@ -37,5 +41,15 @@ export class LocalStorageManager {
     if (!token) return null;
     const [raceId, hostToken] = token.split('DELIMETER');
     return { raceId, hostToken };
+  }
+
+  public static setTheme(theme: Theme) {
+    localStorage.setItem(CacheStorageKey.Theme, theme);
+  }
+
+  public static getTheme(): Theme {
+    const theme = localStorage.getItem(CacheStorageKey.Theme);
+    if (!theme) return 'dark';
+    return theme as Theme;
   }
 }

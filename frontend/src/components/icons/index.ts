@@ -1,4 +1,5 @@
-export * from './Github';
-export * from './Sun';
+export * from './GithubIcon';
+export * from './SunIcon';
 export * from './ArrowBackIcon';
+export * from './RefreshIcon';
 export * from './RefreshIcon';
