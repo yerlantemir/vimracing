@@ -92,6 +92,12 @@ export default function Home() {
     setExecutedCommands([]);
   };
 
+  const languageSelect = (lang: SupportedLanguages) => {
+    if (lang === selectedLang || createRaceLoading) return;
+    setSelectedLang(lang as SupportedLanguages);
+    setDocumentIndex(0);
+  };
+
   return (
     <>
       <div
@@ -104,10 +110,7 @@ export default function Home() {
             className={`${
               a === selectedLang ? 'text-primary' : ''
             } cursor-pointer transition duration-300 hover:text-primary hover:opacity-80`}
-            onClick={() => {
-              if (a === selectedLang || createRaceLoading) return;
-              setSelectedLang(a as SupportedLanguages);
-            }}
+            onClick={() => languageSelect(a as SupportedLanguages)}
           >
             {a}
           </p>
