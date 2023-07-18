@@ -3,6 +3,7 @@ import { Player } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
 import { generateRaceDocs } from './raceDocsGenerator';
+import { calculateDocCompleteness } from '../utils/calculateDocCompleteness';
 
 const DEFAULT_WAITING_TIME_IN_S = 3;
 const DEFAULT_RACE_TIME_IN_S = 60;
@@ -90,10 +91,15 @@ export class Race {
     if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
+
     player.updateDoc(
       newDoc,
       documentIndex,
-      this.getDocCompleteness(newDoc, documentIndex)
+      calculateDocCompleteness(
+        this.raceDocs[documentIndex].start,
+        this.raceDocs[documentIndex].target,
+        newDoc
+      )
     );
 
     this.emit('playerDataChanged', player);
@@ -132,16 +138,6 @@ export class Race {
 
   public getTimer() {
     return this.timer;
-  }
-
-  public getDocCompleteness(doc: string[], docIndex: number): number {
-    const targetDoc = this.raceDocs[docIndex].target;
-    let completeness = 0;
-    for (let i = 0; i < doc.length; i++) {
-      if (doc[i] === targetDoc[i]) completeness++;
-    }
-    const completenessPercentage = (completeness / targetDoc.length) * 100;
-    return Math.round(completenessPercentage);
   }
 
   public getRaceStatus() {
