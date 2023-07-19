@@ -1,7 +1,7 @@
 import { SupportedLanguages } from '@vimracing/shared';
 import axios from 'axios';
 
-export const createRace = async (lang: SupportedLanguages.js) => {
+export const createRace = async (lang: SupportedLanguages) => {
   const createResponse = await axios.post(
     `${process.env.NEXT_PUBLIC_BACKEND_API_URL}/race/create/?lang=${lang}`
   );

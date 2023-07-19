@@ -8,8 +8,9 @@ import { Theme } from '@/types/Theme';
 import { LocalStorageManager } from '@/utils/storage';
 
 export const Layout = ({ children }: HTMLAttributes<HTMLElement>) => {
-  const [theme, setTheme] = useState<Theme>(LocalStorageManager.getTheme());
-
+  const [theme, setTheme] = useState<Theme>(
+    typeof window === 'undefined' ? 'light' : LocalStorageManager.getTheme()
+  );
   useEffect(() => {
     LocalStorageManager.setTheme(theme);
   }, [theme]);

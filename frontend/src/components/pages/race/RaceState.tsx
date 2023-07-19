@@ -128,7 +128,7 @@ export const RaceState: React.FC<RaceStateProps> = ({
           />
         </>
       )}
-      {isRaceFinished && players && (
+      {isRaceFinished && currentPlayer && players && (
         <Recap players={[...players, currentPlayer]} raceDocs={raceDocs} />
       )}
     </>

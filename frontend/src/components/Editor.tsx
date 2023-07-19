@@ -19,8 +19,9 @@ import {
 import { vim } from '@replit/codemirror-vim';
 import { javascript } from '@codemirror/lang-javascript';
 import { DirectMergeConfig, unifiedMergeView } from '@codemirror/merge';
-import { Theme, ThemeContext } from './context/ThemeContext';
+import { ThemeContext } from './context/ThemeContext';
 import { useContext, useEffect, useRef } from 'react';
+import { Theme } from '@/types/Theme';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange?: (doc: string[]) => void;
