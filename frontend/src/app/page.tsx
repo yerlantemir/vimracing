@@ -13,12 +13,11 @@ import { ExecutedCommand, SupportedLanguages } from '@vimracing/shared';
 import { TrainingRecap } from '@/components/pages/race/Recap';
 import { RefreshIcon } from '@/components/icons';
 import { LoadingIcon } from '@/components/Loading';
-
-type RaceData = { start: []; target: [] }[];
+import { RaceDocs } from '@vimracing/shared';
 
 export default function Home() {
   const router = useRouter();
-  const [recapRaceData, setRecapRaceData] = useState<RaceData | null>(null);
+  const [recapRaceData, setRecapRaceData] = useState<RaceDocs | null>(null);
   const [createRaceLoading, setCreateRaceLoading] = useState(false);
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
     []
@@ -27,7 +26,6 @@ export default function Home() {
     SupportedLanguages.js
   );
   const [documentIndex, setDocumentIndex] = useState<number>(0);
-  const editorParentElement = useRef<HTMLDivElement | null>(null);
   const { raceData } = useTraining({
     selectedLang,
     isShowingRecap: !!recapRaceData
@@ -36,7 +34,7 @@ export default function Home() {
   const onCreateRaceClick = async () => {
     try {
       setCreateRaceLoading(true);
-      const response = await createRace();
+      const response = await createRace(selectedLang);
       if (!response) return;
 
       const { hostToken, raceId } = response;

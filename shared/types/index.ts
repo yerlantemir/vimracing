@@ -13,6 +13,8 @@ Backend Event Types:
 6. RaceFinish 
 */
 
+export type RaceDocs = { start: []; target: [] }[];
+
 export type ExecutedCommand = {
   isFailed: boolean;
   command: string;
@@ -82,10 +84,7 @@ export interface BackendRaceInitEvent {
     you: Player;
     players: Player[];
     raceStatus: RaceStatus;
-    raceDocs: {
-      start: string[];
-      target: string[];
-    }[];
+    raceDocs: RaceDocs;
     timerInSeconds: number;
   };
 }
@@ -105,10 +104,7 @@ export interface BackendRaceTimerUpdateEvent {
 export interface BackendRaceStartEvent {
   event: BackendEventType.RACE_START;
   payload: {
-    raceDocs: {
-      start: string[];
-      target: string[];
-    }[];
+    raceDocs: RaceDocs;
   };
 }
 export interface BackendPlayerDataChangeEvent {

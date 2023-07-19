@@ -1,8 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
-import { SupportedLanguages } from '@vimracing/shared';
+import { RaceDocs, SupportedLanguages } from '@vimracing/shared';
 import { getTrainingRace } from '@/api/getTrainingRace';
-
-type RaceData = { start: []; target: [] }[];
 
 export const useTraining = ({
   selectedLang,
@@ -10,19 +8,19 @@ export const useTraining = ({
 }: {
   selectedLang: SupportedLanguages;
   isShowingRecap: boolean;
-}): { raceData: RaceData | null } => {
+}): { raceData: RaceDocs | null } => {
   const [internalSelectedLang, setInternalSelectedLang] =
     useState<SupportedLanguages>(selectedLang);
   const [cache, setCache] = useState<
-    Record<SupportedLanguages, RaceData | null>
+    Record<SupportedLanguages, RaceDocs | null>
   >(
     Object.keys(SupportedLanguages).reduce((acc, lang) => {
       acc[lang as SupportedLanguages] = null;
       return acc;
-    }, {} as Record<SupportedLanguages, RaceData | null>)
+    }, {} as Record<SupportedLanguages, RaceDocs | null>)
   );
 
-  const [currentRaceData, setCurrentRaceData] = useState<RaceData | null>(null);
+  const [currentRaceData, setCurrentRaceData] = useState<RaceDocs | null>(null);
 
   useEffect(() => {
     const emptyLangs = Object.keys(cache).filter((lang) => {
