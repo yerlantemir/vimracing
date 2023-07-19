@@ -43,8 +43,7 @@ export enum RaceStatus {
 export enum FrontendEventType {
   HOST_RACE_START_CLICK = 'HostRaceStartClick',
   DOCUMENT_CHANGE = 'DocumentChange',
-  USERNAME_CHANGE = 'UsernameChange',
-  RACE_FINISH = 'RaceFinish'
+  USERNAME_CHANGE = 'UsernameChange'
 }
 
 export enum BackendEventType {
@@ -60,18 +59,13 @@ export interface FrontendRaceHostStartEvent {
   event: FrontendEventType.HOST_RACE_START_CLICK;
   payload: { hostToken: string };
 }
-export interface FrontendRaceFinishEvent {
-  event: FrontendEventType.RACE_FINISH;
-  payload: {
-    executedCommands: ExecutedCommand[][];
-  };
-}
 
 export interface FrontendDocumentChangeEvent {
   event: FrontendEventType.DOCUMENT_CHANGE;
   payload: {
     docIndex: number;
     newDocument: string[];
+    executedCommands?: ExecutedCommand[];
   };
 }
 
