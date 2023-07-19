@@ -87,35 +87,35 @@ export class Race {
     return this.players;
   }
 
-  public changeDoc(playerId: string, documentIndex: number, newDoc: string[]) {
-    if (this.status !== RaceStatus.ON) return;
-    const player = this.getPlayer(playerId);
-    if (!player) return;
-
-    player.updateDoc(
-      newDoc,
-      documentIndex,
-      calculateDocCompleteness(
-        this.raceDocs[documentIndex].start,
-        this.raceDocs[documentIndex].target,
-        newDoc
-      )
-    );
-
-    this.emit('playerDataChanged', player);
-  }
-
-  public finishPlayerRace(
+  public changeDoc(
     playerId: string,
-    executedCommands: ExecutedCommand[][]
+    documentIndex: number,
+    newDoc: string[],
+    executedCommands?: ExecutedCommand[]
   ) {
     if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
     if (!player) return;
-    const raceFinished = player.finishRace(
-      executedCommands,
-      this.getFinishedPlayersCount() + 1
+
+    const docCompleteness = calculateDocCompleteness(
+      this.raceDocs[documentIndex].start,
+      this.raceDocs[documentIndex].target,
+      newDoc
     );
+    player.updateDoc(newDoc, documentIndex, docCompleteness, executedCommands);
+
+    if (docCompleteness === 100 && documentIndex === this.raceDocs.length - 1) {
+      this.finishPlayerRace(playerId);
+    }
+
+    this.emit('playerDataChanged', player);
+  }
+
+  public finishPlayerRace(playerId: string) {
+    const player = this.getPlayer(playerId);
+    if (!player) return;
+
+    const raceFinished = player.finishRace(this.getFinishedPlayersCount() + 1);
 
     if (raceFinished) this.emit('playerDataChanged', player);
   }
@@ -171,10 +171,11 @@ export class Race {
       if (player.raceData?.place) return player;
       const place =
         notFinishedPlayers.findIndex((p) => p.id === player.id) + startPlace;
-      return {
-        ...player,
-        raceData: { ...player.raceData, place, isFinished: true }
-      } as Player;
+      return new Player(player.id, player.username, {
+        ...player.raceData,
+        place,
+        isFinished: true
+      });
     });
     this.players = finishedPlayers;
   }

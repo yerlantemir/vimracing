@@ -6,17 +6,17 @@ export class Player implements PlayerType {
   raceData?: {
     completeness?: number;
     currentDocIndex?: number;
-    docs?: string[][];
+    docs?: string[][]; // TODO: probably should be deleted
     place?: number;
     executedCommands?: ExecutedCommand[][];
     isFinished?: boolean;
   };
 
-  constructor(id: string, username: string) {
+  constructor(id: string, username: string, raceData?: PlayerType['raceData']) {
     this.id = id;
 
     this.username = username;
-    this.raceData = {
+    this.raceData = raceData ?? {
       completeness: 0,
       currentDocIndex: 0,
       docs: [],
@@ -24,8 +24,14 @@ export class Player implements PlayerType {
     };
   }
 
-  updateDoc(newDoc: string[], docIndex: number, newCompleteness: number) {
+  updateDoc(
+    newDoc: string[],
+    docIndex: number,
+    newCompleteness: number,
+    executedCommands?: ExecutedCommand[] // send only when docIndex is changed
+  ) {
     let newDocs = [];
+    // update existing one
     if (this.raceData?.docs?.[docIndex]) {
       newDocs = this.raceData.docs.map((doc, index) => {
         if (index === docIndex) {
@@ -36,36 +42,32 @@ export class Player implements PlayerType {
     } else {
       newDocs = [...(this.raceData?.docs ?? []), newDoc];
     }
+    console.log(executedCommands, this.raceData?.executedCommands);
+
     if (this.raceData) {
       this.raceData = {
         ...this.raceData,
         docs: newDocs,
+        ...(executedCommands && {
+          executedCommands: this.raceData.executedCommands
+            ? [...this.raceData.executedCommands, executedCommands]
+            : [executedCommands]
+        }),
         completeness: newCompleteness,
         currentDocIndex: docIndex
       };
     }
   }
 
-  finishRace(executedCommands: ExecutedCommand[][], place: number) {
-    if (!this._canFinishRace()) return false;
-
+  finishRace(place: number) {
     if (this.raceData) {
       this.raceData = {
         ...this.raceData,
-        executedCommands,
         isFinished: true,
         place
       };
-      return true;
     }
-  }
-
-  _canFinishRace(): boolean {
-    if (!this.raceData || !this.raceData.docs) return false;
-
-    const { currentDocIndex, docs, completeness } = this.raceData;
-
-    return currentDocIndex === docs?.length - 1 && completeness === 100;
+    return true;
   }
 
   updateUsername(newUsername: string) {
