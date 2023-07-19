@@ -2,10 +2,9 @@ import { Octokit } from 'octokit';
 import fs from 'fs';
 import tar from 'tar';
 import glob from 'glob';
-import path from 'path';
+import path, { dirname } from 'path';
 
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,28 +15,175 @@ const GITHUB_TOKEN = args[0];
 const REPO_LANG = args[1] || 'js';
 const REPO_OWNER = args[2] || 'metarhia';
 const REPO_NAME = args[3] || 'impress';
+const BRANCH_NAME = args[4] || 'master';
 
 const MAX_DOCUMENTS_COUNT = 50;
 const MIN_SYMBOLS_COUNT = 20;
-// 5 - one line, 3 - two line, 2 - three line snippets
-const ONE_LINER_COUNT = 5;
-const TWO_LINER_COUNT = 3;
-const THREE_LINER_COUNT = 2;
+const MISTAKES_TO_SNIPPETS_COUNT_MAPPING = {
+  1: 5,
+  2: 3,
+  3: 2
+};
 
 const FILENAME = path.join(__dirname, './bin/js.tar');
 
-const octokit = new Octokit({
-  auth: GITHUB_TOKEN
-});
+// ===================MAIN CALL===================
+main();
+// ===============================================
 
-const popRandomElement = (array) => {
+async function main() {
+  const octokit = new Octokit({
+    auth: GITHUB_TOKEN
+  });
+  if (!fs.existsSync(path.join(__dirname, './bin')))
+    fs.mkdirSync(path.join(__dirname, './bin'));
+  if (!fs.existsSync(`./racesData`)) fs.mkdirSync(`./racesData`);
+  if (!fs.existsSync(`./racesData/${REPO_LANG}`))
+    fs.mkdirSync(`./racesData/${REPO_LANG}`);
+
+  try {
+    const { data } = await octokit.rest.repos.downloadTarballArchive({
+      owner: REPO_OWNER,
+      repo: REPO_NAME,
+      ref: BRANCH_NAME
+    });
+
+    fs.writeFileSync(FILENAME, Buffer.from(data));
+
+    // Unzip the tar file
+    await tar.x({ file: FILENAME, C: path.join(__dirname, './bin') });
+
+    glob(
+      path.join(__dirname, `./bin/${REPO_OWNER}*/**/*.${REPO_LANG}`),
+      (err, files) => {
+        if (err) {
+          console.log(err, 'ERROR');
+          return;
+        }
+
+        const results = Object.keys(MISTAKES_TO_SNIPPETS_COUNT_MAPPING).reduce(
+          (acc, key) => {
+            acc[key] = [];
+            return acc;
+          },
+          {}
+        );
+        files.forEach((filePath) => {
+          collectSnippetsFromFile(filePath, results);
+        });
+
+        let docIndex = 0;
+        while (
+          Object.keys(results).every(
+            (key) =>
+              results[key].length > MISTAKES_TO_SNIPPETS_COUNT_MAPPING[key]
+          ) &&
+          docIndex < MAX_DOCUMENTS_COUNT
+        ) {
+          let currentRaceDoc = [];
+
+          Object.keys(MISTAKES_TO_SNIPPETS_COUNT_MAPPING).forEach(
+            (mistakesCount) => {
+              const snippetCount =
+                MISTAKES_TO_SNIPPETS_COUNT_MAPPING[mistakesCount];
+              for (let i = 0; i < snippetCount; i++) {
+                const poppedItem = popRandomElement(results[mistakesCount]);
+                if (!poppedItem) return;
+                currentRaceDoc.push(poppedItem);
+              }
+            }
+          );
+
+          fs.writeFileSync(
+            `./racesData/${REPO_LANG}/${docIndex}.json`,
+            JSON.stringify(currentRaceDoc, null, 2)
+          );
+
+          docIndex++;
+        }
+
+        fs.rmdirSync(path.join(__dirname, 'bin'), { recursive: true });
+      }
+    );
+  } catch (err) {
+    fs.rmdirSync(path.join(__dirname, 'bin'), { recursive: true });
+    console.log(err, 'ERROR');
+  }
+}
+
+function popRandomElement(array) {
   const randomIndex = Math.floor(Math.random() * array.length);
   const randomElement = array[randomIndex];
   array.splice(randomIndex, 1);
   return randomElement;
-};
+}
 
-const introduceSyntaxErrors = (code, mistakesCount) => {
+function collectSnippetsFromFile(filePath, results) {
+  const fileBuffer = fs.readFileSync(filePath);
+  const fileLinesList = fileBuffer
+    .toString()
+    .split('\n')
+    .map((a) => a.trim());
+
+  let currentLineIndex = 0;
+  const absoluteFilePath = getAbsoluteFilePath(filePath);
+
+  const linesCount = Object.keys(MISTAKES_TO_SNIPPETS_COUNT_MAPPING);
+  for (let i = 0; i < linesCount.length; i++) {
+    const mistakesCount = linesCount[i];
+    const snippetCount = MISTAKES_TO_SNIPPETS_COUNT_MAPPING[mistakesCount];
+
+    const processedLines = processLines(
+      fileLinesList,
+      currentLineIndex,
+      mistakesCount,
+      snippetCount,
+      absoluteFilePath
+    );
+    results[mistakesCount] = results[mistakesCount].concat(processedLines);
+    currentLineIndex += snippetCount;
+  }
+
+  return results;
+}
+
+function processLines(
+  fileLinesList,
+  startingIndex,
+  mistakesCount,
+  snippetCount,
+  absoluteFilePath
+) {
+  const result = [];
+
+  for (let i = 0; i < snippetCount; i++) {
+    const line = fileLinesList[startingIndex + i];
+    if (!line || line.length < MIN_SYMBOLS_COUNT) {
+      continue;
+    }
+
+    result.push({
+      target: [line],
+      start: introduceSyntaxErrors(line, mistakesCount),
+      source: getSourceCodeLink(absoluteFilePath, startingIndex + i + 1)
+    });
+  }
+  return result;
+}
+
+function getSourceCodeLink(filePath, lineNumber) {
+  return `https://github.com/${REPO_OWNER}/${REPO_NAME}/blob/${BRANCH_NAME}/${filePath}#L${lineNumber}`;
+}
+
+function getAbsoluteFilePath(relativePath) {
+  const paths = relativePath.split('/');
+  const rootDirPathIndex = paths.findIndex(
+    (path) => path.includes(REPO_NAME) && path.includes(REPO_OWNER)
+  );
+  return paths.slice(rootDirPathIndex + 1).join('/');
+}
+
+function introduceSyntaxErrors(code, mistakesCount) {
   const operations = ['add', 'delete', 'replace'];
   let newCode = code.split('');
   const numErrors = mistakesCount;
@@ -73,112 +219,4 @@ const introduceSyntaxErrors = (code, mistakesCount) => {
   }
 
   return newCode.join('');
-};
-
-const collectSnippetsFromFileLinesList = (fileLinesList, results) => {
-  let currentLineIndex = 0;
-  // one liner
-  function processLines(mistakesCount, snippetCount) {
-    for (let i = 0; i < snippetCount; i++) {
-      let lines = [];
-      if (currentLineIndex >= fileLinesList.length) {
-        return; // If out of bounds, return from the function, ending both loops
-      }
-      lines.push(fileLinesList[currentLineIndex]);
-
-      results[mistakesCount].push({
-        target: lines.map((a) => a),
-        start: lines.map((a) => introduceSyntaxErrors(a, mistakesCount))
-      });
-
-      currentLineIndex++;
-    }
-  }
-
-  processLines(1, ONE_LINER_COUNT);
-  processLines(2, TWO_LINER_COUNT);
-  processLines(3, THREE_LINER_COUNT);
-
-  return results;
-};
-
-(async function () {
-  if (!fs.existsSync(path.join(__dirname, './bin')))
-    fs.mkdirSync(path.join(__dirname, './bin'));
-  if (!fs.existsSync(`./racesData`)) fs.mkdirSync(`./racesData`);
-  if (!fs.existsSync(`./racesData/${REPO_LANG}`))
-    fs.mkdirSync(`./racesData/${REPO_LANG}`);
-
-  try {
-    const { data } = await octokit.rest.repos.downloadTarballArchive({
-      owner: REPO_OWNER,
-      repo: REPO_NAME,
-      ref: '' // leave blank for the latest commit of the main branch
-    });
-
-    fs.writeFileSync(FILENAME, Buffer.from(data));
-
-    // Unzip the tar file
-    await tar.x({ file: FILENAME, C: path.join(__dirname, './bin') });
-
-    glob(
-      path.join(__dirname, `./bin/${REPO_OWNER}*/**/*.${REPO_LANG}`),
-      (err, files) => {
-        if (err) {
-          console.log(err, 'ERROR');
-          return;
-        }
-
-        const results = { 1: [], 2: [], 3: [] };
-        files.forEach((file) => {
-          const fileBuffer = fs.readFileSync(file);
-          const fileString = fileBuffer
-            .toString()
-            .split('\n')
-            .filter((a) => a !== '' && a.length > MIN_SYMBOLS_COUNT)
-            .map((a) => a.trim());
-
-          collectSnippetsFromFileLinesList(fileString, results);
-        });
-
-        let docIndex = 0;
-        while (
-          results[1].length >= ONE_LINER_COUNT &&
-          results[2].length >= TWO_LINER_COUNT &&
-          results[3].length >= THREE_LINER_COUNT &&
-          docIndex < MAX_DOCUMENTS_COUNT
-        ) {
-          let currentRaceDoc = [];
-          for (let i = 0; i < ONE_LINER_COUNT; i++) {
-            const poppedItem = popRandomElement(results[1]);
-            if (!poppedItem) return;
-            currentRaceDoc.push(poppedItem);
-          }
-          for (let i = 0; i < TWO_LINER_COUNT; i++) {
-            const poppedItem = popRandomElement(results[2]);
-
-            if (!poppedItem) return;
-            currentRaceDoc.push(poppedItem);
-          }
-          for (let i = 0; i < THREE_LINER_COUNT; i++) {
-            const poppedItem = popRandomElement(results[3]);
-            if (!poppedItem) return;
-            currentRaceDoc.push(poppedItem);
-          }
-
-          fs.writeFileSync(
-            `./racesData/${REPO_LANG}/${docIndex}.json`,
-            JSON.stringify(currentRaceDoc, null, 2)
-          );
-
-          docIndex++;
-        }
-
-        fs.rmdirSync(path.join(__dirname, 'bin'), { recursive: true });
-      }
-    );
-  } catch (err) {
-    fs.rmdirSync(path.join(__dirname, 'bin'), { recursive: true });
-    console.log(err, 'ERROR');
-  }
-})();
+}
