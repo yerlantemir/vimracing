@@ -4,6 +4,7 @@ import WebSocket from 'ws';
 import cors from 'cors';
 import { WebSocketServer } from './race/WebSocketServer';
 import trainingRouter from './training/getTrainingRace';
+import { SupportedLanguages } from '@vimracing/shared';
 
 const app = express();
 
@@ -16,8 +17,12 @@ const raceSocketServer = new WebSocketServer(server);
 
 app.use('/race/training', trainingRouter);
 
-app.post('/race/create', (req, res) => {
-  const { raceId, hostToken } = raceSocketServer.createRace();
+app.post('/race/create', async (req, res) => {
+  const { lang = SupportedLanguages.js } = req.query;
+
+  const { raceId, hostToken } = await raceSocketServer.createRace(
+    lang as SupportedLanguages
+  );
   res.send({
     raceId,
     hostToken

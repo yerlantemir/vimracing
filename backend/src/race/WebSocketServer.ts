@@ -18,6 +18,7 @@ import {
 } from '@vimracing/shared';
 import { Player } from './Player';
 import { validateUsername } from '../utils/validateUsername';
+import { SupportedLanguages } from '@vimracing/shared';
 
 export class WebSocketServer {
   private server: WebSocket.Server;
@@ -99,10 +100,11 @@ export class WebSocketServer {
     }
   }
 
-  createRace() {
+  async createRace(lang: SupportedLanguages) {
     const newRaceId = uuid();
     const hostToken = uuid();
     const newRace = new Race(newRaceId, hostToken);
+    await newRace.init(lang);
 
     // listen for all events
     newRace.on('raceStarted', this.onRaceStart.bind(this));

@@ -42,7 +42,6 @@ export class Player implements PlayerType {
     } else {
       newDocs = [...(this.raceData?.docs ?? []), newDoc];
     }
-    console.log(executedCommands, this.raceData?.executedCommands);
 
     if (this.raceData) {
       this.raceData = {

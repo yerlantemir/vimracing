@@ -2,8 +2,10 @@ import { ExecutedCommand, RaceStatus } from '@vimracing/shared';
 import { Player } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
-import { generateRaceDocs } from './raceDocsGenerator';
 import { calculateDocCompleteness } from '../utils/calculateDocCompleteness';
+import { getRandomRaceData } from '../utils/getRandomRaceData';
+import { RaceDocs } from '@vimracing/shared';
+import { SupportedLanguages } from '@vimracing/shared';
 
 const DEFAULT_WAITING_TIME_IN_S = 3;
 const DEFAULT_RACE_TIME_IN_S = 60;
@@ -25,12 +27,11 @@ export class Race {
   private status: RaceStatus = RaceStatus.WAITING;
   private timer: number = DEFAULT_WAITING_TIME_IN_S;
   private players: Player[] = [];
-  private raceDocs: {
-    start: string[];
-    target: string[];
-  }[];
-  constructor(public id: string, public hostToken: string) {
-    this.raceDocs = generateRaceDocs();
+  private raceDocs: RaceDocs = [];
+  constructor(public id: string, public hostToken: string) {}
+
+  async init(lang: SupportedLanguages) {
+    this.raceDocs = await getRandomRaceData(lang);
   }
 
   addPlayer(player: Player) {
