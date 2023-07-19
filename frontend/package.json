@@ -24,6 +24,7 @@
     "@vimracing/shared": "*",
     "autoprefixer": "^10.4.14",
     "axios": "^1.4.0",
+    "cm6-theme-basic-light": "^0.2.0",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
     "framer-motion": "^10.12.16",
