@@ -6,18 +6,13 @@ import { AnimatePresence } from 'framer-motion';
 import { ExecutedCommand } from '@vimracing/shared';
 
 interface IHotkeysProps {
-  onExecutedCommandsChangeCallback?: (
-    ExecutedCommands: ExecutedCommand[]
-  ) => void;
+  setExecutedCommands?: (ExecutedCommands: ExecutedCommand[]) => void;
   executedCommands?: ExecutedCommand[];
 }
 export const Hotkeys: React.FC<IHotkeysProps> = ({
-  onExecutedCommandsChangeCallback,
-  executedCommands: executedCommandsProp
+  setExecutedCommands,
+  executedCommands = []
 }) => {
-  const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[]>(
-    executedCommandsProp ?? []
-  );
   const [currentCommand, setCurrentCommand] = useState('');
   const [partialCommandExecuted, setPartialCommandExecuted] = useState(false);
   const lastPressedKey = useRef('');
@@ -95,7 +90,7 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
         setCurrentCommand('');
       }
       if (newExecutedCommand) {
-        setExecutedCommands([...executedCommands, newExecutedCommand]);
+        setExecutedCommands?.([...executedCommands, newExecutedCommand]);
       }
     };
     window.addEventListener('vimracing-command-done', onVimCommandDone);
@@ -106,7 +101,8 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
     currentCommand,
     executedCommands,
     lastPressedKey,
-    partialCommandExecuted
+    partialCommandExecuted,
+    setExecutedCommands
   ]);
 
   useEffect(() => {
@@ -118,7 +114,7 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
       lastLastCommand &&
       lastCommand.command === lastLastCommand.command
     ) {
-      setExecutedCommands([
+      setExecutedCommands?.([
         ...executedCommands.slice(0, executedCommands.length - 2),
         {
           ...lastLastCommand,
@@ -126,21 +122,8 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
         }
       ]);
     }
-  }, [executedCommands]);
+  }, [executedCommands, setExecutedCommands]);
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    if (!mounted) {
-      setMounted(true);
-      return;
-    }
-
-    onExecutedCommandsChangeCallback?.(executedCommands);
-  }, [executedCommands, mounted, onExecutedCommandsChangeCallback]);
-
-  useEffect(() => {
-    if (executedCommandsProp) setExecutedCommands(executedCommandsProp);
-  }, [executedCommandsProp]);
   const allCommands = currentCommand
     ? [
         ...executedCommands,
@@ -151,6 +134,7 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
         }
       ]
     : executedCommands;
+
   return (
     <div className="flex gap-3 flex-wrap">
       <AnimatePresence>

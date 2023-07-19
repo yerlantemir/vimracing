@@ -1,5 +1,5 @@
 import { Editor, isTextEqual } from '@/components/Editor';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Players } from './Players';
 import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
 import { Hotkeys } from './Hotkeys/Hotkeys';
@@ -9,8 +9,11 @@ import { getPostfixedPlace } from '@/utils/postfix';
 
 interface RaceStateProps {
   raceDocs: { start: string[]; target: string[] }[];
-  onDocChange: (newDoc: string[], documentIndex: number) => void;
-  onRaceFinish: (executedCommands: ExecutedCommand[][]) => void;
+  onDocChange: (
+    newDoc: string[],
+    documentIndex: number,
+    executedCommands?: ExecutedCommand[]
+  ) => void;
   players?: Player[];
   currentPlayer?: Player;
   raceTimer: number;
@@ -22,13 +25,12 @@ export const RaceState: React.FC<RaceStateProps> = ({
   onDocChange,
   players,
   currentPlayer,
-  onRaceFinish,
   raceTimer,
   raceStatus
 }) => {
-  const [raceExecutedCommands, setRaceExecutedCommands] = useState<
-    ExecutedCommand[][]
-  >(currentPlayer?.raceData?.executedCommands ?? []);
+  const [docExecutedCommands, setDocExecutedCommands] = useState<
+    ExecutedCommand[]
+  >([]);
   const [documentIndex, setDocumentIndex] = useState(
     currentPlayer?.raceData?.currentDocIndex ?? 0
   );
@@ -39,56 +41,46 @@ export const RaceState: React.FC<RaceStateProps> = ({
 
   const onCurrentDocumentChange = useCallback(
     (newDoc: string[]) => {
-      const isFinished = isDocFinished(newDoc, raceDocs[documentIndex].target);
-      if (!isFinished) {
+      const isEditingCurrentDoc = !isDocFinished(
+        newDoc,
+        raceDocs[documentIndex].target
+      );
+      if (isEditingCurrentDoc) {
         onDocChange(newDoc, documentIndex);
         return;
       }
 
+      // current doc finished, move to next doc
       const isLastDocument = documentIndex === raceDocs.length - 1;
       setDocumentIndex(documentIndex + 1);
-      if (isLastDocument) {
-        onDocChange(newDoc, documentIndex);
-        setTimeout(() => {
-          setRaceExecutedCommands((prev) => {
-            onRaceFinish(prev);
-            return [];
-          });
-        }, 300);
-        return;
-      }
+      setDocExecutedCommands((prev) => {
+        console.log({ prev, documentIndex });
 
-      onDocChange(newDoc, documentIndex + 1);
-    },
-    [documentIndex, onDocChange, onRaceFinish, raceDocs]
-  );
-
-  const onExecutedCommandsChangeCallback = useCallback(
-    (executedCommands: ExecutedCommand[]) => {
-      setRaceExecutedCommands((prev) => {
-        if (documentIndex === prev.length - 1) {
-          return prev.map((commands, index) => {
-            if (index === documentIndex) {
-              return executedCommands;
-            }
-            return commands;
-          });
-        }
-        return [...prev, executedCommands];
+        onDocChange(
+          newDoc,
+          isLastDocument ? documentIndex : documentIndex + 1,
+          prev
+        );
+        return [];
       });
     },
-    [documentIndex]
+    [documentIndex, onDocChange, raceDocs]
   );
 
-  const isFinished =
-    documentIndex === raceDocs.length &&
-    currentPlayer?.raceData?.completeness === 100;
+  const isCurrentPlayerFinished = useMemo(
+    () =>
+      documentIndex === raceDocs.length &&
+      currentPlayer?.raceData?.completeness === 100,
+    [currentPlayer?.raceData?.completeness, documentIndex, raceDocs.length]
+  );
+
+  const isRaceFinished = useMemo(
+    () => raceStatus === RaceStatus.FINISHED || isCurrentPlayerFinished,
+    [isCurrentPlayerFinished, raceStatus]
+  );
 
   const renderHeader = () => {
-    if (
-      (raceStatus === RaceStatus.FINISHED || isFinished) &&
-      currentPlayer?.raceData?.place
-    ) {
+    if (isRaceFinished && currentPlayer?.raceData?.place) {
       return (
         <h5 className="text-text">
           You finished {getPostfixedPlace(currentPlayer.raceData.place)}
@@ -102,6 +94,7 @@ export const RaceState: React.FC<RaceStateProps> = ({
       </>
     );
   };
+
   return (
     <>
       <div className="flex justify-between">{renderHeader()}</div>
@@ -120,7 +113,7 @@ export const RaceState: React.FC<RaceStateProps> = ({
         />
       )}
 
-      {!isFinished && raceDocs && (
+      {!isRaceFinished && raceDocs && (
         <>
           {raceDocs && raceDocs[documentIndex] && (
             <Editor
@@ -129,12 +122,13 @@ export const RaceState: React.FC<RaceStateProps> = ({
             />
           )}
           <Hotkeys
-            onExecutedCommandsChangeCallback={onExecutedCommandsChangeCallback}
+            setExecutedCommands={setDocExecutedCommands}
+            executedCommands={docExecutedCommands}
             key={documentIndex}
           />
         </>
       )}
-      {isFinished && players && (
+      {isRaceFinished && players && (
         <Recap players={[...players, currentPlayer]} raceDocs={raceDocs} />
       )}
     </>

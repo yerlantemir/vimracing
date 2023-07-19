@@ -156,9 +156,8 @@ export default function Home() {
               )}
               <Hotkeys
                 key={documentIndex}
-                onExecutedCommandsChangeCallback={
-                  onExecutedCommandsChangeCallback
-                }
+                setExecutedCommands={onExecutedCommandsChangeCallback}
+                executedCommands={executedCommands[documentIndex] ?? []}
               />
             </>
           )}

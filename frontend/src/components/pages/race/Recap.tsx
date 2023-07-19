@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Editor } from '@/components/Editor';
 import { ExecutedCommand, Player } from '@vimracing/shared';
 import React from 'react';
@@ -61,6 +61,8 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
       )}
 
       {finishedPlayers.map((player) => {
+        if (!player.raceData?.executedCommands?.[currentRecapTaskIndex])
+          return null;
         return (
           <div key={player.id} className="flex items-center gap-4">
             <span className="text-text text-sm opacity-80">
@@ -68,7 +70,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
             </span>
             <Hotkeys
               executedCommands={
-                player.raceData?.executedCommands?.[currentRecapTaskIndex] ?? []
+                player.raceData?.executedCommands[currentRecapTaskIndex]
               }
             />
           </div>
