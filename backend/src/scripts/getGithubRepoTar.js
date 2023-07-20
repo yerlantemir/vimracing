@@ -20,9 +20,9 @@ const BRANCH_NAME = args[4] || 'master';
 const MAX_DOCUMENTS_COUNT = 50;
 const MIN_SYMBOLS_COUNT = 20;
 const MISTAKES_TO_SNIPPETS_COUNT_MAPPING = {
-  1: 5,
-  2: 3,
-  3: 2
+  1: 2,
+  2: 2,
+  3: 1
 };
 
 const FILENAME = path.join(__dirname, './bin/js.tar');
@@ -164,7 +164,7 @@ function processLines(
 
     result.push({
       target: [line],
-      start: introduceSyntaxErrors(line, mistakesCount),
+      start: [introduceSyntaxErrors(line, mistakesCount)],
       source: getSourceCodeLink(absoluteFilePath, startingIndex + i + 1)
     });
   }
