@@ -3,6 +3,7 @@ import { Editor } from '@/components/Editor';
 import { ExecutedCommand, Player } from '@vimracing/shared';
 import React from 'react';
 import { Hotkeys } from './Hotkeys/Hotkeys';
+import { RaceDocs } from '@vimracing/shared';
 
 interface IRecapProps {
   raceDocs: { start: string[]; target: string[] }[];
@@ -12,31 +13,43 @@ interface IRecapProps {
 const TasksList = ({
   racesCount,
   currentRecapTaskIndex,
-  onTaskClick
+  onTaskClick,
+  currentTaskSource
 }: {
   racesCount: number;
   currentRecapTaskIndex: number;
   onTaskClick: (taskIndex: number) => void;
+  currentTaskSource: string;
 }) => {
   return (
-    <div className="flex items-center gap-2">
-      {Array(racesCount)
-        .fill(0)
-        .map((_, index) => {
-          return (
-            <span
-              className={`p-2 text-sm cursor-pointer border rounded-md transition-all duration-300 ${
-                index === currentRecapTaskIndex
-                  ? 'text-text border border-primary'
-                  : 'opacity-80 text-text border-text'
-              }`}
-              key={index}
-              onClick={() => onTaskClick(index)}
-            >
-              task {index + 1}
-            </span>
-          );
-        })}
+    <div className="flex justify-between items-center">
+      <div className="flex items-center gap-2">
+        {Array(racesCount)
+          .fill(0)
+          .map((_, index) => {
+            return (
+              <span
+                className={`p-2 text-sm cursor-pointer border rounded-md transition-all duration-300 ${
+                  index === currentRecapTaskIndex
+                    ? 'text-text border border-primary'
+                    : 'opacity-80 text-text border-text'
+                }`}
+                key={index}
+                onClick={() => onTaskClick(index)}
+              >
+                task {index + 1}
+              </span>
+            );
+          })}
+      </div>
+
+      <a
+        href={currentTaskSource}
+        className="text-xs text-primary border-b border-primary"
+        target="_blank"
+      >
+        source
+      </a>
     </div>
   );
 };
@@ -55,6 +68,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
         racesCount={raceDocs.length}
         currentRecapTaskIndex={currentRecapTaskIndex}
         onTaskClick={setCurrentRecapTaskIndex}
+        currentTaskSource={raceDocs[currentRecapTaskIndex].source}
       />
       {raceDocs && raceDocs[currentRecapTaskIndex] && (
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
@@ -81,7 +95,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
 };
 
 interface ITrainingRecapProps {
-  raceDocs: { start: string[]; target: string[] }[];
+  raceDocs: RaceDocs;
   executedCommands: ExecutedCommand[][];
 }
 
@@ -97,7 +111,9 @@ export const TrainingRecap: React.FC<ITrainingRecapProps> = ({
         racesCount={raceDocs.length}
         currentRecapTaskIndex={currentRecapTaskIndex}
         onTaskClick={setCurrentRecapTaskIndex}
+        currentTaskSource={raceDocs[currentRecapTaskIndex].source}
       />
+
       {raceDocs && raceDocs[currentRecapTaskIndex] && (
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
       )}
