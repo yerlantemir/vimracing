@@ -1,39 +1,48 @@
 'use client';
 
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 import { HTMLAttributes, useEffect, useState } from 'react';
 import { ThemeContext } from './context/ThemeContext';
 import { Theme } from '@/types/Theme';
+import { Footer } from './Footer';
 import { LocalStorageManager } from '@/utils/storage';
 
-export const Layout = ({ children }: HTMLAttributes<HTMLElement>) => {
-  const [theme, setTheme] = useState<Theme>(
-    typeof window === 'undefined' ? 'light' : LocalStorageManager.getTheme()
-  );
+type Props = HTMLAttributes<HTMLElement>;
+export const ThemeLayout = ({ children }: Props) => {
+  const [currentTheme, setCurrentTheme] = useState<Theme>('dark');
+
+  const onThemeChange = (newTheme: Theme) => {
+    document.documentElement.setAttribute('data-theme', newTheme);
+    setCurrentTheme(newTheme);
+    LocalStorageManager.setTheme(newTheme);
+  };
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    LocalStorageManager.setTheme(theme);
-  }, [theme]);
+    if (!mounted) {
+      const theme = LocalStorageManager.getTheme();
+      if (theme) {
+        onThemeChange(theme);
+      }
+      setMounted(true);
+    }
+  }, [mounted]);
+
+  if (!mounted) return null;
 
   return (
-    <html lang="en" data-theme={theme}>
-      <ThemeContext.Provider value={{ theme }}>
-        <body className="bg-background text-text">
-          <div
-            className="grow relative"
-            style={{
-              maxWidth: '75rem'
-            }}
-          >
-            <Header
-              currentTheme={theme}
-              onThemeChange={(newTheme: Theme) => setTheme(newTheme)}
-            />
-            {children}
-            <Footer />
-          </div>
-        </body>
-      </ThemeContext.Provider>
-    </html>
+    <ThemeContext.Provider value={{ theme: currentTheme }}>
+      <div
+        className="grow relative"
+        style={{
+          maxWidth: '75rem'
+        }}
+      >
+        <Header currentTheme={currentTheme} onThemeChange={onThemeChange} />
+        {children}
+
+        <Footer />
+      </div>
+    </ThemeContext.Provider>
   );
 };

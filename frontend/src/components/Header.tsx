@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { GithubIcon, SunIcon } from './icons';
 import { useRouter } from 'next/navigation';
 import { MoonIcon } from './icons/MoonIcon';
+import { Theme } from '@/types/Theme';
 
 export const Header = ({
   currentTheme,
   onThemeChange
 }: {
-  onThemeChange: (newTheme: 'dark' | 'light') => void;
-  currentTheme: 'dark' | 'light';
+  onThemeChange: (newTheme: Theme) => void;
+  currentTheme: Theme;
 }) => {
   const router = useRouter();
   const onHeaderClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
