@@ -6,9 +6,10 @@ import { Hotkeys } from './Hotkeys/Hotkeys';
 import { Recap } from './Recap';
 import { Timer } from '@/components/Timer';
 import { getPostfixedPlace } from '@/utils/postfix';
+import { RaceDocs } from '@vimracing/shared';
 
 interface RaceStateProps {
-  raceDocs: { start: string[]; target: string[] }[];
+  raceDocs: RaceDocs;
   onDocChange: (
     newDoc: string[],
     documentIndex: number,

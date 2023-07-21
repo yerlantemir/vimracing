@@ -6,7 +6,7 @@ import { Hotkeys } from './Hotkeys/Hotkeys';
 import { RaceDocs } from '@vimracing/shared';
 
 interface IRecapProps {
-  raceDocs: { start: string[]; target: string[] }[];
+  raceDocs: RaceDocs;
   players: Player[];
 }
 

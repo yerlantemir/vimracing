@@ -1,4 +1,5 @@
 import { LocalStorageManager } from '@/utils/storage';
+import { RaceDocs } from '@vimracing/shared';
 import {
   FrontendUsernameChangeEvent,
   FrontendDocumentChangeEvent,
@@ -28,13 +29,7 @@ type BackendRaceEvent =
 export const useRace = (raceId: string) => {
   const socketConnection = useRef<WebSocket | undefined>();
 
-  const [raceDocs, setRaceDocs] = useState<
-    | {
-        start: string[];
-        target: string[];
-      }[]
-    | undefined
-  >(undefined);
+  const [raceDocs, setRaceDocs] = useState<RaceDocs | undefined>(undefined);
 
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
   const [players, setPlayers] = useState<Player[]>();
