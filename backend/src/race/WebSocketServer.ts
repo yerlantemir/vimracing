@@ -83,7 +83,11 @@ export class WebSocketServer {
     const { event, payload } = data;
     switch (event) {
       case FrontendEventType.HOST_RACE_START_CLICK:
-        if (payload.hostToken !== race.hostToken) return;
+        if (
+          payload.hostToken !== race.hostToken ||
+          race.getRaceStatus() !== RaceStatus.WAITING
+        )
+          return;
         race.start();
         break;
       case FrontendEventType.DOCUMENT_CHANGE:

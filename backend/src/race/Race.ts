@@ -96,7 +96,7 @@ export class Race {
   ) {
     if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
-    if (!player) return;
+    if (!player || !this.raceDocs[documentIndex]) return;
 
     const docCompleteness = calculateDocCompleteness(
       this.raceDocs[documentIndex].start,
