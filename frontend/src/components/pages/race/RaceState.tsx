@@ -70,9 +70,15 @@ export const RaceState: React.FC<RaceStateProps> = ({
 
   const isCurrentPlayerFinished = useMemo(
     () =>
-      documentIndex === raceDocs.length &&
-      currentPlayer?.raceData?.completeness === 100,
-    [currentPlayer?.raceData?.completeness, documentIndex, raceDocs.length]
+      (documentIndex === raceDocs.length &&
+        currentPlayer?.raceData?.completeness === 100) ||
+      currentPlayer?.raceData?.isFinished,
+    [
+      currentPlayer?.raceData?.completeness,
+      currentPlayer?.raceData?.isFinished,
+      documentIndex,
+      raceDocs.length
+    ]
   );
 
   const isRaceFinished = useMemo(
