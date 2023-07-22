@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Editor } from '@/components/Editor';
 import { ExecutedCommand, Player } from '@vimracing/shared';
 import React from 'react';
@@ -21,6 +21,24 @@ const TasksList = ({
   onTaskClick: (taskIndex: number) => void;
   currentTaskSource: string;
 }) => {
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      // use "l" and "j" to navigate between tasks
+      if (e.key === 'l') {
+        const newIndex = currentRecapTaskIndex + 1;
+        onTaskClick(newIndex >= racesCount ? 0 : newIndex);
+      }
+      if (e.key === 'h') {
+        const newIndex = currentRecapTaskIndex - 1;
+        onTaskClick(newIndex >= 0 ? newIndex : racesCount - 1);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [currentRecapTaskIndex, onTaskClick, racesCount]);
+
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
