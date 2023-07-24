@@ -37,25 +37,6 @@ background: '' */
 }
 
 /* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #282c34 #abb2bf;
-}
-
-/* Chrome, Edge, and Safari */
-*::-webkit-scrollbar {
-  width: 3px;
-}
-
-*::-webkit-scrollbar-track {
-  border-radius: 5px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background-color: #abb2bf;
-  border-radius: 14px;
-  border: 3px solid #abb2bf;
-}
 
 body {
   display: flex;
