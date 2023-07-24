@@ -26,13 +26,15 @@ import {
 import { ThemeContext } from './context/ThemeContext';
 import { useContext, useEffect, useRef } from 'react';
 import { Theme } from '@/types/Theme';
+import { RaceDocs } from '@vimracing/shared';
 
 type EditorConfig = Partial<DirectMergeConfig> & {
   onChange?: (doc: string[]) => void;
-  raceDoc: { start: string[]; target: string[] };
+  raceDoc: RaceDocs[number];
   readOnly?: boolean;
   theme: Theme;
 };
+
 const sharedExtension = (config?: EditorConfig) => [
   vim(),
   history(),
@@ -105,6 +107,7 @@ export const Editor: React.FC<
   const editorParentElement = useRef<HTMLDivElement | null>(null);
 
   const { theme } = useContext(ThemeContext);
+  const { shouldRenderVertically = false } = raceDoc;
   useEffect(() => {
     if (
       !editorParentElement.current ||
@@ -127,10 +130,22 @@ export const Editor: React.FC<
       (editor as MergeViewEditor).a.focus();
     }
 
+    // hack
+    if (shouldRenderVertically) {
+      editorParentElement.current
+        .querySelectorAll('.cm-mergeViewEditor')
+        .forEach((el) => {
+          el.setAttribute('style', 'flex-basis: auto');
+        });
+      editorParentElement.current
+        .querySelector('.cm-mergeViewEditors')
+        ?.setAttribute('style', 'flex-direction: column');
+    }
+
     return () => {
       editor.destroy();
     };
-  }, [onChange, raceDoc, readOnly, theme, unified]);
+  }, [onChange, raceDoc, readOnly, shouldRenderVertically, theme, unified]);
 
   return <div ref={editorParentElement} />;
 };

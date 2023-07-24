@@ -7,13 +7,16 @@ export default function TestPage() {
     <div>
       <Editor
         raceDoc={{
-          start: [
-            `static updateB(chunks: readonly Chunk[]) {`,
-            `  return updateChunks(findRangesForChange(chunks, changes, false, a.length), chunks, a, b)`,
+          target: [
+            `return upateChunks(findRangesForChange(chunks, changes, false, a.length), chunks, a, b)`,
             `}`
           ],
-          target: [`static updateB(chunks: readonly Chunk[]) {`, `}`]
+          start: [
+            `return updateChun(findRangesForChange(chunks, changes, false, a.length), chunks, a, b)`,
+            `}`
+          ]
         }}
+        unified={false}
       />
     </div>
   );

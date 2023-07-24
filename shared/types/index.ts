@@ -13,7 +13,12 @@ Backend Event Types:
 6. RaceFinish 
 */
 
-export type RaceDocs = { start: []; target: []; source: string }[];
+export type RaceDocs = {
+  start: [];
+  target: [];
+  source: string;
+  shouldRenderVertically?: boolean;
+}[];
 
 export type ExecutedCommand = {
   isFailed: boolean;
