@@ -21,11 +21,10 @@ const MAX_DOCUMENTS_COUNT = 50;
 const MIN_SYMBOLS_COUNT = 20;
 const MISTAKES_TO_SNIPPETS_COUNT_MAPPING = {
   1: 2,
-  2: 2,
-  3: 1
+  2: 1
 };
 
-const FILENAME = path.join(__dirname, './bin/js.tar');
+const FILENAME = path.join(__dirname, './bin/kek.tar');
 
 // ===================MAIN CALL===================
 main();
