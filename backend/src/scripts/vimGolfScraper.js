@@ -10,7 +10,7 @@ main();
 
 async function main() {
   const links = await getLinks();
-  for (let link of links.slice(links.length - 66)) {
+  for (let link of links) {
     console.log({ link });
     console.log('snippets left', links.length - links.indexOf(link));
     const snippets = await getSnippetsFromLink(link);
