@@ -17,7 +17,6 @@ export type RaceDocs = {
   start: [];
   target: [];
   source: string;
-  shouldRenderVertically?: boolean;
 }[];
 
 export type ExecutedCommand = {

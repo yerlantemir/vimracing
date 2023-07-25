@@ -13,7 +13,7 @@ background: '' */
     --color-secondary: #293141;
     --color-background: #282c34;
     --color-insert: #2c663a;
-    --color-delete: #8b0000;
+    --color-delete: #e06c75;
     --color-delete-background: #663a3a;
     --color-deleted-chunk: rgba(160, 128, 100, 0.08);
   }

@@ -24,7 +24,7 @@ import {
   MergeView
 } from '@codemirror/merge';
 import { ThemeContext } from './context/ThemeContext';
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { Theme } from '@/types/Theme';
 import { RaceDocs } from '@vimracing/shared';
 
@@ -34,6 +34,8 @@ type EditorConfig = Partial<DirectMergeConfig> & {
   readOnly?: boolean;
   theme: Theme;
 };
+
+const HORIZONTAL_CHARACTERS_LIMIT = 50;
 
 const sharedExtension = (config?: EditorConfig) => [
   vim(),
@@ -49,7 +51,8 @@ const sharedExtension = (config?: EditorConfig) => [
     if (v.docChanged) {
       config?.onChange?.(v.state.doc.toJSON());
     }
-  })
+  }),
+  EditorView.editable.of(!config?.readOnly)
 ];
 
 const createDefaultMergeViewConfig = (config?: EditorConfig) => ({
@@ -101,13 +104,22 @@ export const isTextEqual = (a: string[], b: string[]) => {
   return Text.of(a).eq(Text.of(b));
 };
 
-export const Editor: React.FC<
-  Omit<EditorConfig, 'parent' | 'theme'> & { unified?: boolean }
-> = ({ onChange, raceDoc, readOnly, unified = true }) => {
+export const Editor: React.FC<Omit<EditorConfig, 'parent' | 'theme'>> = ({
+  onChange,
+  raceDoc,
+  readOnly
+}) => {
   const editorParentElement = useRef<HTMLDivElement | null>(null);
 
   const { theme } = useContext(ThemeContext);
-  const { shouldRenderVertically = false } = raceDoc;
+
+  const shouldRenderVertically = useMemo(() => {
+    return (
+      raceDoc.start.some((line) => line.length > HORIZONTAL_CHARACTERS_LIMIT) ||
+      raceDoc.target.some((line) => line.length > HORIZONTAL_CHARACTERS_LIMIT)
+    );
+  }, [raceDoc.start, raceDoc.target]);
+
   useEffect(() => {
     if (
       !editorParentElement.current ||
@@ -121,11 +133,13 @@ export const Editor: React.FC<
       theme,
       readOnly
     };
-    const editor = unified
+
+    const shouldBeUnified = !raceDoc.source.includes('vimgolf');
+    const editor = shouldBeUnified
       ? new UnifiedMergeViewEditor(editorCreateConfig)
       : new MergeViewEditor(editorCreateConfig);
 
-    if (unified) (editor as UnifiedMergeViewEditor).focus();
+    if (shouldBeUnified) (editor as UnifiedMergeViewEditor).focus();
     else {
       (editor as MergeViewEditor).a.focus();
     }
@@ -134,18 +148,25 @@ export const Editor: React.FC<
     if (shouldRenderVertically) {
       editorParentElement.current
         .querySelectorAll('.cm-mergeViewEditor')
-        .forEach((el) => {
-          el.setAttribute('style', 'flex-basis: auto');
+        .forEach((el, index) => {
+          if (index === 0) {
+            el.setAttribute(
+              'style',
+              'flex-basis: auto; border-top: 1px solid var(--color-text)'
+            );
+          } else {
+            el.setAttribute('style', 'flex-basis: auto');
+          }
         });
       editorParentElement.current
         .querySelector('.cm-mergeViewEditors')
-        ?.setAttribute('style', 'flex-direction: column');
+        ?.setAttribute('style', 'flex-direction: column-reverse');
     }
 
     return () => {
       editor.destroy();
     };
-  }, [onChange, raceDoc, readOnly, shouldRenderVertically, theme, unified]);
+  }, [onChange, raceDoc, readOnly, shouldRenderVertically, theme]);
 
   return <div ref={editorParentElement} />;
 };
