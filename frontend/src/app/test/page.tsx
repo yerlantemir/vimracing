@@ -7,16 +7,10 @@ export default function TestPage() {
     <div>
       <Editor
         raceDoc={{
-          target: [
-            `return upateChunks(findRangesForChange(chunks, changes, false, a.length), chunks, a, b)`,
-            `}`
-          ],
-          start: [
-            `return updateChun(findRangesForChange(chunks, changes, false, a.length), chunks, a, b)`,
-            `}`
-          ]
+          start: ['abcdefghijklmnopqrstuvwxyz', ''],
+          target: ['zyxwvutsrqponmlkjihgfedcba', ''],
+          source: 'kek'
         }}
-        unified={false}
       />
     </div>
   );
