@@ -14,8 +14,8 @@ Backend Event Types:
 */
 
 export type RaceDocs = {
-  start: [];
-  target: [];
+  start: string[];
+  target: string[];
   source: string;
 }[];
 
