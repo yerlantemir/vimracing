@@ -34,6 +34,7 @@ async function main() {
   const octokit = new Octokit({
     auth: GITHUB_TOKEN
   });
+
   if (!fs.existsSync(path.join(__dirname, './bin')))
     fs.mkdirSync(path.join(__dirname, './bin'));
   if (!fs.existsSync(`./racesData`)) fs.mkdirSync(`./racesData`);
@@ -72,13 +73,7 @@ async function main() {
         });
 
         let docIndex = 0;
-        while (
-          Object.keys(results).every(
-            (key) =>
-              results[key].length > MISTAKES_TO_SNIPPETS_COUNT_MAPPING[key]
-          ) &&
-          docIndex < MAX_DOCUMENTS_COUNT
-        ) {
+        while (docIndex < MAX_DOCUMENTS_COUNT) {
           let currentRaceDoc = [];
 
           Object.keys(MISTAKES_TO_SNIPPETS_COUNT_MAPPING).forEach(
@@ -87,7 +82,9 @@ async function main() {
                 MISTAKES_TO_SNIPPETS_COUNT_MAPPING[mistakesCount];
               for (let i = 0; i < snippetCount; i++) {
                 const poppedItem = popRandomElement(results[mistakesCount]);
-                if (!poppedItem) return;
+                if (!poppedItem) {
+                  process.exit(0);
+                }
                 currentRaceDoc.push(poppedItem);
               }
             }
@@ -128,19 +125,21 @@ function collectSnippetsFromFile(filePath, results) {
   const absoluteFilePath = getAbsoluteFilePath(filePath);
 
   const linesCount = Object.keys(MISTAKES_TO_SNIPPETS_COUNT_MAPPING);
-  for (let i = 0; i < linesCount.length; i++) {
-    const mistakesCount = linesCount[i];
-    const snippetCount = MISTAKES_TO_SNIPPETS_COUNT_MAPPING[mistakesCount];
+  while (currentLineIndex < fileLinesList.length) {
+    for (let i = 0; i < linesCount.length; i++) {
+      const mistakesCount = linesCount[i];
+      const snippetCount = MISTAKES_TO_SNIPPETS_COUNT_MAPPING[mistakesCount];
 
-    const processedLines = processLines(
-      fileLinesList,
-      currentLineIndex,
-      mistakesCount,
-      snippetCount,
-      absoluteFilePath
-    );
-    results[mistakesCount] = results[mistakesCount].concat(processedLines);
-    currentLineIndex += snippetCount;
+      const processedLines = processLines(
+        fileLinesList,
+        currentLineIndex,
+        mistakesCount,
+        snippetCount,
+        absoluteFilePath
+      );
+      results[mistakesCount] = results[mistakesCount].concat(processedLines);
+      currentLineIndex += snippetCount;
+    }
   }
 
   return results;
