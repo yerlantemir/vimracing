@@ -19,7 +19,7 @@ const TasksList = ({
   racesCount: number;
   currentRecapTaskIndex: number;
   onTaskClick: (taskIndex: number) => void;
-  currentTaskSource: string;
+  currentTaskSource?: string;
 }) => {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -61,13 +61,15 @@ const TasksList = ({
           })}
       </div>
 
-      <a
-        href={currentTaskSource}
-        className="text-xs text-primary border-b border-primary"
-        target="_blank"
-      >
-        source
-      </a>
+      {currentTaskSource && (
+        <a
+          href={currentTaskSource}
+          className="text-xs text-primary border-b border-primary"
+          target="_blank"
+        >
+          source
+        </a>
+      )}
     </div>
   );
 };
@@ -86,7 +88,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
         racesCount={raceDocs.length}
         currentRecapTaskIndex={currentRecapTaskIndex}
         onTaskClick={setCurrentRecapTaskIndex}
-        currentTaskSource={raceDocs[currentRecapTaskIndex].source}
+        currentTaskSource={raceDocs[currentRecapTaskIndex]?.source}
       />
       {raceDocs && raceDocs[currentRecapTaskIndex] && (
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
@@ -129,7 +131,7 @@ export const TrainingRecap: React.FC<ITrainingRecapProps> = ({
         racesCount={raceDocs.length}
         currentRecapTaskIndex={currentRecapTaskIndex}
         onTaskClick={setCurrentRecapTaskIndex}
-        currentTaskSource={raceDocs[currentRecapTaskIndex].source}
+        currentTaskSource={raceDocs[currentRecapTaskIndex]?.source}
       />
 
       {raceDocs && raceDocs[currentRecapTaskIndex] && (
