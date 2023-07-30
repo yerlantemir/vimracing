@@ -38,8 +38,8 @@ async function main() {
   if (!fs.existsSync(path.join(__dirname, './bin')))
     fs.mkdirSync(path.join(__dirname, './bin'));
   if (!fs.existsSync(`./racesData`)) fs.mkdirSync(`./racesData`);
-  if (!fs.existsSync(`./racesData/${REPO_LANG}`))
-    fs.mkdirSync(`./racesData/${REPO_LANG}`);
+  if (!fs.existsSync(`./racesData/githubSnippets/${REPO_LANG}`))
+    fs.mkdirSync(`./racesData/githubSnippets/${REPO_LANG}`);
 
   try {
     const { data } = await octokit.rest.repos.downloadTarballArchive({
@@ -91,7 +91,7 @@ async function main() {
           );
 
           fs.writeFileSync(
-            `./racesData/${REPO_LANG}/${docIndex}.json`,
+            `./racesData/githubSnippets/${REPO_LANG}/${docIndex}.json`,
             JSON.stringify(currentRaceDoc, null, 2)
           );
 

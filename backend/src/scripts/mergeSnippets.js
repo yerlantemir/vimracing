@@ -7,49 +7,82 @@ const MAX_SNIPPET_ROWS = 10;
 main();
 // =======
 
-function main() {
-  const fileBuffer = fs.readFileSync('./racesData/vimGolfSnippets.json');
-  const vimGolfSnippets = JSON.parse(fileBuffer.toString());
-  const snippetsDividedByLines = vimGolfSnippets.map(
-    ({ start, target, source }) => {
-      return {
-        start: start.split('\n'),
-        target: target.split('\n'),
-        source
-      };
-    }
-  );
-  const filteredVilGolfSnippets =
-    snippetsDividedByLines.filter(filterVilGolfSnippet);
+async function main() {
+  const vimGolfSnippets = getVimGolfSnippets();
+  const aiPySnippets = getAiSnippets('py');
+  const aiJsSnippets = getAiSnippets('js');
+  const githubPySnippets = await getGithubSnippets('py');
+  const githubJsSnippets = await getGithubSnippets('js');
 
-  for (let lang of ['py', 'js']) {
-    glob(`./racesData/${lang}/*.json`, (err, files) => {
+  // py
+  for (let i = 0; i < 50; i++) {
+    const raceData = [
+      getRandomElement(githubPySnippets),
+      getRandomElement(aiPySnippets),
+      getRandomElement(aiPySnippets),
+      getRandomElement(aiPySnippets),
+      getRandomElement(vimGolfSnippets)
+    ];
+
+    fs.writeFileSync(
+      `./racesData/py/${i}.json`,
+      JSON.stringify(raceData, null, 2)
+    );
+  }
+
+  // js
+  for (let i = 0; i < 50; i++) {
+    const raceData = [
+      getRandomElement(githubJsSnippets),
+      getRandomElement(aiJsSnippets),
+      getRandomElement(aiJsSnippets),
+      getRandomElement(aiJsSnippets),
+      getRandomElement(vimGolfSnippets)
+    ];
+
+    fs.writeFileSync(
+      `./racesData/js/${i}.json`,
+      JSON.stringify(raceData, null, 2)
+    );
+  }
+}
+
+function getVimGolfSnippets() {
+  const fileBuffer = fs.readFileSync('./racesData/filteredGolfSnippets.json');
+  const vimGolfSnippets = JSON.parse(fileBuffer.toString());
+  return vimGolfSnippets;
+}
+
+function getAiSnippets(lang) {
+  const aiSnippets = [];
+  for (let i = 0; i < 10; i++) {
+    const fileBuffer = fs.readFileSync(
+      `./racesData/aisnippets/${lang}/${i}.json`
+    );
+    const snippets = JSON.parse(fileBuffer.toString());
+    aiSnippets.push(...snippets);
+  }
+  return aiSnippets;
+}
+
+function getGithubSnippets(lang) {
+  return new Promise((resolve, reject) => {
+    const result = [];
+    glob(`./racesData/githubSnippets/${lang}/*.json`, (err, files) => {
       for (let file of files) {
         const snippetFileBuffer = fs.readFileSync(file);
-        const fileSnippets = [
-          ...JSON.parse(snippetFileBuffer.toString()),
-          getRandomElement(filteredVilGolfSnippets),
-          getRandomElement(filteredVilGolfSnippets)
-        ];
-        fs.writeFileSync(file, JSON.stringify(fileSnippets, null, 2));
+        const fileSnippets = [...JSON.parse(snippetFileBuffer.toString())];
+        result.push(...fileSnippets);
       }
+      resolve(result);
     });
-  }
+  });
 }
 
 /*
     @snippet: {start: string[], target: string[]}
     @return: boolean
 */
-function filterVilGolfSnippet(snippet) {
-  const { start, target } = snippet;
-  return (
-    target.length <= MAX_SNIPPET_ROWS &&
-    start.length <= MAX_SNIPPET_ROWS &&
-    target.length > 0 &&
-    start.length > 0
-  );
-}
 
 function getRandomElement(array) {
   const randomIndex = Math.floor(Math.random() * array.length);

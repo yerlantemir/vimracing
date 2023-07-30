@@ -12,12 +12,13 @@ const openai = new OpenAIApi(configuration);
 main();
 // =============
 async function main() {
-  const resp = await openai.createChatCompletion({
-    model: 'gpt-4',
-    messages: [
-      {
-        role: 'system',
-        content: `
+  for (let i = 0; i < 10; i++) {
+    const resp = await openai.createChatCompletion({
+      model: 'gpt-4',
+      messages: [
+        {
+          role: 'system',
+          content: `
           You are a program that generates code snippets.
           You generate snippets for the vim code refactoring game.
           Each snippet should have a start and target code as array of strings, where each element of array represents one line of code.
@@ -29,17 +30,19 @@ async function main() {
           Each snippet should have proper indentation.
           Complexity of each snippet should increase with it's index.
           `
-      },
-      {
-        role: 'user',
-        content: `Generate me snippets in Javascript`
-      }
-    ]
-  });
+        },
+        {
+          role: 'user',
+          content: `Generate me snippets in Python`
+        }
+      ]
+    });
 
-  const snippets = JSON.parse(resp.data['choices'][0]['message']['content']);
-  fs.writeFileSync(
-    './racesData/aiSnippets.json',
-    JSON.stringify(snippets, null, 2)
-  );
+    const snippets = JSON.parse(resp.data['choices'][0]['message']['content']);
+    console.log({ i });
+    fs.writeFileSync(
+      `./racesData/aisnippets/python/${i}.json`,
+      JSON.stringify(snippets, null, 2)
+    );
+  }
 }

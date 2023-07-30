@@ -9,16 +9,34 @@ main();
 // ============
 
 async function main() {
-  const links = await getLinks();
-  for (let link of links) {
-    console.log({ link });
-    console.log('snippets left', links.length - links.indexOf(link));
-    const snippets = await getSnippetsFromLink(link);
-    fs.appendFileSync(
-      './racesData/vimGolfSnippets.json',
-      JSON.stringify(snippets) + ',\n'
-    );
-  }
+  splitToLines();
+  //   const links = await getLinks();
+  //   for (let link of links) {
+  //     console.log({ link });
+  //     console.log('snippets left', links.length - links.indexOf(link));
+  //     const snippets = await getSnippetsFromLink(link);
+  //     fs.appendFileSync(
+  //       './racesData/vimGolfSnippets.json',
+  //       JSON.stringify(snippets) + ',\n'
+  //     );
+  //   }
+}
+function splitToLines(str) {
+  const buffer = fs.readFileSync('./racesData/vimGolfSnippets.json', 'utf8');
+  const snippets = JSON.parse(buffer.toString()).map(
+    ({ start, target, source }) => {
+      return {
+        start: start.split('\n'),
+        target: target.split('\n'),
+        source
+      };
+    }
+  );
+
+  fs.writeFileSync(
+    './racesData/vimGolfSnippets.json',
+    JSON.stringify(snippets, null, 2)
+  );
 }
 
 function getSnippetsFromLink(link) {
