@@ -8,7 +8,6 @@ main();
 // =======
 
 async function main() {
-  const vimGolfSnippets = getVimGolfSnippets();
   const aiPySnippets = getAiSnippets('py');
   const aiJsSnippets = getAiSnippets('js');
   const githubPySnippets = await getGithubSnippets('py');
@@ -18,10 +17,10 @@ async function main() {
   for (let i = 0; i < 50; i++) {
     const raceData = [
       getRandomElement(githubPySnippets),
+      getRandomElement(githubPySnippets),
       getRandomElement(aiPySnippets),
       getRandomElement(aiPySnippets),
-      getRandomElement(aiPySnippets),
-      getRandomElement(vimGolfSnippets)
+      getRandomElement(aiPySnippets)
     ];
 
     fs.writeFileSync(
@@ -30,14 +29,14 @@ async function main() {
     );
   }
 
-  // js
+  // // js
   for (let i = 0; i < 50; i++) {
     const raceData = [
       getRandomElement(githubJsSnippets),
+      getRandomElement(githubJsSnippets),
       getRandomElement(aiJsSnippets),
       getRandomElement(aiJsSnippets),
-      getRandomElement(aiJsSnippets),
-      getRandomElement(vimGolfSnippets)
+      getRandomElement(aiJsSnippets)
     ];
 
     fs.writeFileSync(
@@ -45,12 +44,6 @@ async function main() {
       JSON.stringify(raceData, null, 2)
     );
   }
-}
-
-function getVimGolfSnippets() {
-  const fileBuffer = fs.readFileSync('./racesData/filteredGolfSnippets.json');
-  const vimGolfSnippets = JSON.parse(fileBuffer.toString());
-  return vimGolfSnippets;
 }
 
 function getAiSnippets(lang) {
