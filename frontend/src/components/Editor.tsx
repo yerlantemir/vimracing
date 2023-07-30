@@ -134,7 +134,7 @@ export const Editor: React.FC<Omit<EditorConfig, 'parent' | 'theme'>> = ({
       readOnly
     };
 
-    const shouldBeUnified = !raceDoc.source?.includes('vimgolf');
+    const shouldBeUnified = raceDoc.source?.includes('github');
     const editor = shouldBeUnified
       ? new UnifiedMergeViewEditor(editorCreateConfig)
       : new MergeViewEditor(editorCreateConfig);
