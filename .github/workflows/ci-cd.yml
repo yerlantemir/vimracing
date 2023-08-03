@@ -1,0 +1,23 @@
+name: CI/CD Workflow
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.10
+
+    steps:
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Deploy to DigitalOcean
+        run: |
+          # Use doctl to interact with your DigitalOcean droplet
+          # You'll want to replace `<droplet-ID>` and `<path-to-your-app>`
+          doctl compute ssh 357096535 -- 'cd /home/vimracing && git pull && cd backend && yarn run build && pm2 delete vimracing >2 /dev/null && pm2 start dist/index.js --name vimracing'
