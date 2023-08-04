@@ -12,20 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh/
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
-
-      - name: Install doctl
-        uses: digitalocean/action-doctl@v2
+      - name: Deploy to DO
+        uses: appleboy/ssh-action@v1.0.0
         with:
-          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Deploy to DigitalOcean
-        run: |
-          # Use doctl to interact with your DigitalOcean droplet
-          # You'll want to replace `<droplet-ID>` and `<path-to-your-app>`
-          doctl compute ssh 357096535 -- 'cd /home/vimracing && git pull && cd backend && yarn run build && pm2 delete vimracing >2 /dev/null && pm2 start dist/index.js --name vimracing'
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          script: 'cd /home/vimracing && git pull && yarn && cd backend && yarn run build && pm2 delete -s vimracing || : && pm2 start dist/index.js --name vimracing'
