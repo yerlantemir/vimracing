@@ -18,4 +18,4 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          script: 'cd /home/vimracing && git pull && yarn && cd backend && yarn run build && pm2 delete -s vimracing || : && pm2 start dist/index.js --name vimracing'
+          script: 'cd /home/vimracing && git pull && yarn && cd shared && yarn build && cd ../backend && yarn run build && pm2 delete -s vimracing || : && pm2 start dist/index.js --name vimracing'
