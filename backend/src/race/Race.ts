@@ -1,5 +1,5 @@
 import { RaceStatus, SharedCompletedDocsPayload } from '@vimracing/shared';
-import { Player } from './Player';
+import { Player, raceDataDefaults } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
 import { calculateDocCompleteness } from '../utils/calculateDocCompleteness';
@@ -89,22 +89,24 @@ export class Race {
 
   public changeDoc(
     playerId: string,
-    documentIndex: number,
     newDoc: string[],
     sharedDocPayload?: SharedCompletedDocsPayload
   ) {
     if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
-    if (!player || !this.raceDocs[documentIndex]) return;
+    if (!player || !player.raceData) return;
 
     const docCompleteness = calculateDocCompleteness(
-      this.raceDocs[documentIndex].start,
-      this.raceDocs[documentIndex].target,
+      this.raceDocs[player.raceData.currentDocIndex].start,
+      this.raceDocs[player.raceData.currentDocIndex].target,
       newDoc
     );
-    player.updateDoc(newDoc, documentIndex, docCompleteness, sharedDocPayload);
+    player.updateDoc(newDoc, docCompleteness, sharedDocPayload);
 
-    if (docCompleteness === 100 && documentIndex === this.raceDocs.length - 1) {
+    if (
+      docCompleteness === 100 &&
+      player.raceData.currentDocIndex === this.raceDocs.length - 1
+    ) {
       this.finishPlayerRace(playerId);
     }
 
@@ -173,6 +175,7 @@ export class Race {
         notFinishedPlayers.findIndex((p) => p.id === player.id) + startPlace;
       return new Player(player.id, player.username, {
         ...player.raceData,
+        ...raceDataDefaults,
         place,
         isFinished: true
       });

@@ -36,13 +36,13 @@ export type Player = {
   id: string;
   username: string;
   raceData?: {
-    completeness?: number;
-    currentDocIndex?: number;
-    completedDocs?: ({
+    completeness: number;
+    currentDocIndex: number;
+    completedDocs: ({
       doc?: string[];
     } & SharedCompletedDocsPayload)[];
     place?: number;
-    isFinished?: boolean;
+    isFinished: boolean;
   };
 };
 
@@ -75,7 +75,6 @@ export interface FrontendRaceHostStartEvent {
 export interface FrontendDocumentChangeEvent {
   event: FrontendEventType.DOCUMENT_CHANGE;
   payload: {
-    docIndex: number;
     newDocument: string[];
     sharedDocPayload?: SharedCompletedDocsPayload;
   };
@@ -122,11 +121,7 @@ export interface BackendPlayerDataChangeEvent {
   payload: {
     id: Player['id'];
     username: Player['username'];
-    raceData:
-      | Player['raceData']
-      | {
-          completedDocs: SharedCompletedDocsPayload[];
-        };
+    raceData: Player['raceData'];
   };
 }
 export interface BackendRaceFinishEvent {

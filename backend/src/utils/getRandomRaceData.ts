@@ -17,9 +17,7 @@ export const getRandomRaceData = async (
   const raceMaxIndex = files.length;
   const randomRaceId = Math.floor(Math.random() * raceMaxIndex);
 
-  const data = await readFile(
-    `${racesDataPath}/${lang}/${randomRaceId}.json`,
-    'utf8'
-  );
+  const data = await readFile(`${racesDataPath}/js/7.json`, 'utf8');
+
   return JSON.parse(data);
 };

@@ -5,7 +5,8 @@ import {
   RaceDocs,
   ExecutedCommand,
   Player,
-  RaceStatus
+  RaceStatus,
+  SharedCompletedDocsPayload
 } from '@vimracing/shared';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { Recap } from './Recap';
@@ -16,10 +17,7 @@ interface RaceStateProps {
   raceDocs: RaceDocs;
   onDocChange: (
     newDoc: string[],
-    documentIndex: number,
-    executedCommands?: ExecutedCommand[],
-    secondsSinceStart?: number,
-    keysCount?: number
+    sharedRacePayload?: SharedCompletedDocsPayload
   ) => void;
   players?: Player[];
   currentPlayer?: Player;
@@ -43,7 +41,7 @@ export const RaceState: React.FC<RaceStateProps> = ({
     currentPlayer?.raceData?.currentDocIndex ?? 0
   );
   const [currentDocumentDoc, setCurrentDocumentDoc] = useState(
-    raceDocs[documentIndex].start
+    raceDocs[documentIndex]?.start
   );
   const [hasDocumentChange, setHasDocumentChange] = useState(false);
 
@@ -59,29 +57,28 @@ export const RaceState: React.FC<RaceStateProps> = ({
   useEffect(() => {
     if (!hasDocumentChange) return;
     setHasDocumentChange(false);
+
     const isEditingCurrentDoc = !isDocFinished(
       currentDocumentDoc,
       raceDocs[documentIndex].target
     );
 
+    console.log({ isEditingCurrentDoc });
     if (isEditingCurrentDoc) {
-      onDocChange(currentDocumentDoc, documentIndex);
+      onDocChange(currentDocumentDoc);
       return;
     }
 
     // current doc finished, move to next doc
-    const isLastDocument = documentIndex === raceDocs.length - 1;
     setDocumentIndex(documentIndex + 1);
     setDocExecutedCommands([]);
     setKeysCount(0);
 
-    onDocChange(
-      currentDocumentDoc,
-      isLastDocument ? documentIndex : documentIndex + 1,
-      docExecutedCommands,
-      raceTimer,
+    onDocChange(currentDocumentDoc, {
+      executedCommands: docExecutedCommands,
+      seconds: raceTimer,
       keysCount
-    );
+    });
   }, [
     currentDocumentDoc,
     docExecutedCommands,

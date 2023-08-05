@@ -91,12 +91,7 @@ export class WebSocketServer {
         race.start();
         break;
       case FrontendEventType.DOCUMENT_CHANGE:
-        race.changeDoc(
-          playerId,
-          payload.docIndex,
-          payload.newDocument,
-          payload.sharedDocPayload
-        );
+        race.changeDoc(playerId, payload.newDocument, payload.sharedDocPayload);
         break;
       case FrontendEventType.USERNAME_CHANGE:
         race.changeUsername(playerId, payload.newUsername);

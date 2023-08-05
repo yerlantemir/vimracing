@@ -3,71 +3,48 @@ import {
   SharedCompletedDocsPayload
 } from '@vimracing/shared';
 
+export const raceDataDefaults = {
+  completeness: 0,
+  currentDocIndex: 0,
+  completedDocs: [],
+  isFinished: false
+};
+
 export class Player implements PlayerType {
   id: string;
   username: string;
   raceData?: {
-    completeness?: number;
-    currentDocIndex?: number;
-    completedDocs?: ({
+    completeness: number;
+    currentDocIndex: number;
+    completedDocs: ({
       doc?: string[];
     } & SharedCompletedDocsPayload)[];
     place?: number;
-    isFinished?: boolean;
+    isFinished: boolean;
   };
 
   constructor(id: string, username: string, raceData?: PlayerType['raceData']) {
     this.id = id;
 
     this.username = username;
-    this.raceData = raceData ?? {
-      completeness: 0,
-      currentDocIndex: 0,
-      completedDocs: [],
-      isFinished: false
-    };
+    this.raceData = raceData ?? raceDataDefaults;
   }
 
   updateDoc(
     newDoc: string[],
-    docIndex: number,
     newCompleteness: number,
-    sharedDocPayload?: SharedCompletedDocsPayload
+    sharedDocPayload?: SharedCompletedDocsPayload // if exists, it means that this doc was completed
   ) {
-    let newDocs: NonNullable<Player['raceData']>['completedDocs'] = [];
-    // update existing one
-    if (this.raceData?.completedDocs?.[docIndex]?.doc) {
-      newDocs = this.raceData.completedDocs.map(
-        (completedDocPayload, index) => {
-          if (index === docIndex) {
-            return {
-              ...completedDocPayload,
-              ...(sharedDocPayload && sharedDocPayload),
-              doc: newDoc
-            };
-          }
-          return completedDocPayload;
-        }
-      );
-    } else {
-      newDocs = [
-        ...(this.raceData?.completedDocs ?? []),
-        {
-          doc: newDoc,
-          executedCommands: sharedDocPayload?.executedCommands ?? [],
-          keysCount: sharedDocPayload?.keysCount ?? 0,
-          seconds: sharedDocPayload?.seconds ?? 0
-        }
-      ];
-    }
+    if (!this.raceData) return;
+    this.raceData.completedDocs[this.raceData.currentDocIndex] = {
+      doc: newDoc,
+      executedCommands: sharedDocPayload?.executedCommands ?? [],
+      keysCount: sharedDocPayload?.keysCount ?? 0,
+      seconds: sharedDocPayload?.seconds ?? 0
+    };
 
-    if (this.raceData) {
-      this.raceData = {
-        ...this.raceData,
-        completedDocs: newDocs,
-        completeness: newCompleteness,
-        currentDocIndex: docIndex
-      };
+    if (newCompleteness === 100) {
+      this.raceData.currentDocIndex++;
     }
   }
 

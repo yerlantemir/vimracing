@@ -1,5 +1,5 @@
 import { LocalStorageManager } from '@/utils/storage';
-import { RaceDocs } from '@vimracing/shared';
+import { RaceDocs, SharedCompletedDocsPayload } from '@vimracing/shared';
 import {
   FrontendUsernameChangeEvent,
   FrontendDocumentChangeEvent,
@@ -13,8 +13,7 @@ import {
   BackendRaceFinishEvent,
   BackendRaceInitEvent,
   BackendRaceStartEvent,
-  BackendRaceTimerUpdateEvent,
-  ExecutedCommand
+  BackendRaceTimerUpdateEvent
 } from '@vimracing/shared';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -25,6 +24,13 @@ type BackendRaceEvent =
   | BackendRaceStartEvent
   | BackendPlayerDataChangeEvent
   | BackendRaceFinishEvent;
+
+export const raceDataDefaults = {
+  completeness: 0,
+  currentDocIndex: 0,
+  completedDocs: [],
+  isFinished: false
+};
 
 export const useRace = (raceId: string) => {
   const socketConnection = useRef<WebSocket | undefined>();
@@ -112,6 +118,7 @@ export const useRace = (raceId: string) => {
             ...prev,
             username,
             raceData: {
+              ...raceDataDefaults,
               ...prev.raceData,
               ...raceData
             }
@@ -126,6 +133,7 @@ export const useRace = (raceId: string) => {
               ...player,
               username,
               raceData: {
+                ...raceDataDefaults,
                 ...player.raceData,
                 ...raceData
               }
@@ -178,29 +186,17 @@ export const useRace = (raceId: string) => {
   );
 
   const onCurrentPlayerDocumentChange = useCallback(
-    (
-      newDocument: string[],
-      documentIndex: number,
-      executedCommands?: ExecutedCommand[],
-      secondsSinceStart?: number,
-      keysCount?: number
-    ) => {
+    (newDocument: string[], sharedDocPayload?: SharedCompletedDocsPayload) => {
       const payload: FrontendDocumentChangeEvent = {
         event: FrontendEventType.DOCUMENT_CHANGE,
         payload: {
-          docIndex: documentIndex,
           newDocument,
-          ...(executedCommands &&
-            secondsSinceStart &&
-            keysCount !== undefined && {
-              sharedDocPayload: {
-                executedCommands,
-                seconds: secondsSinceStart,
-                keysCount
-              }
-            })
+          ...(sharedDocPayload && {
+            sharedDocPayload
+          })
         }
       };
+
       socketConnection.current?.send(JSON.stringify(payload));
     },
     []
