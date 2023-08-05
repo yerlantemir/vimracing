@@ -30,7 +30,7 @@ export const Players: React.FC<PlayersProps> = ({
   return (
     <div className="flex gap-4">
       <div
-        className="flex flex-col gap-3 grow justify-start overflow-y-scroll"
+        className="flex flex-col gap-3 grow justify-start"
         style={{ maxHeight: '120px' }}
       >
         {allPlayers.map((player) => {
