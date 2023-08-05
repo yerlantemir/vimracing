@@ -16,9 +16,10 @@ export const calculateDocCompleteness = (
   currentStringList: string[]
 ) => {
   let initialDifferencesCount = 0;
+
   for (let i = 0; i < startStringList.length; i++) {
     const currentStartStr = startStringList[i];
-    const currentTargetStr = targetStringList[i];
+    const currentTargetStr = targetStringList[i] || '';
     initialDifferencesCount += calcDiffCount(currentStartStr, currentTargetStr);
   }
 
