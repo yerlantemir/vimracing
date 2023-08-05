@@ -8,26 +8,29 @@ import { ExecutedCommand } from '@vimracing/shared';
 interface IHotkeysProps {
   setExecutedCommands?: (ExecutedCommands: ExecutedCommand[]) => void;
   executedCommands?: ExecutedCommand[];
+  keysCount?: number;
+  onKeyPressed?: (key: string) => void;
 }
 export const Hotkeys: React.FC<IHotkeysProps> = ({
   setExecutedCommands,
-  executedCommands = []
+  executedCommands = [],
+  keysCount,
+  onKeyPressed
 }) => {
   const [currentCommand, setCurrentCommand] = useState('');
   const [partialCommandExecuted, setPartialCommandExecuted] = useState(false);
-  const [keysCount, setKeysCount] = useState(0);
   const lastPressedKey = useRef('');
 
   useEffect(() => {
     const onVimKey = (event: any) => {
       lastPressedKey.current = event.detail;
-      setKeysCount((prev) => prev + 1);
+      onKeyPressed?.(event.detail);
     };
     window.addEventListener('vimracing-key', onVimKey);
     return () => {
       window.removeEventListener('vimracing-key', onVimKey);
     };
-  }, []);
+  }, [onKeyPressed]);
 
   useEffect(() => {
     const onVimCommandDone = (event: any) => {
@@ -146,7 +149,7 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
           })}
         </AnimatePresence>
       </div>
-      <KeysCounter count={keysCount} />
+      {!!keysCount && <KeysCounter count={keysCount} />}
     </>
   );
 };
@@ -166,6 +169,7 @@ const KeysCounter: React.FC<{ count: number }> = ({ count }) => {
   }, [animate, count, scope]);
 
   if (!count) return null;
+
   return (
     <div className="flex justify-center">
       <span className="text-xl" ref={scope}>

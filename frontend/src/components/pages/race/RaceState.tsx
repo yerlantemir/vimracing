@@ -1,19 +1,25 @@
 import { Editor, isTextEqual } from '@/components/Editor';
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Players } from './Players';
-import { ExecutedCommand, Player, RaceStatus } from '@vimracing/shared';
+import {
+  RaceDocs,
+  ExecutedCommand,
+  Player,
+  RaceStatus
+} from '@vimracing/shared';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { Recap } from './Recap';
 import { Timer } from '@/components/Timer';
 import { getPostfixedPlace } from '@/utils/postfix';
-import { RaceDocs } from '@vimracing/shared';
 
 interface RaceStateProps {
   raceDocs: RaceDocs;
   onDocChange: (
     newDoc: string[],
     documentIndex: number,
-    executedCommands?: ExecutedCommand[]
+    executedCommands?: ExecutedCommand[],
+    secondsSinceStart?: number,
+    keysCount?: number
   ) => void;
   players?: Player[];
   currentPlayer?: Player;
@@ -32,41 +38,60 @@ export const RaceState: React.FC<RaceStateProps> = ({
   const [docExecutedCommands, setDocExecutedCommands] = useState<
     ExecutedCommand[]
   >([]);
+  const [keysCount, setKeysCount] = useState(0);
   const [documentIndex, setDocumentIndex] = useState(
     currentPlayer?.raceData?.currentDocIndex ?? 0
   );
+  const [currentDocumentDoc, setCurrentDocumentDoc] = useState(
+    raceDocs[documentIndex].start
+  );
+  const [hasDocumentChange, setHasDocumentChange] = useState(false);
 
   const isDocFinished = (current: string[], target: string[]) => {
     return isTextEqual(current, target);
   };
 
-  const onCurrentDocumentChange = useCallback(
-    (newDoc: string[]) => {
-      const isEditingCurrentDoc = !isDocFinished(
-        newDoc,
-        raceDocs[documentIndex].target
-      );
-      if (isEditingCurrentDoc) {
-        onDocChange(newDoc, documentIndex);
-        return;
-      }
+  const onCurrentDocumentChange = useCallback((newDoc: string[]) => {
+    setCurrentDocumentDoc(newDoc);
+    setHasDocumentChange(true);
+  }, []);
 
-      // current doc finished, move to next doc
-      const isLastDocument = documentIndex === raceDocs.length - 1;
-      setDocumentIndex(documentIndex + 1);
-      setDocExecutedCommands((prev) => {
-        console.log({ prev, documentIndex });
+  useEffect(() => {
+    if (!hasDocumentChange) return;
+    setHasDocumentChange(false);
+    const isEditingCurrentDoc = !isDocFinished(
+      currentDocumentDoc,
+      raceDocs[documentIndex].target
+    );
 
-        onDocChange(
-          newDoc,
-          isLastDocument ? documentIndex : documentIndex + 1,
-          prev
-        );
-        return [];
-      });
-    },
-    [documentIndex, onDocChange, raceDocs]
-  );
+    if (isEditingCurrentDoc) {
+      onDocChange(currentDocumentDoc, documentIndex);
+      return;
+    }
+
+    // current doc finished, move to next doc
+    const isLastDocument = documentIndex === raceDocs.length - 1;
+    setDocumentIndex(documentIndex + 1);
+    setDocExecutedCommands([]);
+    setKeysCount(0);
+
+    onDocChange(
+      currentDocumentDoc,
+      isLastDocument ? documentIndex : documentIndex + 1,
+      docExecutedCommands,
+      raceTimer,
+      keysCount
+    );
+  }, [
+    currentDocumentDoc,
+    docExecutedCommands,
+    documentIndex,
+    hasDocumentChange,
+    keysCount,
+    onDocChange,
+    raceDocs,
+    raceTimer
+  ]);
 
   const isCurrentPlayerFinished = useMemo(
     () =>
@@ -132,6 +157,8 @@ export const RaceState: React.FC<RaceStateProps> = ({
             setExecutedCommands={setDocExecutedCommands}
             executedCommands={docExecutedCommands}
             key={documentIndex}
+            keysCount={keysCount}
+            onKeyPressed={() => setKeysCount(keysCount + 1)}
           />
         </>
       )}

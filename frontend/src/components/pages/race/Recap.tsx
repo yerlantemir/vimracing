@@ -78,8 +78,8 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
 
   const finishedPlayers = players.filter(
     (player) =>
-      player.raceData?.executedCommands?.length &&
-      player.raceData?.executedCommands?.length > 0
+      player.raceData?.completedDocs?.length &&
+      player.raceData?.completedDocs?.length > 0
   );
 
   return (
@@ -95,7 +95,10 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
       )}
 
       {finishedPlayers.map((player) => {
-        if (!player.raceData?.executedCommands?.[currentRecapTaskIndex])
+        if (
+          !player.raceData?.completedDocs?.[currentRecapTaskIndex]
+            ?.executedCommands
+        )
           return null;
         return (
           <div key={player.id} className="flex items-center gap-4">
@@ -104,7 +107,8 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
             </span>
             <Hotkeys
               executedCommands={
-                player.raceData?.executedCommands[currentRecapTaskIndex]
+                player.raceData?.completedDocs?.[currentRecapTaskIndex]
+                  .executedCommands
               }
             />
           </div>

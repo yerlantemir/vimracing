@@ -181,14 +181,24 @@ export const useRace = (raceId: string) => {
     (
       newDocument: string[],
       documentIndex: number,
-      executedCommands?: ExecutedCommand[]
+      executedCommands?: ExecutedCommand[],
+      secondsSinceStart?: number,
+      keysCount?: number
     ) => {
       const payload: FrontendDocumentChangeEvent = {
         event: FrontendEventType.DOCUMENT_CHANGE,
         payload: {
           docIndex: documentIndex,
           newDocument,
-          executedCommands
+          ...(executedCommands &&
+            secondsSinceStart &&
+            keysCount !== undefined && {
+              sharedDocPayload: {
+                executedCommands,
+                seconds: secondsSinceStart,
+                keysCount
+              }
+            })
         }
       };
       socketConnection.current?.send(JSON.stringify(payload));
