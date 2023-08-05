@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Command } from './Command';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence, useAnimate } from 'framer-motion';
 import { ExecutedCommand } from '@vimracing/shared';
 
 interface IHotkeysProps {
@@ -15,11 +15,13 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
 }) => {
   const [currentCommand, setCurrentCommand] = useState('');
   const [partialCommandExecuted, setPartialCommandExecuted] = useState(false);
+  const [keysCount, setKeysCount] = useState(0);
   const lastPressedKey = useRef('');
 
   useEffect(() => {
     const onVimKey = (event: any) => {
       lastPressedKey.current = event.detail;
+      setKeysCount((prev) => prev + 1);
     };
     window.addEventListener('vimracing-key', onVimKey);
     return () => {
@@ -136,12 +138,39 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
     : executedCommands;
 
   return (
-    <div className="flex gap-3 flex-wrap">
-      <AnimatePresence>
-        {allCommands.map((command, index) => {
-          return <Command key={index} {...command} index={index} />;
-        })}
-      </AnimatePresence>
+    <>
+      <div className="flex gap-3 flex-wrap">
+        <AnimatePresence>
+          {allCommands.map((command, index) => {
+            return <Command key={index} {...command} index={index} />;
+          })}
+        </AnimatePresence>
+      </div>
+      <KeysCounter count={keysCount} />
+    </>
+  );
+};
+
+const KeysCounter: React.FC<{ count: number }> = ({ count }) => {
+  const [scope, animate] = useAnimate();
+  const prevCount = useRef<number>(0);
+
+  useEffect(() => {
+    if (count !== prevCount.current) {
+      animate(scope.current, {
+        scale: [1.5, 1],
+        color: ['var(--color-text)', 'var(--color-primary)']
+      });
+    }
+    prevCount.current = count;
+  }, [animate, count, scope]);
+
+  if (!count) return null;
+  return (
+    <div className="flex justify-center">
+      <span className="text-xl" ref={scope}>
+        {count}
+      </span>
     </div>
   );
 };
