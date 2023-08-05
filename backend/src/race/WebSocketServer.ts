@@ -95,7 +95,7 @@ export class WebSocketServer {
           playerId,
           payload.docIndex,
           payload.newDocument,
-          payload.executedCommands
+          payload.sharedDocPayload
         );
         break;
       case FrontendEventType.USERNAME_CHANGE:
@@ -174,7 +174,7 @@ export class WebSocketServer {
             raceData: {
               completeness: newPlayer.raceData?.completeness,
               currentDocIndex: newPlayer.raceData?.currentDocIndex,
-              executedCommands: newPlayer.raceData?.executedCommands, // TODO: should we send it to front?
+              completedDocs: newPlayer.getSharedCompletedDocsData() ?? [],
               place: newPlayer.raceData?.place
             }
           }

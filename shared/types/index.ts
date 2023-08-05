@@ -27,15 +27,21 @@ export type ExecutedCommand = {
   index?: number;
 };
 
+export type SharedCompletedDocsPayload = {
+  executedCommands: ExecutedCommand[];
+  keysCount: number;
+  seconds: number;
+};
 export type Player = {
   id: string;
   username: string;
   raceData?: {
     completeness?: number;
     currentDocIndex?: number;
-    docs?: string[][];
+    completedDocs?: ({
+      doc?: string[];
+    } & SharedCompletedDocsPayload)[];
     place?: number;
-    executedCommands?: ExecutedCommand[][];
     isFinished?: boolean;
   };
 };
@@ -71,7 +77,7 @@ export interface FrontendDocumentChangeEvent {
   payload: {
     docIndex: number;
     newDocument: string[];
-    executedCommands?: ExecutedCommand[];
+    sharedDocPayload?: SharedCompletedDocsPayload;
   };
 }
 
@@ -113,7 +119,15 @@ export interface BackendRaceStartEvent {
 }
 export interface BackendPlayerDataChangeEvent {
   event: BackendEventType.PLAYER_DATA_CHANGE;
-  payload: Pick<Player, 'id' | 'username' | 'raceData'>;
+  payload: {
+    id: Player['id'];
+    username: Player['username'];
+    raceData:
+      | Player['raceData']
+      | {
+          completedDocs: SharedCompletedDocsPayload[];
+        };
+  };
 }
 export interface BackendRaceFinishEvent {
   event: BackendEventType.RACE_FINISH;

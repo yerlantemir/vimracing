@@ -1,11 +1,10 @@
-import { ExecutedCommand, RaceStatus } from '@vimracing/shared';
+import { RaceStatus, SharedCompletedDocsPayload } from '@vimracing/shared';
 import { Player } from './Player';
 import { EventEmitter } from 'events';
 import { Tail } from '../types/Tail';
 import { calculateDocCompleteness } from '../utils/calculateDocCompleteness';
 import { getRandomRaceData } from '../utils/getRandomRaceData';
-import { RaceDocs } from '@vimracing/shared';
-import { SupportedLanguages } from '@vimracing/shared';
+import { SupportedLanguages, RaceDocs } from '@vimracing/shared';
 
 const DEFAULT_WAITING_TIME_IN_S = 3;
 const DEFAULT_RACE_TIME_IN_S = 60;
@@ -92,7 +91,7 @@ export class Race {
     playerId: string,
     documentIndex: number,
     newDoc: string[],
-    executedCommands?: ExecutedCommand[]
+    sharedDocPayload?: SharedCompletedDocsPayload
   ) {
     if (this.status !== RaceStatus.ON) return;
     const player = this.getPlayer(playerId);
@@ -103,7 +102,7 @@ export class Race {
       this.raceDocs[documentIndex].target,
       newDoc
     );
-    player.updateDoc(newDoc, documentIndex, docCompleteness, executedCommands);
+    player.updateDoc(newDoc, documentIndex, docCompleteness, sharedDocPayload);
 
     if (docCompleteness === 100 && documentIndex === this.raceDocs.length - 1) {
       this.finishPlayerRace(playerId);

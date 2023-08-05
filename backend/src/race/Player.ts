@@ -1,4 +1,7 @@
-import { ExecutedCommand, Player as PlayerType } from '@vimracing/shared';
+import {
+  Player as PlayerType,
+  SharedCompletedDocsPayload
+} from '@vimracing/shared';
 
 export class Player implements PlayerType {
   id: string;
@@ -6,9 +9,10 @@ export class Player implements PlayerType {
   raceData?: {
     completeness?: number;
     currentDocIndex?: number;
-    docs?: string[][]; // TODO: probably should be deleted
+    completedDocs?: ({
+      doc?: string[];
+    } & SharedCompletedDocsPayload)[];
     place?: number;
-    executedCommands?: ExecutedCommand[][];
     isFinished?: boolean;
   };
 
@@ -19,7 +23,7 @@ export class Player implements PlayerType {
     this.raceData = raceData ?? {
       completeness: 0,
       currentDocIndex: 0,
-      docs: [],
+      completedDocs: [],
       isFinished: false
     };
   }
@@ -28,30 +32,39 @@ export class Player implements PlayerType {
     newDoc: string[],
     docIndex: number,
     newCompleteness: number,
-    executedCommands?: ExecutedCommand[] // send only when docIndex is changed
+    sharedDocPayload?: SharedCompletedDocsPayload
   ) {
-    let newDocs = [];
+    let newDocs: NonNullable<Player['raceData']>['completedDocs'] = [];
     // update existing one
-    if (this.raceData?.docs?.[docIndex]) {
-      newDocs = this.raceData.docs.map((doc, index) => {
-        if (index === docIndex) {
-          return newDoc;
+    if (this.raceData?.completedDocs?.[docIndex]?.doc) {
+      newDocs = this.raceData.completedDocs.map(
+        (completedDocPayload, index) => {
+          if (index === docIndex) {
+            return {
+              ...completedDocPayload,
+              ...(sharedDocPayload && sharedDocPayload),
+              doc: newDoc
+            };
+          }
+          return completedDocPayload;
         }
-        return doc;
-      });
+      );
     } else {
-      newDocs = [...(this.raceData?.docs ?? []), newDoc];
+      newDocs = [
+        ...(this.raceData?.completedDocs ?? []),
+        {
+          doc: newDoc,
+          executedCommands: sharedDocPayload?.executedCommands ?? [],
+          keysCount: sharedDocPayload?.keysCount ?? 0,
+          seconds: sharedDocPayload?.seconds ?? 0
+        }
+      ];
     }
 
     if (this.raceData) {
       this.raceData = {
         ...this.raceData,
-        docs: newDocs,
-        ...(executedCommands && {
-          executedCommands: this.raceData.executedCommands
-            ? [...this.raceData.executedCommands, executedCommands]
-            : [executedCommands]
-        }),
+        completedDocs: newDocs,
         completeness: newCompleteness,
         currentDocIndex: docIndex
       };
@@ -71,5 +84,17 @@ export class Player implements PlayerType {
 
   updateUsername(newUsername: string) {
     this.username = newUsername;
+  }
+
+  getSharedCompletedDocsData(): SharedCompletedDocsPayload[] {
+    return (
+      this.raceData?.completedDocs?.map((completedDocPayload) => {
+        return {
+          keysCount: completedDocPayload.keysCount,
+          seconds: completedDocPayload.seconds,
+          executedCommands: completedDocPayload.executedCommands
+        };
+      }) ?? []
+    );
   }
 }
