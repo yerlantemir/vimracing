@@ -79,7 +79,6 @@ export class Race {
     this.status = RaceStatus.FINISHED;
 
     this.setPlayersPlace();
-    // calculate places
     this.emit('raceFinished');
   }
 

@@ -3,6 +3,7 @@ import {
   SharedCompletedDocsPayload
 } from '@vimracing/shared';
 
+// be careful when assigning default values to raceData, it can be shared between players
 export const raceDataDefaults = {
   completeness: 0,
   currentDocIndex: 0,
@@ -27,7 +28,7 @@ export class Player implements PlayerType {
     this.id = id;
 
     this.username = username;
-    this.raceData = raceData ?? raceDataDefaults;
+    this.raceData = raceData ?? { ...raceDataDefaults };
   }
 
   updateDoc(

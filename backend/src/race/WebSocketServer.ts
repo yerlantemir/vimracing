@@ -167,10 +167,11 @@ export class WebSocketServer {
             id: newPlayer.id,
             username: newPlayer.username,
             raceData: {
-              completeness: newPlayer.raceData?.completeness,
-              currentDocIndex: newPlayer.raceData?.currentDocIndex,
+              completeness: newPlayer.raceData?.completeness ?? 0,
+              currentDocIndex: newPlayer.raceData?.currentDocIndex ?? 0,
               completedDocs: newPlayer.getSharedCompletedDocsData() ?? [],
-              place: newPlayer.raceData?.place
+              place: newPlayer.raceData?.place,
+              isFinished: newPlayer.raceData?.isFinished ?? false
             }
           }
         };
