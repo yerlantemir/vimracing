@@ -5,10 +5,11 @@ import { Tail } from '../types/Tail';
 import { calculateDocCompleteness } from '../utils/calculateDocCompleteness';
 import { getRandomRaceData } from '../utils/getRandomRaceData';
 import { SupportedLanguages, RaceDocs } from '@vimracing/shared';
-
-const DEFAULT_WAITING_TIME_IN_S = 3;
-const DEFAULT_RACE_TIME_IN_S = 60;
-const RACE_TIMER_UPDATE_INTERVAL_IN_MS = 1000;
+import {
+  DEFAULT_RACE_TIME_IN_S,
+  DEFAULT_WAITING_TIME_IN_S,
+  RACE_TIMER_UPDATE_INTERVAL_IN_MS
+} from '../shared/defaults';
 
 interface RaceEvents {
   playerAdded: (race: Race, player: Player) => void;
@@ -100,7 +101,6 @@ export class Race {
       this.raceDocs[player.raceData.currentDocIndex].target,
       newDoc
     );
-    player.updateDoc(newDoc, docCompleteness, sharedDocPayload);
 
     if (
       docCompleteness === 100 &&
@@ -108,6 +108,7 @@ export class Race {
     ) {
       this.finishPlayerRace(playerId);
     }
+    player.updateDoc(newDoc, docCompleteness, sharedDocPayload);
 
     this.emit('playerDataChanged', player);
   }
@@ -173,8 +174,9 @@ export class Race {
       const place =
         notFinishedPlayers.findIndex((p) => p.id === player.id) + startPlace;
       return new Player(player.id, player.username, {
-        ...player.raceData,
         ...raceDataDefaults,
+        completedDocs: [],
+        ...player.raceData,
         place,
         isFinished: true
       });

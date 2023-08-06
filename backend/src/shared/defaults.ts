@@ -1,0 +1,3 @@
+export const DEFAULT_WAITING_TIME_IN_S = 1;
+export const DEFAULT_RACE_TIME_IN_S = 60;
+export const RACE_TIMER_UPDATE_INTERVAL_IN_MS = 1000;

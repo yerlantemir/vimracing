@@ -2,12 +2,12 @@ import {
   Player as PlayerType,
   SharedCompletedDocsPayload
 } from '@vimracing/shared';
+import { DEFAULT_RACE_TIME_IN_S } from '../shared/defaults';
 
 // be careful when assigning default values to raceData, it can be shared between players
 export const raceDataDefaults = {
   completeness: 0,
   currentDocIndex: 0,
-  completedDocs: [],
   isFinished: false
 };
 
@@ -28,7 +28,7 @@ export class Player implements PlayerType {
     this.id = id;
 
     this.username = username;
-    this.raceData = raceData ?? { ...raceDataDefaults };
+    this.raceData = raceData ?? { ...raceDataDefaults, completedDocs: [] };
   }
 
   updateDoc(
@@ -41,11 +41,14 @@ export class Player implements PlayerType {
       doc: newDoc,
       executedCommands: sharedDocPayload?.executedCommands ?? [],
       keysCount: sharedDocPayload?.keysCount ?? 0,
-      seconds: sharedDocPayload?.seconds ?? 0
+      seconds: DEFAULT_RACE_TIME_IN_S - (sharedDocPayload?.seconds ?? 0)
     };
 
     if (newCompleteness === 100) {
       this.raceData.currentDocIndex++;
+      this.raceData.completeness = 0;
+    } else {
+      this.raceData.completeness = newCompleteness;
     }
   }
 
