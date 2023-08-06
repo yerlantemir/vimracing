@@ -37,7 +37,7 @@ export const useRace = (raceId: string) => {
 
   const [raceDocs, setRaceDocs] = useState<RaceDocs | undefined>(undefined);
 
-  const [currentPlayer, setCurrentPlayer] = useState<Player>(
+  const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(
     LocalStorageManager.getUser() as Player
   );
   const [players, setPlayers] = useState<Player[]>();
@@ -234,7 +234,7 @@ export const useRace = (raceId: string) => {
       newSocketConnection.removeEventListener('message', onMessageFromServer);
       socketConnection.current?.close();
     };
-  }, [currentPlayer.id, currentPlayer.username, onMessageFromServer, raceId]);
+  }, [currentPlayer?.id, currentPlayer?.username, onMessageFromServer, raceId]);
 
   return {
     raceDocs,
