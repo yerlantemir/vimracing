@@ -1,9 +1,17 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Editor } from '@/components/Editor';
 import { ExecutedCommand, Player } from '@vimracing/shared';
 import React from 'react';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { RaceDocs } from '@vimracing/shared';
+import './recap.css';
+import {
+  CommandIcon,
+  CounterIcon,
+  PlayerIcon,
+  RaceTimerIcon,
+  SecondsIcon
+} from '@/components/icons';
 
 interface IRecapProps {
   raceDocs: RaceDocs;
@@ -94,26 +102,42 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
       )}
 
-      {finishedPlayers.map((player) => {
-        if (
-          !player.raceData?.completedDocs?.[currentRecapTaskIndex]
-            ?.executedCommands
-        )
-          return null;
-        return (
-          <div key={player.id} className="flex items-center gap-4">
-            <span className="text-text text-sm opacity-80">
-              {player.username}
-            </span>
-            <Hotkeys
-              executedCommands={
-                player.raceData?.completedDocs?.[currentRecapTaskIndex]
-                  .executedCommands
-              }
-            />
-          </div>
-        );
-      })}
+      <div className="table">
+        <PlayerIcon />
+        <CommandIcon />
+        <CounterIcon />
+        <SecondsIcon />
+        <RaceTimerIcon />
+        {finishedPlayers.map((player) => {
+          if (
+            !player.raceData?.completedDocs?.[currentRecapTaskIndex]
+              ?.executedCommands
+          )
+            return null;
+          return (
+            <Fragment key={player.id}>
+              <span className="text-text text-sm opacity-80">
+                {player.username}
+              </span>
+              <Hotkeys
+                executedCommands={
+                  player.raceData?.completedDocs?.[currentRecapTaskIndex]
+                    .executedCommands
+                }
+              />
+              <span>
+                {player.raceData.completedDocs[currentRecapTaskIndex].keysCount}
+              </span>
+              <span>
+                {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
+              </span>
+              <span>
+                {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
+              </span>
+            </Fragment>
+          );
+        })}
+      </div>
     </>
   );
 };
