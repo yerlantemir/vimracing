@@ -4,7 +4,6 @@ import { ExecutedCommand, Player } from '@vimracing/shared';
 import React from 'react';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { RaceDocs } from '@vimracing/shared';
-import './recap.css';
 import {
   CommandIcon,
   CounterIcon,
@@ -12,6 +11,7 @@ import {
   RaceTimerIcon,
   SecondsIcon
 } from '@/components/icons';
+import { Tooltip } from '@/components/Tooltip';
 
 interface IRecapProps {
   raceDocs: RaceDocs;
@@ -102,18 +102,44 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
       )}
 
-      <div className="table">
-        <PlayerIcon />
-        <CommandIcon />
-        <CounterIcon />
-        <SecondsIcon />
-        <RaceTimerIcon />
+      <div
+        className="grid"
+        style={{
+          gridTemplateColumns:
+            'min-content 1fr min-content min-content min-content',
+          gap: '8px 1rem',
+          alignItems: 'center'
+        }}
+      >
+        <Tooltip text="Username">
+          <PlayerIcon />
+        </Tooltip>
+
+        <Tooltip text="Executed commands">
+          <CommandIcon />
+        </Tooltip>
+
+        <Tooltip text="Pressed keys count">
+          <CounterIcon />
+        </Tooltip>
+
+        <Tooltip text="Seconds">
+          <SecondsIcon />
+        </Tooltip>
+        <Tooltip text="Race timer">
+          <RaceTimerIcon />
+        </Tooltip>
         {finishedPlayers.map((player) => {
           if (
             !player.raceData?.completedDocs?.[currentRecapTaskIndex]
               ?.executedCommands
           )
             return null;
+
+          const currentDocSeconds =
+            player.raceData?.completedDocs?.[currentRecapTaskIndex].seconds -
+            (player.raceData?.completedDocs?.[currentRecapTaskIndex - 1]
+              ?.seconds ?? 0);
           return (
             <Fragment key={player.id}>
               <span className="text-text text-sm opacity-80">
@@ -128,9 +154,7 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
               <span>
                 {player.raceData.completedDocs[currentRecapTaskIndex].keysCount}
               </span>
-              <span>
-                {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
-              </span>
+              <span>{currentDocSeconds}</span>
               <span>
                 {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
               </span>
