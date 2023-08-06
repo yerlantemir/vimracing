@@ -37,7 +37,9 @@ export const useRace = (raceId: string) => {
 
   const [raceDocs, setRaceDocs] = useState<RaceDocs | undefined>(undefined);
 
-  const [currentPlayer, setCurrentPlayer] = useState<Player>();
+  const [currentPlayer, setCurrentPlayer] = useState<Player>(
+    LocalStorageManager.getUser() as Player
+  );
   const [players, setPlayers] = useState<Player[]>();
   const [raceTimer, setRaceTimer] = useState<number>();
   const [raceStatus, setRaceStatus] = useState<RaceStatus>();
@@ -214,9 +216,12 @@ export const useRace = (raceId: string) => {
     socketConnection.current?.send(JSON.stringify(payload));
   };
   useEffect(() => {
-    const user = LocalStorageManager.getUser();
-    const userIdParam = user?.id ? `&userId=${user.id}` : '';
-    const usernameParam = user?.username ? `&username=${user.username}` : '';
+    if (socketConnection.current) return;
+
+    const userIdParam = currentPlayer?.id ? `&userId=${currentPlayer.id}` : '';
+    const usernameParam = currentPlayer?.username
+      ? `&username=${currentPlayer.username}`
+      : '';
 
     const newSocketConnection = new WebSocket(
       `${process.env.NEXT_PUBLIC_BACKEND_WS_URL}/?raceId=${raceId}${userIdParam}${usernameParam}`
@@ -229,7 +234,7 @@ export const useRace = (raceId: string) => {
       newSocketConnection.removeEventListener('message', onMessageFromServer);
       socketConnection.current?.close();
     };
-  }, [onMessageFromServer, raceId]);
+  }, [currentPlayer.id, currentPlayer.username, onMessageFromServer, raceId]);
 
   return {
     raceDocs,
