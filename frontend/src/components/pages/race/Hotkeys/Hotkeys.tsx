@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Command } from './Command';
 import { AnimatePresence, useAnimate } from 'framer-motion';
 import { ExecutedCommand } from '@vimracing/shared';
+import './Hotkeys.css';
 
 interface IHotkeysProps {
   setExecutedCommands?: (ExecutedCommands: ExecutedCommand[]) => void;
@@ -17,6 +18,7 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
   keysCount,
   onKeyPressed
 }) => {
+  const commandsContainerRef = useRef<HTMLDivElement | null>(null);
   const [currentCommand, setCurrentCommand] = useState('');
   const [partialCommandExecuted, setPartialCommandExecuted] = useState(false);
   const lastPressedKey = useRef('');
@@ -140,9 +142,18 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
       ]
     : executedCommands;
 
+  useEffect(() => {
+    if (commandsContainerRef.current && executedCommands)
+      commandsContainerRef.current.scrollLeft =
+        commandsContainerRef.current.scrollWidth;
+  }, [executedCommands]);
+
   return (
     <>
-      <div className="flex gap-3 flex-wrap">
+      <div
+        className="flex gap-3 overflow-x-auto overflow-y-hidden commands"
+        ref={commandsContainerRef}
+      >
         <AnimatePresence>
           {allCommands.map((command, index) => {
             return <Command key={index} {...command} index={index} />;
