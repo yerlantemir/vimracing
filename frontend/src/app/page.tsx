@@ -5,7 +5,7 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Editor } from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
@@ -22,6 +22,8 @@ export default function Home() {
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
     []
   );
+
+  const [keysCount, setKeysCount] = useState<number[]>([]);
   const [selectedLang, setSelectedLang] = useState<SupportedLanguages>(
     SupportedLanguages.js
   );
@@ -96,6 +98,16 @@ export default function Home() {
     setDocumentIndex(0);
   };
 
+  const recapStatistics = useMemo(() => {
+    return keysCount.map((count, index) => {
+      return {
+        seconds: 0,
+        executedCommands: executedCommands[index],
+        keysCount: count
+      };
+    });
+  }, [keysCount, executedCommands]);
+
   return (
     <>
       <div
@@ -136,7 +148,7 @@ export default function Home() {
           {recapRaceData ? (
             <TrainingRecap
               raceDocs={recapRaceData}
-              executedCommands={executedCommands}
+              sharedCompletedDocsPayload={recapStatistics}
             />
           ) : (
             <>

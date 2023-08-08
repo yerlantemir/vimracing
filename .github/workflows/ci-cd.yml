@@ -20,7 +20,8 @@ jobs:
           script: |
             cd /home/vimracing 
 
-            git pull 
+            git fetch origin
+            git reset --hard origin/main
             yarn
 
             cd shared 
