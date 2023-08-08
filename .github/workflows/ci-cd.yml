@@ -30,7 +30,7 @@ jobs:
             cd ../frontend
             yarn build
             pm2 delete -s vimracing || : 
-            pm2 start --name api.vimracing
+            pm2 start "yarn start" --name vimracing
 
             cd ../backend 
             yarn run build 
