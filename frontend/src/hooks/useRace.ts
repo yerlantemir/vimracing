@@ -1,3 +1,4 @@
+import { raceDataDefaults } from '@/shared/defaults';
 import { LocalStorageManager } from '@/utils/storage';
 import { RaceDocs, SharedCompletedDocsPayload } from '@vimracing/shared';
 import {
@@ -24,13 +25,6 @@ type BackendRaceEvent =
   | BackendRaceStartEvent
   | BackendPlayerDataChangeEvent
   | BackendRaceFinishEvent;
-
-export const raceDataDefaults = {
-  completeness: 0,
-  currentDocIndex: 0,
-  completedDocs: [],
-  isFinished: false
-};
 
 export const useRace = (raceId: string) => {
   const socketConnection = useRef<WebSocket | undefined>();

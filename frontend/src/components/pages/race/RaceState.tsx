@@ -12,6 +12,7 @@ import { Hotkeys } from './Hotkeys/Hotkeys';
 import { Recap } from './Recap';
 import { Timer } from '@/components/Timer';
 import { getPostfixedPlace } from '@/utils/postfix';
+import { raceDataDefaults } from '@/shared/defaults';
 
 interface RaceStateProps {
   raceDocs: RaceDocs;
@@ -135,6 +136,7 @@ export const RaceState: React.FC<RaceStateProps> = ({
           currentPlayer={{
             ...currentPlayer,
             raceData: {
+              ...raceDataDefaults,
               ...currentPlayer.raceData,
               currentDocIndex: documentIndex
             }

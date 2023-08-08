@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Editor } from '@/components/Editor';
-import { ExecutedCommand, Player } from '@vimracing/shared';
+import { Player, SharedCompletedDocsPayload } from '@vimracing/shared';
 import React from 'react';
 import { Hotkeys } from './Hotkeys/Hotkeys';
 import { RaceDocs } from '@vimracing/shared';
@@ -12,6 +12,7 @@ import {
   SecondsIcon
 } from '@/components/icons';
 import { Tooltip } from '@/components/Tooltip';
+import { raceDataDefaults } from '@/shared/defaults';
 
 interface IRecapProps {
   raceDocs: RaceDocs;
@@ -81,14 +82,91 @@ const TasksList = ({
     </div>
   );
 };
-export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
-  const [currentRecapTaskIndex, setCurrentRecapTaskIndex] = useState(0);
 
+const RecapTable = ({
+  players,
+  currentRecapTaskIndex,
+  isTraining = false
+}: {
+  players: Player[];
+  currentRecapTaskIndex: number;
+  isTraining?: boolean;
+}) => {
   const finishedPlayers = players.filter(
     (player) =>
       player.raceData?.completedDocs?.length &&
       player.raceData?.completedDocs?.length > 0
   );
+  return (
+    <div
+      className="grid"
+      style={{
+        gridTemplateColumns: `${
+          isTraining ? '' : 'min-content'
+        } 1fr min-content min-content min-content`,
+        gap: '8px 1rem',
+        alignItems: 'center'
+      }}
+    >
+      {!isTraining && (
+        <Tooltip text="Username">
+          <PlayerIcon />
+        </Tooltip>
+      )}
+
+      <Tooltip text="Executed commands">
+        <CommandIcon />
+      </Tooltip>
+
+      <Tooltip text="Pressed keys count">
+        <CounterIcon />
+      </Tooltip>
+
+      <Tooltip text="Seconds">
+        <SecondsIcon />
+      </Tooltip>
+      <Tooltip text="Race timer">
+        <RaceTimerIcon />
+      </Tooltip>
+      {finishedPlayers.map((player) => {
+        if (
+          !player.raceData?.completedDocs?.[currentRecapTaskIndex]
+            ?.executedCommands
+        )
+          return null;
+
+        const currentDocSeconds =
+          player.raceData?.completedDocs?.[currentRecapTaskIndex].seconds -
+          (player.raceData?.completedDocs?.[currentRecapTaskIndex - 1]
+            ?.seconds ?? 0);
+        return (
+          <Fragment key={player.id}>
+            {!isTraining && (
+              <span className="text-text text-sm opacity-80">
+                {player.username}
+              </span>
+            )}
+            <Hotkeys
+              executedCommands={
+                player.raceData?.completedDocs?.[currentRecapTaskIndex]
+                  .executedCommands
+              }
+            />
+            <span>
+              {player.raceData.completedDocs[currentRecapTaskIndex].keysCount}
+            </span>
+            <span>{currentDocSeconds}</span>
+            <span>
+              {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
+            </span>
+          </Fragment>
+        );
+      })}
+    </div>
+  );
+};
+export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
+  const [currentRecapTaskIndex, setCurrentRecapTaskIndex] = useState(0);
 
   return (
     <>
@@ -101,79 +179,22 @@ export const Recap: React.FC<IRecapProps> = ({ raceDocs, players }) => {
       {raceDocs && raceDocs[currentRecapTaskIndex] && (
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
       )}
-
-      <div
-        className="grid"
-        style={{
-          gridTemplateColumns:
-            'min-content 1fr min-content min-content min-content',
-          gap: '8px 1rem',
-          alignItems: 'center'
-        }}
-      >
-        <Tooltip text="Username">
-          <PlayerIcon />
-        </Tooltip>
-
-        <Tooltip text="Executed commands">
-          <CommandIcon />
-        </Tooltip>
-
-        <Tooltip text="Pressed keys count">
-          <CounterIcon />
-        </Tooltip>
-
-        <Tooltip text="Seconds">
-          <SecondsIcon />
-        </Tooltip>
-        <Tooltip text="Race timer">
-          <RaceTimerIcon />
-        </Tooltip>
-        {finishedPlayers.map((player) => {
-          if (
-            !player.raceData?.completedDocs?.[currentRecapTaskIndex]
-              ?.executedCommands
-          )
-            return null;
-
-          const currentDocSeconds =
-            player.raceData?.completedDocs?.[currentRecapTaskIndex].seconds -
-            (player.raceData?.completedDocs?.[currentRecapTaskIndex - 1]
-              ?.seconds ?? 0);
-          return (
-            <Fragment key={player.id}>
-              <span className="text-text text-sm opacity-80">
-                {player.username}
-              </span>
-              <Hotkeys
-                executedCommands={
-                  player.raceData?.completedDocs?.[currentRecapTaskIndex]
-                    .executedCommands
-                }
-              />
-              <span>
-                {player.raceData.completedDocs[currentRecapTaskIndex].keysCount}
-              </span>
-              <span>{currentDocSeconds}</span>
-              <span>
-                {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
-              </span>
-            </Fragment>
-          );
-        })}
-      </div>
+      <RecapTable
+        currentRecapTaskIndex={currentRecapTaskIndex}
+        players={players}
+      />
     </>
   );
 };
 
 interface ITrainingRecapProps {
   raceDocs: RaceDocs;
-  executedCommands: ExecutedCommand[][];
+  sharedCompletedDocsPayload: SharedCompletedDocsPayload[];
 }
 
 export const TrainingRecap: React.FC<ITrainingRecapProps> = ({
   raceDocs,
-  executedCommands
+  sharedCompletedDocsPayload
 }) => {
   const [currentRecapTaskIndex, setCurrentRecapTaskIndex] = useState(0);
 
@@ -190,7 +211,20 @@ export const TrainingRecap: React.FC<ITrainingRecapProps> = ({
         <Editor raceDoc={raceDocs[currentRecapTaskIndex]} readOnly />
       )}
 
-      <Hotkeys executedCommands={executedCommands[currentRecapTaskIndex]} />
+      <RecapTable
+        players={[
+          {
+            id: '1',
+            username: 'Player 1',
+            raceData: {
+              ...raceDataDefaults,
+              completedDocs: sharedCompletedDocsPayload
+            }
+          }
+        ]}
+        currentRecapTaskIndex={currentRecapTaskIndex}
+        isTraining={true}
+      />
     </>
   );
 };
