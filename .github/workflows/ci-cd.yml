@@ -1,11 +1,10 @@
-name: CI/CD Workflow
+name: Deploy
 
 on:
   workflow_dispatch:
   push:
-    branches: [main]
-    paths:
-      - 'backend/**'
+    tags:
+      - 'v*'
 
 jobs:
   deploy:
@@ -18,4 +17,22 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          script: 'cd /home/vimracing && git pull && yarn && cd shared && yarn build && cd ../backend && yarn run build && pm2 delete -s vimracing || : && pm2 start dist/index.js --name vimracing'
+          script: | 
+          cd /home/vimracing 
+
+          git pull 
+          yarn
+
+          cd shared 
+          yarn build 
+
+          cd ../frontend
+          yarn build
+          pm2 delete -s vimracing || : 
+          pm2 start --name api.vimracing
+
+          cd ../backend 
+          yarn run build 
+
+          pm2 delete -s api.vimracing || : 
+          pm2 start dist/index.js --name api.vimracing
