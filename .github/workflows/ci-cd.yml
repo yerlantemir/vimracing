@@ -1,5 +1,9 @@
 name: Deploy
 
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
 on:
   workflow_dispatch:
   push:
@@ -11,15 +15,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to DO
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18.1'
+
+      - name: Extract Tag Name
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Build Shared Package
+        run: |
+          cd shared
+          yarn build
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Frontend Project
+        run: |
+          cd frontend
+          vercel env add production NEXT_PUBLIC_VERSION $VERSION --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Frontend Project to Vercel
+        run: |
+          cd frontend
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy backend
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            cd /home/vimracing 
-
+            cd /home/vimracing
             git fetch origin
             git reset --hard origin/main
             yarn
@@ -27,13 +69,7 @@ jobs:
             cd shared 
             yarn build 
 
-            cd ../frontend
-            yarn build
-            pm2 delete -s vimracing || : 
-            pm2 start "yarn start" --name vimracing
-
             cd ../backend 
             yarn run build 
-
             pm2 delete -s api.vimracing || : 
             pm2 start dist/index.js --name api.vimracing
