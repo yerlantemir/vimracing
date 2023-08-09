@@ -35,7 +35,7 @@ jobs:
           rm -rf $(yarn cache dir)
 
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install  --network-concurrency 1
 
       - name: Build Shared Package
         run: |
@@ -51,7 +51,8 @@ jobs:
       - name: Build Frontend Project
         run: |
           cd frontend
-          vercel env add plain NEXT_PUBLIC_VERSION $VERSION production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add NEXT_PUBLIC_VERSION production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env set NEXT_PUBLIC_VERSION $VERSION production --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Frontend Project to Vercel
