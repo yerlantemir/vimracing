@@ -29,6 +29,9 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn
 
+      - name: Clear Yarn Cache
+        run: yarn cache clean
+
       - name: Install Dependencies
         run: yarn install
 
