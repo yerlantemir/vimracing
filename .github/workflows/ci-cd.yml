@@ -24,23 +24,7 @@ jobs:
           node-version: '18.1'
 
       - name: Extract Tag Name
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-
-      - name: Install Yarn
-        run: npm install -g yarn@1.22.19
-
-      - name: Clear Yarn Cache
-        run: |
-          yarn cache clean
-          rm -rf $(yarn cache dir)
-
-      - name: Install Dependencies
-        run: yarn install  --network-concurrency 1
-
-      - name: Build Shared Package
-        run: |
-          cd shared
-          yarn build
+        run: echo "VERSION=$(git tag --list 'web-v*' --sort=-v:refname | head -n 1)" >> $GITHUB_ENV
 
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
@@ -51,8 +35,9 @@ jobs:
       - name: Build Frontend Project
         run: |
           cd frontend
-          vercel env add NEXT_PUBLIC_VERSION production --token=${{ secrets.VERCEL_TOKEN }}
-          vercel env set NEXT_PUBLIC_VERSION $VERSION production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env rm NEXT_PUBLIC_VERSION production --token=${{ secrets.VERCEL_TOKEN }} -y |:
+          echo $VERSION | vercel env add NEXT_PUBLIC_VERSION production --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Frontend Project to Vercel
