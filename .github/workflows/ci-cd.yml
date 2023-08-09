@@ -49,7 +49,7 @@ jobs:
       - name: Build Frontend Project
         run: |
           cd frontend
-          vercel env add production NEXT_PUBLIC_VERSION $VERSION --token=${{ secrets.VERCEL_TOKEN }}
+          vercel env add plain NEXT_PUBLIC_VERSION $VERSION production --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Frontend Project to Vercel
