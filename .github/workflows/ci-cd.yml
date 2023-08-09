@@ -30,7 +30,9 @@ jobs:
         run: npm install -g yarn@1.22.19
 
       - name: Clear Yarn Cache
-        run: yarn cache clean
+        run: |
+          yarn cache clean
+          rm -rf $(yarn cache dir)
 
       - name: Install Dependencies
         run: yarn install
