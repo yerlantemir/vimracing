@@ -72,25 +72,11 @@ jobs:
           key: ${{ secrets.KEY }}
           script: |
             cd /home/vimracing/backend
+
+            # fixes the issue https://github.com/appleboy/scp-action/issues/133
+            rm -rf dist || true
+            mv backend/dist ./
+            rm -rf apps || true
+
             pm2 delete -s api.vimracing || true
             pm2 start dist/index.js --name api.vimracing
-
-      # - name: Deploy backend
-      #   uses: appleboy/ssh-action@v1.0.0
-      #   with:
-      #     host: ${{ secrets.HOST }}
-      #     username: ${{ secrets.USERNAME }}
-      #     key: ${{ secrets.KEY }}
-      #     script: |
-      #       cd /home/vimracing
-      #       git fetch origin
-      #       git reset --hard origin/main
-      #       yarn
-
-      #       cd shared
-      #       yarn build
-
-      #       cd ../backend
-      #       yarn run build
-      #       pm2 delete -s api.vimracing || :
-      #       pm2 start dist/index.js --name api.vimracing
