@@ -26,6 +26,14 @@ jobs:
       - name: Extract Tag Name
         run: echo "VERSION=$(git tag --list 'web-v*' --sort=-v:refname | head -n 1)" >> $GITHUB_ENV
 
+      - name: Install Yarn
+        run: npm install -g yarn@1.22.19
+
+      - name: Clear Yarn Cache
+        run: |
+          yarn cache clean
+          rm -rf $(yarn cache dir)
+
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
@@ -35,15 +43,12 @@ jobs:
       - name: Build Frontend Project
         run: |
           cd frontend
-          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
           vercel env rm NEXT_PUBLIC_VERSION production --token=${{ secrets.VERCEL_TOKEN }} -y |:
           echo $VERSION | vercel env add NEXT_PUBLIC_VERSION production --token=${{ secrets.VERCEL_TOKEN }}
           vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy Frontend Project to Vercel
-        run: |
-          cd frontend
-          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy backend
         uses: appleboy/ssh-action@v1.0.0
