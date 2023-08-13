@@ -12,7 +12,10 @@ import {
   SecondsIcon
 } from '@/components/icons';
 import { Tooltip } from '@/components/Tooltip';
-import { raceDataDefaults } from '@/shared/defaults';
+import {
+  DEFAULT_TRAINING_RACE_TIME,
+  raceDataDefaults
+} from '@/shared/defaults';
 
 interface IRecapProps {
   raceDocs: RaceDocs;
@@ -135,10 +138,11 @@ const RecapTable = ({
         )
           return null;
 
-        const currentDocSeconds =
-          player.raceData?.completedDocs?.[currentRecapTaskIndex].seconds -
-          (player.raceData?.completedDocs?.[currentRecapTaskIndex - 1]
-            ?.seconds ?? 0);
+        const prevRaceSeconds =
+          player.raceData?.completedDocs?.[currentRecapTaskIndex - 1]
+            ?.seconds ?? DEFAULT_TRAINING_RACE_TIME;
+        const currentRaceSeconds =
+          player.raceData?.completedDocs?.[currentRecapTaskIndex].seconds;
         return (
           <Fragment key={player.id}>
             {!isTraining && (
@@ -155,7 +159,7 @@ const RecapTable = ({
             <span>
               {player.raceData.completedDocs[currentRecapTaskIndex].keysCount}
             </span>
-            <span>{currentDocSeconds}</span>
+            <span>{prevRaceSeconds - currentRaceSeconds}</span>
             <span>
               {player.raceData.completedDocs[currentRecapTaskIndex].seconds}
             </span>

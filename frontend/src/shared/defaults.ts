@@ -4,3 +4,5 @@ export const raceDataDefaults = {
   completedDocs: [],
   isFinished: false
 };
+
+export const DEFAULT_TRAINING_RACE_TIME = 60;

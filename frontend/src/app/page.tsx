@@ -5,15 +5,20 @@ import { Button } from '@/components/Button';
 import { createRace } from '@/api/createRace';
 import { useRouter } from 'next/navigation';
 import { LocalStorageManager } from '@/utils/storage';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Editor } from '@/components/Editor';
 import { Hotkeys } from '@/components/pages/race/Hotkeys/Hotkeys';
 import { useTraining } from '@/hooks/useTraining';
-import { ExecutedCommand, SupportedLanguages } from '@vimracing/shared';
+import {
+  RaceDocs,
+  ExecutedCommand,
+  SupportedLanguages
+} from '@vimracing/shared';
 import { TrainingRecap } from '@/components/pages/race/Recap';
 import { RefreshIcon } from '@/components/icons';
 import { LoadingIcon } from '@/components/Loading';
-import { RaceDocs } from '@vimracing/shared';
+import { Timer } from '@/components/Timer';
+import { DEFAULT_TRAINING_RACE_TIME } from '@/shared/defaults';
 
 export default function Home() {
   const router = useRouter();
@@ -22,12 +27,17 @@ export default function Home() {
   const [executedCommands, setExecutedCommands] = useState<ExecutedCommand[][]>(
     []
   );
+  const [raceSeconds, setRaceSeconds] = useState<number[]>([]);
+  const [touched, setTouched] = useState(false);
+  const [raceTime, setRaceTime] = useState(DEFAULT_TRAINING_RACE_TIME);
 
   const [keysCount, setKeysCount] = useState<number[]>([]);
   const [selectedLang, setSelectedLang] = useState<SupportedLanguages>(
     SupportedLanguages.js
   );
   const [documentIndex, setDocumentIndex] = useState<number>(0);
+  const docIndexRef = useRef(0);
+
   const { raceData } = useTraining({
     selectedLang,
     isShowingRecap: !!recapRaceData
@@ -63,12 +73,39 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (!raceData?.[documentIndex]) {
+    let interval: NodeJS.Timer | undefined = undefined;
+    if (touched) {
+      interval = setInterval(() => {
+        setRaceTime((prev) => {
+          if (prev === 1) {
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [touched]);
+
+  // document changed
+  useEffect(() => {
+    if (docIndexRef.current !== documentIndex) {
+      docIndexRef.current = documentIndex;
+      setRaceSeconds((prev) => [...prev, raceTime]);
+    }
+  }, [documentIndex, raceTime]);
+
+  // finish training race
+  useEffect(() => {
+    if (!raceData?.[documentIndex] || raceTime === 0) {
       setRecapRaceData(raceData);
       setDocumentIndex(0);
       return;
     }
-  }, [documentIndex, raceData]);
+  }, [documentIndex, raceData, raceTime]);
 
   const onExecutedCommandsChangeCallback = useCallback(
     (executedCommands: ExecutedCommand[]) => {
@@ -88,6 +125,9 @@ export default function Home() {
   );
 
   const onKeyPressedCallback = useCallback(() => {
+    if (!touched) {
+      setTouched(true);
+    }
     setKeysCount((prev) => {
       if (documentIndex === prev.length - 1) {
         return prev.map((count, index) => {
@@ -99,7 +139,7 @@ export default function Home() {
       }
       return [...prev, 1];
     });
-  }, [documentIndex]);
+  }, [documentIndex, touched]);
 
   const onRefreshClick = () => {
     setRecapRaceData(null);
@@ -115,12 +155,12 @@ export default function Home() {
   const recapStatistics = useMemo(() => {
     return keysCount.map((count, index) => {
       return {
-        seconds: 0,
+        seconds: raceSeconds[index],
         executedCommands: executedCommands[index],
         keysCount: count
       };
     });
-  }, [keysCount, executedCommands]);
+  }, [keysCount, raceSeconds, executedCommands]);
 
   return (
     <>
@@ -166,12 +206,15 @@ export default function Home() {
             />
           ) : (
             <>
-              {raceData && (
-                <span className="text-xs">
-                  <span className="text-primary">{documentIndex + 1}</span>/
-                  {raceData.length}
-                </span>
-              )}
+              <div className="flex justify-between">
+                {raceData && (
+                  <span className="text-xs">
+                    <span className="text-primary">{documentIndex + 1}</span>/
+                    {raceData.length}
+                  </span>
+                )}
+                <Timer time={raceTime} />
+              </div>
               {raceData && raceData[documentIndex] && (
                 <Editor
                   raceDoc={raceData[documentIndex]}
