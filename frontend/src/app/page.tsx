@@ -87,6 +87,20 @@ export default function Home() {
     [documentIndex]
   );
 
+  const onKeyPressedCallback = useCallback(() => {
+    setKeysCount((prev) => {
+      if (documentIndex === prev.length - 1) {
+        return prev.map((count, index) => {
+          if (index === documentIndex) {
+            return count + 1;
+          }
+          return count;
+        });
+      }
+      return [...prev, 1];
+    });
+  }, [documentIndex]);
+
   const onRefreshClick = () => {
     setRecapRaceData(null);
     setExecutedCommands([]);
@@ -168,6 +182,8 @@ export default function Home() {
                 key={documentIndex}
                 setExecutedCommands={onExecutedCommandsChangeCallback}
                 executedCommands={executedCommands[documentIndex] ?? []}
+                keysCount={keysCount[documentIndex] ?? 0}
+                onKeyPressed={onKeyPressedCallback}
               />
             </>
           )}
