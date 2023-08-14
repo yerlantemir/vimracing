@@ -34,6 +34,8 @@ type EditorConfig = Partial<DirectMergeConfig> & {
   raceDoc: RaceDocs[number];
   readOnly?: boolean;
   theme: Theme;
+  isCreatingRace?: boolean;
+  onTargetDocChange?: (doc: string[]) => void;
 };
 
 const HORIZONTAL_CHARACTERS_LIMIT = 50;
@@ -80,13 +82,23 @@ const createDefaultMergeViewConfig = (config?: EditorConfig) => ({
     doc: Text.of(config?.raceDoc?.target ?? []),
     extensions: [
       javascript(),
-      EditorView.theme({
-        '&': {
-          pointerEvents: 'none',
-          userSelect: 'none'
-        }
-      }),
-      EditorView.editable.of(false)
+      ...(!config?.isCreatingRace
+        ? [
+            EditorView.theme({
+              '&': {
+                pointerEvents: 'none',
+                userSelect: 'none'
+              }
+            }),
+            EditorView.editable.of(false)
+          ]
+        : [
+            EditorView.updateListener.of((v: ViewUpdate) => {
+              if (v.docChanged) {
+                config?.onTargetDocChange?.(v.state.doc.toJSON());
+              }
+            })
+          ])
     ]
   },
   highlightChanges: true,
@@ -127,7 +139,9 @@ export const isTextEqual = (a: string[], b: string[]) => {
 export const Editor: React.FC<Omit<EditorConfig, 'parent' | 'theme'>> = ({
   onChange,
   raceDoc,
-  readOnly
+  readOnly,
+  isCreatingRace,
+  onTargetDocChange
 }) => {
   const editorParentElement = useRef<HTMLDivElement | null>(null);
   const [currentEditor, setCurrentEditor] = useState<
@@ -153,7 +167,9 @@ export const Editor: React.FC<Omit<EditorConfig, 'parent' | 'theme'>> = ({
       parent: editorParentElement.current,
       onChange,
       theme,
-      readOnly
+      readOnly,
+      isCreatingRace,
+      onTargetDocChange
     };
 
     const shouldBeUnified = raceDoc.source?.includes('github');
