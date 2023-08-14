@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { SupportedLanguages } from '@vimracing/shared';
-import { getRandomRaceData } from '../utils/getRandomRaceData';
+import { getRandomRaceData } from '../../utils/getRandomRaceData';
 
 const router = Router();
 

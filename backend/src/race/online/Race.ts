@@ -1,15 +1,15 @@
 import { RaceStatus, SharedCompletedDocsPayload } from '@vimracing/shared';
 import { Player, raceDataDefaults } from './Player';
 import { EventEmitter } from 'events';
-import { Tail } from '../types/Tail';
-import { calculateDocCompleteness } from '../utils/calculateDocCompleteness';
-import { getRandomRaceData } from '../utils/getRandomRaceData';
+import { Tail } from '../../types/Tail';
+import { calculateDocCompleteness } from '../../utils/calculateDocCompleteness';
+import { getRandomRaceData } from '../../utils/getRandomRaceData';
 import { SupportedLanguages, RaceDocs } from '@vimracing/shared';
 import {
   DEFAULT_RACE_TIME_IN_S,
   DEFAULT_WAITING_TIME_IN_S,
   RACE_TIMER_UPDATE_INTERVAL_IN_MS
-} from '../shared/defaults';
+} from '../../shared/defaults';
 
 interface RaceEvents {
   playerAdded: (race: Race, player: Player) => void;

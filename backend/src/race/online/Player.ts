@@ -2,7 +2,7 @@ import {
   Player as PlayerType,
   SharedCompletedDocsPayload
 } from '@vimracing/shared';
-import { DEFAULT_RACE_TIME_IN_S } from '../shared/defaults';
+import { DEFAULT_RACE_TIME_IN_S } from '../../shared/defaults';
 
 // be careful when assigning default values to raceData, it can be shared between players
 export const raceDataDefaults = {

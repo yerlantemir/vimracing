@@ -4,7 +4,7 @@ import util from 'util';
 import { SupportedLanguages } from '@vimracing/shared';
 import { RaceDocs } from '@vimracing/shared';
 
-const racesDataPath = path.resolve(__dirname, '../../racesData');
+const racesDataPath = path.resolve(__dirname, '../../../racesData');
 const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
 

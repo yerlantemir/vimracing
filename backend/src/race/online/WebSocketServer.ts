@@ -17,8 +17,8 @@ import {
   FrontendUsernameChangeEvent
 } from '@vimracing/shared';
 import { Player } from './Player';
-import { validateUsername } from '../utils/validateUsername';
 import { SupportedLanguages } from '@vimracing/shared';
+import { validateUsername } from '../../utils/validateUsername';
 
 export class WebSocketServer {
   private server: WebSocket.Server;
