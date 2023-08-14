@@ -5,6 +5,7 @@ import { Command } from './Command';
 import { AnimatePresence, useAnimate } from 'framer-motion';
 import { ExecutedCommand } from '@vimracing/shared';
 import './Hotkeys.css';
+import { CounterIcon } from '@/components/icons';
 
 interface IHotkeysProps {
   setExecutedCommands?: (ExecutedCommands: ExecutedCommand[]) => void;
@@ -151,7 +152,7 @@ export const Hotkeys: React.FC<IHotkeysProps> = ({
   return (
     <>
       <div
-        className="flex gap-3 overflow-x-auto overflow-y-hidden commands"
+        className="flex gap-3 overflow-x-auto overflow-y-hidden commands py-2"
         ref={commandsContainerRef}
       >
         <AnimatePresence>
@@ -171,10 +172,16 @@ const KeysCounter: React.FC<{ count: number }> = ({ count }) => {
 
   useEffect(() => {
     if (count !== prevCount.current) {
-      animate(scope.current, {
-        scale: [1.5, 1],
-        color: ['var(--color-text)', 'var(--color-primary)']
-      });
+      animate(
+        scope.current,
+        {
+          scale: [1, 1.5, 1]
+        },
+        {
+          times: [0.9, 1],
+          duration: 0.3
+        }
+      );
     }
     prevCount.current = count;
   }, [animate, count, scope]);
@@ -182,10 +189,9 @@ const KeysCounter: React.FC<{ count: number }> = ({ count }) => {
   if (!count) return null;
 
   return (
-    <div className="flex justify-center">
-      <span className="text-xl" ref={scope}>
-        {count}
-      </span>
+    <div className="text-xl flex justify-center items-center gap-2" ref={scope}>
+      <CounterIcon className="h-4 w-4" />
+      {count}
     </div>
   );
 };

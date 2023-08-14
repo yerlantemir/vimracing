@@ -1,3 +1,10 @@
+import { RaceTimerIcon } from './icons';
+
 export const Timer = ({ time }: { time: number }) => {
-  return <span className="text-primary text-sm">{time}</span>;
+  return (
+    <div className="flex items-center gap-2">
+      <RaceTimerIcon />
+      <span className="text-sm">{time}</span>
+    </div>
+  );
 };
